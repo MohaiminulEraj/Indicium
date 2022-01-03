@@ -1,0 +1,302 @@
+@import url("https://fonts.googleapis.com/css2?family=Sen:wght@800&display=swap");
+.deskBr,
+.deskLogo {
+  display: flex;
+}
+.header3rdSectionDesk,
+.showDesk {
+  display: block;
+}
+.showDeskFlex {
+  display: flex;
+}
+.mobileBr,
+.mobileLogo,
+.header3rdSectionMobile,
+.showMobile,
+.showMobileBlock {
+  display: none;
+}
+@media only screen and (max-width: 500px) {
+  .deskBr,
+  .deskLogo,
+  .header3rdSectionDesk,
+  .showDesk {
+    display: none;
+  }
+  .mobileBr,
+  .mobileLogo,
+  .header3rdSectionMobile,
+  .showMobile {
+    display: flex;
+  }
+  .showMobileBlock {
+    display: block;
+  }
+  .section1HeadingSubMobileColor {
+    color: #b3ff24;
+  }
+  .section1HeadingMobile {
+    font-size: 44px;
+  }
+  .headerBgLayerMobile {
+    display: none;
+  }
+  .HeaderBg {
+    background-color: #000305;
+  }
+  .header3rdSectionCol2Img {
+    width: 80%;
+    height: auto;
+  }
+  .header3rdSectionButtonsMobile {
+    justify-content: center;
+    margin-top: 40px;
+  }
+  .gradientBtn {
+    font-size: 14px;
+    margin-right: 10px;
+    width: 110px;
+    height: 38px;
+    background-image: linear-gradient(to left, #be44ca, #7429f1);
+  }
+  .artistCardBtnMobile {
+    font-size: 14px;
+    margin-right: 10px;
+    width: 110px;
+    height: 38px;
+  }
+  .HeaderBg {
+    min-height: 700px;
+  }
+  .selectionTabsMobileRow {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .selectionTabsMobileRow .col-sm-2 {
+    width: 48%;
+    margin-bottom: 20px;
+  }
+  .popularMobileRow {
+    width: 100% !important;
+  }
+  .selectionTab {
+    min-height: 62px;
+  }
+  .selectionTabImgWrapper {
+    width: 20px;
+    height: 20px;
+  }
+  .aboutUsSectionTitleMobile {
+    background: -webkit-linear-gradient(#41b6e6, #be44ca);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    height: 49px;
+    padding-top: 10px;
+  }
+  .aboutUsSectionButtonsWrapper {
+    margin-top: 20px;
+  }
+  .aboutUsSectionButton {
+    background-image: linear-gradient(to right, #7429f1, #be44ca);
+    width: 105px;
+    height: 35px;
+    font-size: 11px;
+  }
+  .aboutUsSectionButtonDisable {
+    opacity: 1;
+    background-image: none;
+    background-color: #1a1022 !important;
+  }
+  .aboutSectionRow2 .col-sm-6 .row {
+    text-align: center;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .aboutSectionRow2CardTitle {
+    font-size: 22px;
+  }
+  .aboutSectionRow2CardTagline {
+    font-size: 16px;
+  }
+  .showMobileBlock .row .col-sm-3 {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+  .mobileVideo {
+    margin-bottom: 40px;
+  }
+  .aboutUsSection {
+    padding-bottom: 20px;
+  }
+  .partnersSection {
+    min-height: 420px;
+  }
+  .partnersCardWrapper .col-sm-2 {
+    width: 20%;
+    padding-right: 5px;
+    padding-left: 0px;
+  }
+  .partnersCard {
+    height: 40px;
+  }
+  .ourPartnerTitle,
+  .footerTitile {
+    background: -webkit-linear-gradient(#41b6e6, #be44ca);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    height: 49px;
+    padding-top: 10px;
+    margin-bottom: 20px !important;
+    font-size: 30px;
+  }
+  .footerContainer {
+    padding-left: 10px;
+    text-align: center;
+  }
+  .footercol1Text {
+    font-size: 16px;
+  }
+  .footerContainer .row .col-sm-2 {
+    width: 50%;
+    margin-top: 10px;
+  }
+  .footerContainer .row {
+    text-align: center;
+  }
+  .footerMidColTitle {
+    margin-bottom: 20px;
+  }
+  .footerEmailInput {
+    width: 85%;
+  }
+  .trendingTitle {
+    font-size: 28px;
+  }
+  .trending {
+    text-align: center;
+  }
+  .trendingTitle {
+    color: #cfff65;
+  }
+  .trendingCardInfoWrapperRow1Col2 {
+    justify-content: flex-end;
+  }
+  .trendingCardInfoWrapperRow .col-sm-8 {
+    width: 50%;
+  }
+  .trendingCardInfoWrapperRow .col-sm-4 {
+    width: 50%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .trendingCardsRow .col-sm-4 {
+    margin-bottom: 20px;
+  }
+  .trendingSecBtnWrapper {
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+  .artistCardCol {
+    margin-bottom: 20px;
+  }
+  .artistCardInfoRow .col-sm-4 {
+    width: 30%;
+  }
+  .popularCardImages .col-sm-4 {
+    width: 33.3%;
+  }
+  .navBarDiscover {
+    height: 150px;
+  }
+  .discoverSection {
+    text-align: center;
+  }
+  .discoverTitleWrapper {
+    height: 60px;
+  }
+  .trendingDateWrapper {
+    width: auto;
+    margin-bottom: 12px;
+  }
+  .discoverHeadBar {
+    border: 0px;
+    height: 150px;
+  }
+  .dicoverCard {
+    margin-bottom: 10px;
+    height: 500px;
+  }
+  .discoverCardRow1 .col-sm-9,
+  .discoverCardRow2 .col-sm-8,
+  .discoverCardRow3 .col-sm-8 {
+    width: 80%;
+    text-align: left;
+  }
+  .discoverCardRow1 .col-sm-3,
+  .discoverCardRow2 .col-sm-4,
+  .discoverCardRow3 .col-sm-4 {
+    width: 20%;
+  }
+  .showDeskFlex {
+    display: none;
+  }
+  .discoverSingleContainer {
+    height: auto;
+  }
+  .popularCardLastRowTitle {
+    width: 60%;
+  }
+  .discoverSingleThumbnail {
+    width: 100%;
+    height: 100%;
+  }
+  .discoverSingleCol2Row1 .col-sm-4 {
+    width: 40%;
+  }
+  .discoverSingleCol2Row1 .col-sm-8 {
+    width: 60%;
+  }
+  .dsCol2Row2 .col-sm-4 {
+    width: 50%;
+  }
+  .dsCol2Row2,
+  .dsCol2Row3,
+  .dsCol2Row3Text1 {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .dsCol2Row2Text2Wrapper {
+    text-align: right;
+  }
+  .dsCol2Row4 .col-sm-1,
+  .dsCol2Row6 .col-sm-1 {
+    width: 15%;
+  }
+  .dsCol2Row4ProfileTitleWrapper {
+    width: 40%;
+  }
+  .dsCol2Row6 .col-sm-8 {
+    width: 40%;
+  }
+  .dsPopularCont {
+    margin-top: 60px;
+  }
+  .signupFormSection {
+    padding: 0px;
+    padding-bottom: 30px;
+  }
+  .signupTagline {
+    padding-bottom: 30px;
+  }
+  .profileActionButton .col-sm-6,
+  .profileActionButton .col-sm-3,
+  .socialActionButton .col-sm-4 {
+    width: auto !important;
+  }
+  .profileLeftCardWrapper{
+    bottom: 0px;
+    top: 15px;
+  }
+}

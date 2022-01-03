@@ -1,0 +1,115 @@
+@import url("https://fonts.googleapis.com/css2?family=Sen:wght@400;700;800&display=swap");
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0px;
+}
+.navItemWrapper {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+.title {
+  color: #b3ff24;
+  font-size: 32px;
+}
+.navItem {
+  color: #777e90;
+  font-size: 14px;
+  font-family: sen;
+  font-weight: 600;
+}
+.navItemSignup {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 100;
+  margin-left: 10px;
+  font-family: sen;
+}
+.navbar-brand {
+  width: 30%;
+}
+.navLoginBtn {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 400;
+  background-image: linear-gradient(to left, #41b6e6, #b64bcc);
+  padding: 8px 40px 8px 40px;
+  border-radius: 100px;
+  position: relative;
+  left: 20px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  width: 122px;
+}
+.navLoginBtnText {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: sen;
+}
+.navLoginBtnTextIcon {
+  font-size: 14px;
+  right: 10px;
+  position: relative;
+}
+
+.navCont {
+  z-index: 1;
+}
+.navbar-nav {
+  align-items: center;
+}
+.headerBgLayer {
+  height: 100%;
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.searchBar {
+  border: 1.5px solid #c4c4c4;
+  border-radius: 100px;
+  height: 35px;
+  width: 256px;
+  margin-left: 20px;
+}
+.searchBarRow {
+  align-items: center;
+  height: inherit;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.searchBarText {
+  color: #e9f6ff;
+  font-size: 12px;
+  position: relative;
+  bottom: 2px;
+  font-family: sen;
+}
+.navbar-toggler {
+  background-color: transparent;
+}
+.navbar-toggler-icon {
+  background-image: url("../assets/images/toggleIcon.png") !important;
+}
+.bellIconCricle {
+  width: 10px;
+  height: 10px;
+  background-color: #b3ff24;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  border-radius: 100px;
+}
+.bellIconWrapper {
+  position: relative;
+}
