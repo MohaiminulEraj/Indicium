@@ -106,7 +106,7 @@ export const loadUser = () => async (dispatch) => {
 
         dispatch({
             type: LOAD_USER_SUCCESS,
-            payload: data.user
+            payload: data
         })
 
     } catch (error) {
@@ -121,7 +121,7 @@ export const loadUser = () => async (dispatch) => {
     }
 }
 
-export const verify_email = (code) => async (dispatch) => {
+export const verifyEmail = (code) => async (dispatch) => {
     try {
         dispatch({
             type: VERIFY_USER_REQUEST,
@@ -132,13 +132,18 @@ export const verify_email = (code) => async (dispatch) => {
                 'Content-Type': 'application/json',
             },
         }
-
+        const userInfoFromCookies = Cookies.get('userInfo')
+            ? JSON.parse(Cookies.get('userInfo'))
+            : null
+        const userEmail = userInfoFromCookies ? userInfoFromCookies.email : null
+        console.log(userEmail)
         const { data } = await axios.post(
             '/api/users/verify-email',
-            { code },
+            { code, userEmail },
             config
         )
 
+        document.location.href = '/update-profile'
         dispatch({
             type: VERIFY_USER_SUCCESS,
             payload: data,

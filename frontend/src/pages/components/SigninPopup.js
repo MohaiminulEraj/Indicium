@@ -86,7 +86,7 @@ const SigninPopup = (props) => {
                                     Remember me
                                 </div>
                                 <div className="col-sm-6 forgetPassText">
-                                    <Link to="/reset-password">
+                                    <Link to="/forgot-password">
                                         Forgot your password?
                                     </Link>
                                 </div>

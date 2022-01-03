@@ -7,8 +7,9 @@ import normalize from 'normalize-url';
 // @access   Private
 const getCurrentUser = asyncHandler(async (req, res) => {
     try {
+        console.log(req.user.id)
         const profile = await Profile.findOne({
-            user: req.user._id
+            user: req.user.id
         }).populate('user', ['name', 'email', 'avatar']);
 
         if (!profile) {

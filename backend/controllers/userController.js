@@ -56,14 +56,14 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error('User already exists!')
     }
     await client.verify
-        .services('VAc146727b775c0f56aa85c5e5f1aa34b0')
+        .services(process.env.SERVICE_ID)
         .verifications.create({ to: email, channel: "email" })
         .then((verification) => console.log(verification.sid))
         .catch((err) => console.log(err.message));
 
     const avatar = normalize(
         gravatar.url(email, {
-            s: '200',
+            s: '400',
             r: 'pg',
             d: 'mm'
         }),
@@ -72,7 +72,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         email,
         password,
-        avatar
+        avatar,
     })
     if (user) {
 
@@ -82,6 +82,7 @@ const registerUser = asyncHandler(async (req, res) => {
             res.status(201).json({
                 _id: user._id,
                 email: user.email,
+                verified: user.verified,
                 token: generateToken(user._id),
             })
         }
@@ -140,27 +141,27 @@ const forgotPassword = asyncHandler(async (req, res) => {
 })
 
 const verifyEmail = asyncHandler(async (req, res) => {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const client = new twilio(accountSid, authToken);
-    const { code } = req.body
+        const accountSid = process.env.TWILIO_ACCOUNT_SID;
+        const authToken = process.env.TWILIO_AUTH_TOKEN;
+        const client = new twilio(accountSid, authToken);
+        const { code, userEmail } = req.body
+        // const user = await User.findById(req.user._id)
 
-    // await client.verify
-    //     .services('VAc146727b775c0f56aa85c5e5f1aa34b0')
-    //     .verifications.create({ to: email, channel: "email" })
-    //     .then((verification) => console.log(verification.sid))
-    //     .catch((err) => console.log(err.message));
-
-    // console.log(req)
-    let xyz = await client.verify.services('VAc146727b775c0f56aa85c5e5f1aa34b0')
-        .verificationChecks
-        .create({ to: 'eraj471@gmail.com', code: code })
-        .then(verification_check => console.log(verification_check.status))
-    console.log(xyz.status)
-    if (xyz.status !== 'approved') {
-        res.status(401)
-        throw new Error('Email not verified')
-    }
+        console.log(code, userEmail)
+        let xyz = await client.verify.services(process.env.SERVICE_ID)
+            .verificationChecks
+            .create({ to: userEmail, code: code })
+        // .then(verification_check => console.log(verification_check.status))
+        // console.log(xyz)
+        if (xyz.status !== 'approved') {
+            res.status(401)
+            throw new Error('Email not verified')
+        }
+        res.json({ message: "Email verified" })
+    // user.verified = true
+    // await user.save().then(result => {
+    //     res.json({ message: "Email verified!" })
+    // }).catch(err => console.log(err))
 
 })
 

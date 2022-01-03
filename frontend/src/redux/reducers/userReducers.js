@@ -89,11 +89,11 @@ export const authReducer = (state = { isAuthenticated: null, loading: true, user
 export const loadedUserReducer = (state = { loading: true, isAuthenticated: false, user: null }, action) => {
   switch (action.type) {
 
-    // case LOAD_USER_REQUEST:
-    //   return {
-    //     loading: true,
-    //     isAuthenticated: false
-    //   }
+    case LOAD_USER_REQUEST:
+      return {
+        loading: true,
+        isAuthenticated: false
+      }
 
     case LOAD_USER_SUCCESS:
       return {

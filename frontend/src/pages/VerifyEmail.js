@@ -9,7 +9,6 @@ import SignUpPopup from "./components/SignUpPopup";
 import VerifyEmailPopup from "./components/VerifyEmailPopup";
 
 
-
 const VerifyEmail = (props) => {
     const [showPopup, setShowPopup] = useState(false);
     const [showSignupPopup, setShowSignupPopup] = useState(false);

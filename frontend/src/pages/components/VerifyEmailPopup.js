@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/Home.css";
 import "../../styles/Responsive.css";
@@ -6,13 +6,28 @@ import logo from "../../assets/images/logo.png"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux'
+import { verifyEmail } from "../../redux/actions/userActions"
 
 const VerifyEmailPopup = (props) => {
     const [code, setCode] = useState('')
+    const dispatch = useDispatch()
+
+    const verifyUser = useSelector((state) => state.verifyUser)
+    const { loading, error, userInfo } = verifyUser
+
+    // const redirect = props.location.search ? props.location.search.split('=')[1] : '/'
+
+    // useEffect(() => {
+    //     console.log(verifyUser)
+    //     if (verifyUser) {
+    //         window.location.href = '/update-profile'
+    //     }
+    // }, [verifyUser])
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+        dispatch(verifyEmail(code))
     }
 
     return (
@@ -52,7 +67,7 @@ const VerifyEmailPopup = (props) => {
                                     <div className="row">
                                         <div className="col-sm inputFieldWrapperVerify">
                                             <div className="inputFieldWrapperLayer"></div>
-                                            <input value={code} onChange={(e) => setCode(e.target.value)} type="text" className="inputField" required />
+                                            <input value={code} onChange={(e) => setCode(e.target.value)} type="text" className="inputField" maxlength={6} required />
                                         </div>
                                         {/* <div className="col-sm inputFieldWrapperVerify">
                                                 <div className="inputFieldWrapperLayer"></div>
