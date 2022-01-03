@@ -8,22 +8,15 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
 import { verifyEmail } from "../../redux/actions/userActions"
+import Message from "./Message";
+import Loader from "./Loader";
 
 const VerifyEmailPopup = (props) => {
     const [code, setCode] = useState('')
     const dispatch = useDispatch()
 
     const verifyUser = useSelector((state) => state.verifyUser)
-    const { loading, error, userInfo } = verifyUser
-
-    // const redirect = props.location.search ? props.location.search.split('=')[1] : '/'
-
-    // useEffect(() => {
-    //     console.log(verifyUser)
-    //     if (verifyUser) {
-    //         window.location.href = '/update-profile'
-    //     }
-    // }, [verifyUser])
+    const { loading, error } = verifyUser
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -59,7 +52,8 @@ const VerifyEmailPopup = (props) => {
                             Enter the 6 digit code we've sent to your email.
                         </div>
                         <div className="formWrapper">
-
+                            {error && <Message variant='danger'>{error}</Message>}
+                            {loading && <Loader />}
                             <form onSubmit={handleSubmit}>
                                 {/* Email Field */}
                                 <div className="inputWrapper">

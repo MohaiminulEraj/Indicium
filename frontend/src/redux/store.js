@@ -4,6 +4,8 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import {
     userLoginReducer,
     userRegisterReducer,
+    userDetailsReducer,
+    userUpdateProfileReducer,
     verifyUserReducer,
     loadedUserReducer,
     forgotPasswordReducer,
@@ -16,6 +18,8 @@ import Cookies from 'js-cookie'
 const reducer = combineReducers({
     userLogin: userLoginReducer,
     userRegister: userRegisterReducer,
+    userDetails: userDetailsReducer,
+    userUpdateProfile: userUpdateProfileReducer,
     verifyUser: verifyUserReducer,
     loadedUser: loadedUserReducer,
     forgotPassword: forgotPasswordReducer,

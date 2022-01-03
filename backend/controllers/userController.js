@@ -141,23 +141,21 @@ const forgotPassword = asyncHandler(async (req, res) => {
 })
 
 const verifyEmail = asyncHandler(async (req, res) => {
-        const accountSid = process.env.TWILIO_ACCOUNT_SID;
-        const authToken = process.env.TWILIO_AUTH_TOKEN;
-        const client = new twilio(accountSid, authToken);
-        const { code, userEmail } = req.body
-        // const user = await User.findById(req.user._id)
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const client = new twilio(accountSid, authToken);
+    const { code, userEmail } = req.body
+    // const user = await User.findById(req.user._id)
 
-        console.log(code, userEmail)
-        let xyz = await client.verify.services(process.env.SERVICE_ID)
-            .verificationChecks
-            .create({ to: userEmail, code: code })
-        // .then(verification_check => console.log(verification_check.status))
-        // console.log(xyz)
-        if (xyz.status !== 'approved') {
-            res.status(401)
-            throw new Error('Email not verified')
-        }
-        res.json({ message: "Email verified" })
+    // console.log(code, userEmail)
+    let xyz = await client.verify.services(process.env.SERVICE_ID)
+        .verificationChecks
+        .create({ to: userEmail, code: code })
+    if (xyz.status !== 'approved') {
+        res.status(401)
+        throw new Error('Email not verified')
+    }
+    res.json({ message: "Email verified" })
     // user.verified = true
     // await user.save().then(result => {
     //     res.json({ message: "Email verified!" })

@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 const ProfileSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
+        ref: 'User'
     },
     name: {
         type: String,
@@ -15,42 +15,41 @@ const ProfileSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    walletPublicAddress: {
+    location: {
         type: String,
-        required: true
+        required: true,
+    },
+    walletPublicAddress: {
+        type: String
     },
     bio: {
         type: String,
         required: true,
         maxLength: 200
     },
-    social: {
-        instagram: {
-            type: String
-        },
-        twitter: {
-            type: String
-        },
-        facebook: {
-            type: String
-        },
-        website: {
-            type: String
-        }
+    instagram: {
+        type: String
     },
-    notifications: {
-        email: {
-            type: Boolean
-        },
-        new_bids: {
-            type: Boolean
-        },
-        item_purchased: {
-            type: Boolean
-        },
-        people_followed: {
-            type: Boolean
-        }
+    twitter: {
+        type: String
+    },
+    facebook: {
+        type: String
+    },
+    website: {
+        type: String
+    },
+    notify_email: {
+        type: Boolean
+    },
+    notify_new_bids: {  
+        type: Boolean
+    },
+    notify_item_purchased: {
+        type: Boolean
+    },
+    notify_people_followed: {
+        type: Boolean
     }
 
 }, {

@@ -16,7 +16,8 @@ const CustomNavbar = (props) => {
 
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
-
+  const userDetails = useSelector((state) => state.userDetails)
+  const { user } = userDetails
   const logoutHandler = () => {
     dispatch(logout())
   }
@@ -87,7 +88,7 @@ const CustomNavbar = (props) => {
                 <>
                   <Nav.Link>
                     <div className="navItemSignup">
-                      <Link to="/update-profile">Welcome User!</Link>
+                      <Link to="/update-profile">Welcome {user ? user.name : 'User'}!</Link>
                     </div>
                   </Nav.Link>
                   <Nav.Link href="#" >

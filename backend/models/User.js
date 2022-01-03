@@ -4,17 +4,66 @@ import bcrypt from 'bcryptjs'
 const UserSchema = new mongoose.Schema({
     email: {
         type: String,
-        required: true,
+        // required: true,
         lowercase: true,
         trim: true,
         unique: true
     },
     password: {
         type: String,
-        required: true,
+        // required: true,
     },
     avatar: {
         type: String
+    },
+    name: {
+        type: String,
+        // required: true,
+        default: 'User'
+    },
+    username: {
+        type: String,
+        // required: true,
+        // default: "u",
+        unique: true
+    },
+    location: {
+        type: String,
+        // required: true,
+        default: 'lc'
+    },
+    walletPublicAdd: {
+        type: String
+    },
+    bio: {
+        type: String,
+        // required: true,
+        default: 'b',
+        maxLength: 200
+    },
+    instagram: {
+        type: String
+    },
+    twitter: {
+        type: String
+    },
+    facebook: {
+        type: String
+    },
+    website: {
+        type: String
+    },
+    notify_email: {
+        type: Boolean
+    },
+    notify_new_bids: {
+        type: Boolean
+    },
+    notify_item_purchased: {
+        type: Boolean
+    },
+    notify_people_followed: {
+        type: Boolean
     },
     verified: {
         type: Boolean,
