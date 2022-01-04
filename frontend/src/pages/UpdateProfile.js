@@ -6,9 +6,9 @@ import Footer from "./components/Footer";
 import CustomNavbar from "./components/CustomNavbar";
 import SigninPopup from "./components/SigninPopup";
 import SignUpPopup from "./components/SignUpPopup";
-import profileAvatar from "../assets/images/profileAvatar.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+// import profileAvatar from "../assets/images/profileAvatar.png";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserDetails, updateUserProfile } from '../redux/actions/userActions'
 import Message from './components/Message'
@@ -70,7 +70,7 @@ const UpdateProfile = (props) => {
                 dispatch({ type: USER_UPDATE_PROFILE_RESET })
                 dispatch(getUserDetails(userInfo._id))
             } else {
-                setName(user?.name)
+                setName(user?.name === 'User' ? '' : user.name)
                 setWalletPublicAdd(user?.walletPublicAdd === 'w' ? '' : user?.walletPublicAdd)
                 setLocation(user?.location === 'lc' ? '' : user?.location)
                 setBio(user?.bio === 'b' ? '' : user?.bio)
@@ -83,7 +83,7 @@ const UpdateProfile = (props) => {
                 setNotify_item_purchased(user?.notify_item_purchased)
                 setNotify_people_followed(user?.notify_people_followed)
                 setAvatarPreview(user?.avatar?.url)
-                setAvatar(user?.avatar?.url)
+                // setAvatar(user?.avatar?.url)
             }
         }
     }, [dispatch, user, userInfo, success])
@@ -103,6 +103,7 @@ const UpdateProfile = (props) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        // console.log(avatar)
         dispatch(updateUserProfile({ id: userInfo._id, name, avatar, walletPublicAdd, location, bio, instagram, twitter, facebook, website, notify_email, notify_new_bids, notify_item_purchased, notify_people_followed }))
     }
 
@@ -158,7 +159,7 @@ const UpdateProfile = (props) => {
                                         <label style={{ cursor: 'pointer' }} htmlFor="uploadPhoto" className="uploadSignupBtnLayer">
                                             Upload
                                         </label>
-                                        <input name='avatar' id="uploadPhoto" onChange={avatarUpdate} type="file" className="uploadSignupBtnLayer" accept='images/*' placeholder="Upload" />
+                                        <input name='avatar' id="uploadPhoto" onChange={avatarUpdate} type="file" className="uploadSignupBtnLayer" accept='images/*' />
 
                                     </div>
                                 </div>
