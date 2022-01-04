@@ -58,6 +58,10 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error('User already exists!')
     }
+    if (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/.test(password) == false) {
+        res.status(400)
+        throw new Error('Password must contain at least one uppercase letter, one lowercase letter, one number and one special character')
+    }
     await client.verify
         .services(process.env.SERVICE_ID)
         .verifications.create({ to: email, channel: "email" })

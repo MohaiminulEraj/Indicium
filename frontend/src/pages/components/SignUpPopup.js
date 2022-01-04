@@ -32,12 +32,6 @@ const SignUpPopup = (props) => {
     const submitHandler = (e) => {
         e.preventDefault()
         dispatch(register(email, password, rememberMe))
-
-        // if (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/.test(password)) {
-        //     dispatch(register(email, password, rememberMe))
-        // } else {
-        //     setAlert('Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character', 'danger');
-        // }
     }
 
 
