@@ -68,7 +68,7 @@ const UpdateProfile = (props) => {
         } else {
             if (!user || !user.name || success) {
                 dispatch({ type: USER_UPDATE_PROFILE_RESET })
-                dispatch(getUserDetails())
+                dispatch(getUserDetails(userInfo._id))
             } else {
                 setName(user?.name)
                 setWalletPublicAdd(user?.walletPublicAdd === 'w' ? '' : user?.walletPublicAdd)
