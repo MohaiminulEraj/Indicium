@@ -31,8 +31,8 @@ const UpdateProfile = (props) => {
     // const [form, setForm] = useState();
     const [name, setName] = useState(user ? user.name : '');
     const [walletPublicAdd, setWalletPublicAdd] = useState(user ? user.walletPublicAdd : '')
-    const [location, setLocation] = useState(user ? user.location : '')
-    // const [walletPublicAddress, setWalletPublicAddress] = useState(user ? user.walletPublicAddress : '')
+    const [location, setLocation] = useState(user ? (user.location !== 'lc' && user.location) : '')
+    const [username, setusername] = useState(user ? user.username : '')
     const [bio, setBio] = useState(user ? user.bio : '')
     const [instagram, setInstagram] = useState(user ? user.instagram : '')
     const [twitter, setTwitter] = useState(user ? user.twitter : '')
@@ -42,12 +42,8 @@ const UpdateProfile = (props) => {
     const [notify_new_bids, setNotify_new_bids] = useState(user ? user.notify_new_bids : false)
     const [notify_item_purchased, setNotify_item_purchased] = useState(user ? user.notify_item_purchased : false)
     const [notify_people_followed, setNotify_people_followed] = useState(user ? user.notify_people_followed : false)
-
-    // Create file input button
-    const fileInput = React.createRef();
-    const fileInputButton = () => {
-        fileInput.current.click();
-    };
+    const [avatar, setAvatar] = useState('');
+    const [avatarPreview, setAvatarPreview] = useState(user?.avatar?.url);
 
 
     const userUpdateProfile = useSelector((state) => state.userUpdateProfile)
@@ -72,12 +68,12 @@ const UpdateProfile = (props) => {
         } else {
             if (!user || !user.name || success) {
                 dispatch({ type: USER_UPDATE_PROFILE_RESET })
-                dispatch(getUserDetails(userInfo._id))
+                dispatch(getUserDetails())
             } else {
                 setName(user?.name)
-                setWalletPublicAdd(user?.walletPublicAdd)
-                setLocation(user?.location)
-                setBio(user?.bio)
+                setWalletPublicAdd(user?.walletPublicAdd === 'w' ? '' : user?.walletPublicAdd)
+                setLocation(user?.location === 'lc' ? '' : user?.location)
+                setBio(user?.bio === 'b' ? '' : user?.bio)
                 setInstagram(user?.instagram)
                 setTwitter(user?.twitter)
                 setFacebook(user?.facebook)
@@ -86,16 +82,30 @@ const UpdateProfile = (props) => {
                 setNotify_new_bids(user?.notify_new_bids)
                 setNotify_item_purchased(user?.notify_item_purchased)
                 setNotify_people_followed(user?.notify_people_followed)
+                setAvatarPreview(user?.avatar?.url)
+                setAvatar(user?.avatar?.url)
             }
         }
     }, [dispatch, user, userInfo, success])
-    console.log(userInfo._id)
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        dispatch(updateUserProfile({ id: userInfo._id, name, walletPublicAdd, location, bio, instagram, twitter, facebook, website, notify_email, notify_new_bids, notify_item_purchased, notify_people_followed }))
+
+    const avatarUpdate = (e) => {
+        if (e.target.name === 'avatar') {
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (reader.readyState === 2) {
+                    setAvatar(reader.result);
+                    setAvatarPreview(reader.result);
+                }
+            }
+            reader.readAsDataURL(e.target.files[0])
+        }
     }
 
-    console.log(user?.avatar?.url)
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        dispatch(updateUserProfile({ id: userInfo._id, name, avatar, walletPublicAdd, location, bio, instagram, twitter, facebook, website, notify_email, notify_new_bids, notify_item_purchased, notify_people_followed }))
+    }
+
     return (
         <div className="body">
 
@@ -138,7 +148,7 @@ const UpdateProfile = (props) => {
                         <div className="row signupFormCol1Row1">
                             <div className="col-sm-6 profileLeftCardImgWrapper2">
                                 {/* <img src={profileAvatar} style={{ width: '100%', height: '100%' }} /> */}
-                                <img src={user?.avatar?.url} style={{ width: '100%', height: '100%' }} />
+                                <img src={avatarPreview} style={{ width: '100%', height: '100%' }} />
                             </div>
                             <div className="col-sm-6 " style={{ marginLeft: 20 }}>
                                 <div className="signupFormCol1Row1Text1">Profile photo</div>
@@ -148,7 +158,7 @@ const UpdateProfile = (props) => {
                                         <label style={{ cursor: 'pointer' }} htmlFor="uploadPhoto" className="uploadSignupBtnLayer">
                                             Upload
                                         </label>
-                                        <input id="uploadPhoto" type="file" className="uploadSignupBtnLayer" placeholder="Upload" />
+                                        <input name='avatar' id="uploadPhoto" onChange={avatarUpdate} type="file" className="uploadSignupBtnLayer" accept='images/*' placeholder="Upload" />
 
                                     </div>
                                 </div>
@@ -171,7 +181,7 @@ const UpdateProfile = (props) => {
                                 <div className="signupInputLabel">UserName</div>
                                 <div className="signupInputFieldWrapper">
                                     <div className="signupInputFieldWrapperLayer"></div>
-                                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Bruno12" className="signupInputField" />
+                                    <input type="text" value={user?.username} placeholder="Username" className="signupInputField" disabled />
                                 </div>
                             </div> */}
 
