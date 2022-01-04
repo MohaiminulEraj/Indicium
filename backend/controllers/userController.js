@@ -23,7 +23,10 @@ const authUser = asyncHandler(async (req, res) => {
     const { email, password, rememberMe } = req.body
 
     const user = await User.findOne({ email })
-
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found!')
+    }
     if (user && (await user.matchPassword(password))) {
         if (rememberMe) {
             storeInCookies(user, 200, res)
@@ -61,14 +64,16 @@ const registerUser = asyncHandler(async (req, res) => {
         .then((verification) => console.log(verification.sid))
         .catch((err) => console.log(err.message));
 
-    const avatar = normalize(
-        gravatar.url(email, {
-            s: '400',
-            r: 'pg',
-            d: 'mm'
-        }),
-        { forceHttps: true }
-    );
+    const avatar = {
+        url: normalize(
+            gravatar.url(email, {
+                s: '200',
+                r: 'pg',
+                d: 'mm'
+            }),
+            { forceHttps: true }
+        )
+    }
     const user = await User.create({
         email,
         password,

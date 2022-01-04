@@ -811,6 +811,12 @@ a:hover {
   border-radius: 6px;
 }
 
+#uploadPhoto {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+
 .artistCardBtn:hover {
   background-image: linear-gradient(to left, #fff, #fff);
 }

@@ -21,13 +21,13 @@ function App() {
       <Routes>
         <Route path="/discover" element={<DiscoverRoute />} />
         <Route path="/discoverSingle" element={<DiscoverRouteSingle />} />
-        <Route path="/profile" element={<ProfileRoute />} />
+        <Route path="/profile" element={<PrivateRoute component={ProfileRoute} />} />
         <Route path="/signin" element={<SigninRoute />} />
         <Route path="/signup" element={<SignupRoute />} />
         <Route path="/home" element={<HomeRoute />} />
         <Route path="/update-profile" element={<PrivateRoute component={UpdateProfileRoute} />} />
         <Route path="/forgot-password" element={<ForgotPassRoute />} />
-        <Route path="/new-password" element={<NewPassRoute />} />
+        <Route path="/reset-password" element={<NewPassRoute />} />
         <Route path="/verify-email" element={<VerifyEmailRoute />} />
         <Route path="/" element={<HomeRoute />} />
       </Routes>

@@ -12,6 +12,6 @@ import { protect } from '../middleware/authMiddleware.js'
 router
     .route('/')
     .get(protect, getUserProfile)
-    .put(updateUserProfile)
+    .put(protect, updateUserProfile)
 
 export default router

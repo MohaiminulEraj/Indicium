@@ -15,7 +15,7 @@ import Message from './components/Message'
 import Loader from './components/Loader'
 import { USER_UPDATE_PROFILE_RESET } from '../redux/constants/userConstants'
 
-const SignUp = (props) => {
+const UpdateProfile = (props) => {
     const dispatch = useDispatch()
 
 
@@ -43,7 +43,11 @@ const SignUp = (props) => {
     const [notify_item_purchased, setNotify_item_purchased] = useState(user ? user.notify_item_purchased : false)
     const [notify_people_followed, setNotify_people_followed] = useState(user ? user.notify_people_followed : false)
 
-
+    // Create file input button
+    const fileInput = React.createRef();
+    const fileInputButton = () => {
+        fileInput.current.click();
+    };
 
 
     const userUpdateProfile = useSelector((state) => state.userUpdateProfile)
@@ -85,13 +89,13 @@ const SignUp = (props) => {
             }
         }
     }, [dispatch, user, userInfo, success])
+    console.log(userInfo._id)
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch(updateUserProfile({ id: user._id, name, walletPublicAdd, location, bio, instagram, twitter, facebook, website, notify_email, notify_new_bids, notify_item_purchased, notify_people_followed }))
+        dispatch(updateUserProfile({ id: userInfo._id, name, walletPublicAdd, location, bio, instagram, twitter, facebook, website, notify_email, notify_new_bids, notify_item_purchased, notify_people_followed }))
     }
 
-
-
+    console.log(user?.avatar?.url)
     return (
         <div className="body">
 
@@ -133,14 +137,19 @@ const SignUp = (props) => {
                         <div className="signupVR"></div>
                         <div className="row signupFormCol1Row1">
                             <div className="col-sm-6 profileLeftCardImgWrapper2">
-                                <img src={profileAvatar} style={{ width: '100%', height: '100%' }} />
+                                {/* <img src={profileAvatar} style={{ width: '100%', height: '100%' }} /> */}
+                                <img src={user?.avatar?.url} style={{ width: '100%', height: '100%' }} />
                             </div>
                             <div className="col-sm-6 " style={{ marginLeft: 20 }}>
                                 <div className="signupFormCol1Row1Text1">Profile photo</div>
                                 <div className="signupFormCol1Row1Text2">We recommend an image of at <br />least 400x400. Gifs work too 🙌</div>
                                 <div className="uploadSignupBtnWrapper">
                                     <div className="uploadSignupBtn">
-                                        <div className="uploadSignupBtnLayer">Upload</div>
+                                        <label style={{ cursor: 'pointer' }} htmlFor="uploadPhoto" className="uploadSignupBtnLayer">
+                                            Upload
+                                        </label>
+                                        <input id="uploadPhoto" type="file" className="uploadSignupBtnLayer" placeholder="Upload" />
+
                                     </div>
                                 </div>
                             </div>
@@ -165,14 +174,7 @@ const SignUp = (props) => {
                                     <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Bruno12" className="signupInputField" />
                                 </div>
                             </div> */}
-                            {/* { Wallet } */}
-                            <div className="signupInputWrapper">
-                                <div className="signupInputLabel">Wallet public address</div>
-                                <div className="signupInputFieldWrapper">
-                                    <div className="signupInputFieldWrapperLayer"></div>
-                                    <input type="text" value={walletPublicAdd} onChange={(e) => setWalletPublicAdd(e.target.value)} placeholder="Wallet Address" className="signupInputField" />
-                                </div>
-                            </div>
+
                             {/* Email Field */}
                             <div className="signupInputWrapper">
                                 <div className="signupInputLabel">Email</div>
@@ -181,7 +183,14 @@ const SignUp = (props) => {
                                     <input type="email" value={userInfo?.email} disabled placeholder="Add your email here" className="signupInputField" />
                                 </div>
                             </div>
-
+                            {/* { Wallet } */}
+                            <div className="signupInputWrapper">
+                                <div className="signupInputLabel">Wallet Public Address</div>
+                                <div className="signupInputFieldWrapper">
+                                    <div className="signupInputFieldWrapperLayer"></div>
+                                    <input type="text" value={walletPublicAdd} onChange={(e) => setWalletPublicAdd(e.target.value)} placeholder="Wallet Address" className="signupInputField" />
+                                </div>
+                            </div>
                             {/* Location Field */}
                             <div className="signupInputWrapper">
                                 <div className="signupInputLabel">Location</div>
@@ -251,7 +260,7 @@ const SignUp = (props) => {
 
                         <div className="switchWrapper">
                             <label class="switch">
-                                <input type="checkbox" value={notify_email} onChange={(e) => setNotify_email(e.target.value)} />
+                                <input type="checkbox" checked={notify_email} onChange={(e) => setNotify_email(e.target.checked)} />
                                 <span class="slider round"></span>
                             </label>
                             <div className="switchText">Email Notifications</div>
@@ -259,7 +268,7 @@ const SignUp = (props) => {
 
                         <div className="switchWrapper">
                             <label class="switch">
-                                <input type="checkbox" value={notify_new_bids} onChange={(e) => setNotify_new_bids(e.target.value)} />
+                                <input type="checkbox" checked={notify_new_bids} onChange={(e) => setNotify_new_bids(e.target.checked)} />
                                 <span class="slider round"></span>
                             </label>
                             <div className="switchText">New Bids</div>
@@ -268,7 +277,7 @@ const SignUp = (props) => {
 
                         <div className="switchWrapper">
                             <label class="switch">
-                                <input type="checkbox" value={notify_item_purchased} onChange={(e) => setNotify_item_purchased(e.target.value)} />
+                                <input type="checkbox" checked={notify_item_purchased} onChange={(e) => setNotify_item_purchased(e.target.checked)} />
                                 <span class="slider round"></span>
                             </label>
                             <div className="switchText">Item Purchased</div>
@@ -277,7 +286,7 @@ const SignUp = (props) => {
 
                         <div className="switchWrapper">
                             <label class="switch">
-                                <input type="checkbox" value={notify_people_followed} onChange={(e) => setNotify_people_followed(e.target.value)} />
+                                <input type="checkbox" checked={notify_people_followed} onChange={(e) => setNotify_people_followed(e.target.checked)} />
                                 <span class="slider round"></span>
                             </label>
                             <div className="switchText">People Followed</div>
@@ -290,14 +299,19 @@ const SignUp = (props) => {
                         </div>
                         <div className="row" style={{ marginTop: 20 }}>
                             <div className="col-sm-12 rememberMeText" style={{ fontSize: 12 }}>
-                                <div
+                                <input
                                     className="rememberMeToggleBtn"
                                     onClick={() => setIagree(!iagree)}
-                                    style={{ backgroundColor: iagree ? "#41B6E6" : 'white' }}
-                                >
-                                    {iagree && <FontAwesomeIcon icon={faCheck} color="white" style={{ fontSize: 10 }} />}
-                                </div>
-                                I agree Stack terms of service
+                                    type="checkbox"
+                                    id="agreement"
+                                    required
+                                />
+                                <label htmlFor="agreement">
+                                    I agree Stack terms of service
+                                </label>
+                                {/* {iagree && <FontAwesomeIcon icon={faCheck} color="white" style={{ fontSize: 10 }} />} */}
+                                {/* </div> */}
+                                {/* <input onClick={() => setIagree(!iagree)} style={{ backgroundColor: iagree ? "#41B6E6" : 'white' }} className="rememberMeToggleBtn" type="checkbox" /> */}
                             </div>
                         </div>
                         {/* Save Profile Button starts here  */}
@@ -326,4 +340,4 @@ const SignUp = (props) => {
     );
 };
 
-export default SignUp;
+export default UpdateProfile;
