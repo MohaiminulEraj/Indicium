@@ -23,7 +23,6 @@ app.use(cookieParser()); // parsing cookies
 // app.use(require('./router'));    // Registering all app-routers here
 
 
-app.get('/', (req, res) => res.send('API Running!'));
 
 app.use('/api/users', userRoutes);
 app.use('/api/profile', profileRoutes);
