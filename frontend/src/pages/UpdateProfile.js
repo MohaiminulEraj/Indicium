@@ -97,7 +97,7 @@ const UpdateProfile = (props) => {
                     setAvatarPreview(reader.result);
                 }
             }
-            reader.readAsDataURL(e.target.files[0])
+            if (e.target.files[0]) reader.readAsDataURL(e.target.files[0])
         }
     }
 
@@ -108,7 +108,7 @@ const UpdateProfile = (props) => {
     }
 
     return (
-        <div className="body">
+        <div className="body upr">
 
             {/* Signup and register popups */}
             {showPopup &&
@@ -135,50 +135,46 @@ const UpdateProfile = (props) => {
 
             {/* Form Starts here here */}
             {message && <Message variant='danger'>{message}</Message>}
-            { }
             {success && <Message variant='success'>Profile Updated</Message>}
-            {loading ? (
-                <Loader />
-            ) : error ? (
-                <Message variant='danger'>{error}</Message>
-            ) : (
-                <form onSubmit={handleSubmit} className="signupFormSection row">
-                    <div className="col-sm-6 signupFormSectionCol ">
-                        {/* Left form column Starts here here */}
-                        <div className="signupVR"></div>
-                        <div className="row signupFormCol1Row1">
-                            <div className="col-sm-6 profileLeftCardImgWrapper2">
-                                {/* <img src={profileAvatar} style={{ width: '100%', height: '100%' }} /> */}
-                                <img src={avatarPreview} style={{ width: '100%', height: '100%' }} />
-                            </div>
-                            <div className="col-sm-6 " style={{ marginLeft: 20 }}>
-                                <div className="signupFormCol1Row1Text1">Profile photo</div>
-                                <div className="signupFormCol1Row1Text2">We recommend an image of at <br />least 400x400. Gifs work too 🙌</div>
-                                <div className="uploadSignupBtnWrapper">
-                                    <div className="uploadSignupBtn">
-                                        <label style={{ cursor: 'pointer' }} htmlFor="uploadPhoto" className="uploadSignupBtnLayer">
-                                            Upload
-                                        </label>
-                                        <input name='avatar' id="uploadPhoto" onChange={avatarUpdate} type="file" className="uploadSignupBtnLayer" accept='images/*' />
+            {error && <Message variant='danger'>{error}</Message>}
+            {loading && <Loader />}
+            <form onSubmit={handleSubmit} className="signupFormSection row">
+                <div className="col-sm-6 signupFormSectionCol ">
+                    {/* Left form column Starts here here */}
+                    <div className="signupVR"></div>
+                    <div className="row signupFormCol1Row1">
+                        <div className="col-sm-6 profileLeftCardImgWrapper2">
+                            {/* <img src={profileAvatar} style={{ width: '100%', height: '100%' }} /> */}
+                            <img src={avatarPreview} style={{ width: '100%', height: '100%' }} />
+                        </div>
+                        <div className="col-sm-6 " style={{ marginLeft: 20 }}>
+                            <div className="signupFormCol1Row1Text1">Profile photo</div>
+                            <div className="signupFormCol1Row1Text2">We recommend an image of at <br />least 400x400. Gifs work too 🙌</div>
+                            <div className="uploadSignupBtnWrapper">
+                                <div className="uploadSignupBtn">
+                                    <label style={{ cursor: 'pointer' }} htmlFor="uploadPhoto" className="uploadSignupBtnLayer">
+                                        Upload
+                                    </label>
+                                    <input name='avatar' id="uploadPhoto" onChange={avatarUpdate} type="file" className="uploadSignupBtnLayer" accept='images/*' />
 
-                                    </div>
                                 </div>
                             </div>
-                            <div className="fullHr" style={{ marginTop: 30 }}></div>
-                            <div className="signupFormCol1Row1Text1">My Account</div>
+                        </div>
+                        <div className="fullHr" style={{ marginTop: 30 }}></div>
+                        <div className="signupFormCol1Row1Text1">My Account</div>
 
-                            {/* Form starts here */}
-                            {/* Name Field */}
-                            <div className="signupInputWrapper">
-                                <div className="signupInputLabel">Name</div>
-                                <div className="signupInputFieldWrapper">
-                                    <div className="signupInputFieldWrapperLayer"></div>
-                                    <input name="name" value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Bruno Bangnyfe" className="signupInputField" />
-                                </div>
+                        {/* Form starts here */}
+                        {/* Name Field */}
+                        <div className="signupInputWrapper">
+                            <div className="signupInputLabel">Name</div>
+                            <div className="signupInputFieldWrapper">
+                                <div className="signupInputFieldWrapperLayer"></div>
+                                <input name="name" value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Bruno Bangnyfe" className="signupInputField" />
                             </div>
+                        </div>
 
-                            {/* UserName Field */}
-                            {/* <div className="signupInputWrapper">
+                        {/* UserName Field */}
+                        {/* <div className="signupInputWrapper">
                                 <div className="signupInputLabel">UserName</div>
                                 <div className="signupInputFieldWrapper">
                                     <div className="signupInputFieldWrapperLayer"></div>
@@ -186,158 +182,157 @@ const UpdateProfile = (props) => {
                                 </div>
                             </div> */}
 
-                            {/* Email Field */}
-                            <div className="signupInputWrapper">
-                                <div className="signupInputLabel">Email</div>
-                                <div className="signupInputFieldWrapper">
-                                    <div className="signupInputFieldWrapperLayer"></div>
-                                    <input type="email" value={userInfo?.email} disabled placeholder="Add your email here" className="signupInputField" />
-                                </div>
+                        {/* Email Field */}
+                        <div className="signupInputWrapper">
+                            <div className="signupInputLabel">Email</div>
+                            <div className="signupInputFieldWrapper">
+                                <div className="signupInputFieldWrapperLayer"></div>
+                                <input type="email" value={userInfo?.email} disabled placeholder="Add your email here" className="signupInputField" />
                             </div>
-                            {/* { Wallet } */}
-                            <div className="signupInputWrapper">
-                                <div className="signupInputLabel">Wallet Public Address</div>
-                                <div className="signupInputFieldWrapper">
-                                    <div className="signupInputFieldWrapperLayer"></div>
-                                    <input type="text" value={walletPublicAdd} onChange={(e) => setWalletPublicAdd(e.target.value)} placeholder="Wallet Address" className="signupInputField" />
-                                </div>
+                        </div>
+                        {/* { Wallet } */}
+                        <div className="signupInputWrapper">
+                            <div className="signupInputLabel">Wallet Public Address</div>
+                            <div className="signupInputFieldWrapper">
+                                <div className="signupInputFieldWrapperLayer"></div>
+                                <input type="text" value={walletPublicAdd} onChange={(e) => setWalletPublicAdd(e.target.value)} placeholder="Wallet Address" className="signupInputField" />
                             </div>
-                            {/* Location Field */}
-                            <div className="signupInputWrapper">
-                                <div className="signupInputLabel">Location</div>
-                                <div className="signupInputFieldWrapper">
-                                    <div className="signupInputFieldWrapperLayer"></div>
-                                    <input type="text" placeholder="Indianapolis" value={location} onChange={(e) => setLocation(e.target.value)} className="signupInputField" />
-                                </div>
+                        </div>
+                        {/* Location Field */}
+                        <div className="signupInputWrapper">
+                            <div className="signupInputLabel">Location</div>
+                            <div className="signupInputFieldWrapper">
+                                <div className="signupInputFieldWrapperLayer"></div>
+                                <input type="text" placeholder="Indianapolis" value={location} onChange={(e) => setLocation(e.target.value)} className="signupInputField" />
                             </div>
+                        </div>
 
-                            {/* Bio Field */}
-                            <div className="signupInputWrapper">
-                                <div className="signupInputLabel">Bio</div>
-                                <div className="signupInputFieldWrapper signupTextField">
-                                    <div className="signupInputFieldWrapperLayer"></div>
-                                    <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="signupInputField signupTextField"></textarea>
-                                </div>
+                        {/* Bio Field */}
+                        <div className="signupInputWrapper">
+                            <div className="signupInputLabel">Bio</div>
+                            <div className="signupInputFieldWrapper signupTextField">
+                                <div className="signupInputFieldWrapperLayer"></div>
+                                <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="signupInputField signupTextField"></textarea>
                             </div>
+                        </div>
 
 
 
 
-                            {/* Form starts here */}
+                        {/* Form starts here */}
+                    </div>
+                </div>
+                {/* Left form column Ends here here */}
+                <div className="col-sm-6 signupFormSectionCol" style={{ paddingLeft: 30 }}>
+                    <div className="signupFormCol1Row1Text1">Social Account</div>
+
+                    {/* Instagram Field */}
+                    <div className="signupInputWrapper">
+                        <div className="signupInputLabel">Instagram</div>
+                        <div className="signupInputFieldWrapper">
+                            <div className="signupInputFieldWrapperLayer"></div>
+                            <input type="text" placeholder="https://www.instagram.com/MrcAlexandre" value={instagram} onChange={(e) => setInstagram(e.target.value)} className="signupInputField" />
                         </div>
                     </div>
-                    {/* Left form column Ends here here */}
-                    <div className="col-sm-6 signupFormSectionCol" style={{ paddingLeft: 30 }}>
-                        <div className="signupFormCol1Row1Text1">Social Account</div>
 
-                        {/* Instagram Field */}
-                        <div className="signupInputWrapper">
-                            <div className="signupInputLabel">Instagram</div>
-                            <div className="signupInputFieldWrapper">
-                                <div className="signupInputFieldWrapperLayer"></div>
-                                <input type="text" placeholder="https://www.instagram.com/MrcAlexandre" value={instagram} onChange={(e) => setInstagram(e.target.value)} className="signupInputField" />
-                            </div>
+                    {/* Twitter Field */}
+                    <div className="signupInputWrapper">
+                        <div className="signupInputLabel">Twitter</div>
+                        <div className="signupInputFieldWrapper">
+                            <div className="signupInputFieldWrapperLayer"></div>
+                            <input type="text" placeholder="Enter URL" value={twitter} onChange={(e) => setTwitter(e.target.value)} className="signupInputField" />
                         </div>
-
-                        {/* Twitter Field */}
-                        <div className="signupInputWrapper">
-                            <div className="signupInputLabel">Twitter</div>
-                            <div className="signupInputFieldWrapper">
-                                <div className="signupInputFieldWrapperLayer"></div>
-                                <input type="text" placeholder="Enter URL" value={twitter} onChange={(e) => setTwitter(e.target.value)} className="signupInputField" />
-                            </div>
-                        </div>
-
-                        {/* Facebook Field */}
-                        <div className="signupInputWrapper">
-                            <div className="signupInputLabel">Facebook</div>
-                            <div className="signupInputFieldWrapper">
-                                <div className="signupInputFieldWrapperLayer"></div>
-                                <input type="text" placeholder="Enter URL" value={facebook} onChange={(e) => setFacebook(e.target.value)} className="signupInputField" />
-                            </div>
-                        </div>
-
-                        {/* Website Field */}
-                        <div className="signupInputWrapper">
-                            <div className="signupInputLabel">Website</div>
-                            <div className="signupInputFieldWrapper">
-                                <div className="signupInputFieldWrapperLayer"></div>
-                                <input type="text" placeholder="Enter URL" value={website} onChange={(e) => setWebsite(e.target.value)} className="signupInputField" />
-                            </div>
-                        </div>
-                        <div className="fullHr" style={{ marginTop: 30 }}></div>
-
-                        <div className="signupFormCol1Row1Text1">Notifications</div>
-
-                        <div className="switchWrapper">
-                            <label class="switch">
-                                <input type="checkbox" checked={notify_email} onChange={(e) => setNotify_email(e.target.checked)} />
-                                <span class="slider round"></span>
-                            </label>
-                            <div className="switchText">Email Notifications</div>
-                        </div>
-
-                        <div className="switchWrapper">
-                            <label class="switch">
-                                <input type="checkbox" checked={notify_new_bids} onChange={(e) => setNotify_new_bids(e.target.checked)} />
-                                <span class="slider round"></span>
-                            </label>
-                            <div className="switchText">New Bids</div>
-                        </div>
-
-
-                        <div className="switchWrapper">
-                            <label class="switch">
-                                <input type="checkbox" checked={notify_item_purchased} onChange={(e) => setNotify_item_purchased(e.target.checked)} />
-                                <span class="slider round"></span>
-                            </label>
-                            <div className="switchText">Item Purchased</div>
-                        </div>
-
-
-                        <div className="switchWrapper">
-                            <label class="switch">
-                                <input type="checkbox" checked={notify_people_followed} onChange={(e) => setNotify_people_followed(e.target.checked)} />
-                                <span class="slider round"></span>
-                            </label>
-                            <div className="switchText">People Followed</div>
-                        </div>
-                        <div className="fullHr" style={{ marginTop: 30 }}></div>
-                        {user?.status === 'REGISTER NEW' &&
-                            <>
-                                <div className="termsText">
-                                    Please take a few minutes to read and understand Stacks Terms of Service.
-                                    <br />
-                                    To continue, you’ll need to accept the terms of services by checking the boxes.
-                                </div>
-                                <div className="row" style={{ marginTop: 20 }}>
-                                    <div className="col-sm-12 rememberMeText" style={{ fontSize: 12 }}>
-                                        <input
-                                            className="rememberMeToggleBtn"
-                                            onClick={() => setIagree(!iagree)}
-                                            type="checkbox"
-                                            id="agreement"
-                                            required
-                                        />
-                                        <label htmlFor="agreement">
-                                            I agree Stack terms of service
-                                        </label>
-                                        {/* {iagree && <FontAwesomeIcon icon={faCheck} color="white" style={{ fontSize: 10 }} />} */}
-                                        {/* </div> */}
-                                        {/* <input onClick={() => setIagree(!iagree)} style={{ backgroundColor: iagree ? "#41B6E6" : 'white' }} className="rememberMeToggleBtn" type="checkbox" /> */}
-                                    </div>
-                                </div>
-                            </>
-                        }
-                        {/* Save Profile Button starts here  */}
-                        <button type="submit" className="saveProfileBtn">
-                            Save Profile
-                        </button>
-
                     </div>
-                    {/* Right form column Ends here  */}
-                </form>
-            )}
+
+                    {/* Facebook Field */}
+                    <div className="signupInputWrapper">
+                        <div className="signupInputLabel">Facebook</div>
+                        <div className="signupInputFieldWrapper">
+                            <div className="signupInputFieldWrapperLayer"></div>
+                            <input type="text" placeholder="Enter URL" value={facebook} onChange={(e) => setFacebook(e.target.value)} className="signupInputField" />
+                        </div>
+                    </div>
+
+                    {/* Website Field */}
+                    <div className="signupInputWrapper">
+                        <div className="signupInputLabel">Website</div>
+                        <div className="signupInputFieldWrapper">
+                            <div className="signupInputFieldWrapperLayer"></div>
+                            <input type="text" placeholder="Enter URL" value={website} onChange={(e) => setWebsite(e.target.value)} className="signupInputField" />
+                        </div>
+                    </div>
+                    <div className="fullHr" style={{ marginTop: 30 }}></div>
+
+                    <div className="signupFormCol1Row1Text1">Notifications</div>
+
+                    <div className="switchWrapper">
+                        <label class="switch">
+                            <input type="checkbox" checked={notify_email} onChange={(e) => setNotify_email(e.target.checked)} />
+                            <span class="slider round"></span>
+                        </label>
+                        <div className="switchText">Email Notifications</div>
+                    </div>
+
+                    <div className="switchWrapper">
+                        <label class="switch">
+                            <input type="checkbox" checked={notify_new_bids} onChange={(e) => setNotify_new_bids(e.target.checked)} />
+                            <span class="slider round"></span>
+                        </label>
+                        <div className="switchText">New Bids</div>
+                    </div>
+
+
+                    <div className="switchWrapper">
+                        <label class="switch">
+                            <input type="checkbox" checked={notify_item_purchased} onChange={(e) => setNotify_item_purchased(e.target.checked)} />
+                            <span class="slider round"></span>
+                        </label>
+                        <div className="switchText">Item Purchased</div>
+                    </div>
+
+
+                    <div className="switchWrapper">
+                        <label class="switch">
+                            <input type="checkbox" checked={notify_people_followed} onChange={(e) => setNotify_people_followed(e.target.checked)} />
+                            <span class="slider round"></span>
+                        </label>
+                        <div className="switchText">People Followed</div>
+                    </div>
+                    <div className="fullHr" style={{ marginTop: 30 }}></div>
+                    {user?.status === 'REGISTER NEW' &&
+                        <>
+                            <div className="termsText">
+                                Please take a few minutes to read and understand Stacks Terms of Service.
+                                <br />
+                                To continue, you’ll need to accept the terms of services by checking the boxes.
+                            </div>
+                            <div className="row" style={{ marginTop: 20 }}>
+                                <div className="col-sm-12 rememberMeText" style={{ fontSize: 12 }}>
+                                    <input
+                                        className="rememberMeToggleBtn"
+                                        onClick={() => setIagree(!iagree)}
+                                        type="checkbox"
+                                        id="agreement"
+                                        required
+                                    />
+                                    <label htmlFor="agreement">
+                                        I agree Stack terms of service
+                                    </label>
+                                    {/* {iagree && <FontAwesomeIcon icon={faCheck} color="white" style={{ fontSize: 10 }} />} */}
+                                    {/* </div> */}
+                                    {/* <input onClick={() => setIagree(!iagree)} style={{ backgroundColor: iagree ? "#41B6E6" : 'white' }} className="rememberMeToggleBtn" type="checkbox" /> */}
+                                </div>
+                            </div>
+                        </>
+                    }
+                    {/* Save Profile Button starts here  */}
+                    <button type="submit" className="saveProfileBtn">
+                        Save Profile
+                    </button>
+
+                </div>
+                {/* Right form column Ends here  */}
+            </form>
             {/* Form Ends  here */}
 
 

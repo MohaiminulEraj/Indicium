@@ -155,7 +155,9 @@ const verifyEmail = asyncHandler(async (req, res) => {
     const client = new twilio(accountSid, authToken);
     const { code, userEmail } = req.body
     // const user = await User.findById(req.user._id)
-
+    const verifiedEmail = {
+        verified: true
+    }
     // console.log(code, userEmail)
     let xyz = await client.verify.services(process.env.SERVICE_ID)
         .verificationChecks
@@ -164,6 +166,12 @@ const verifyEmail = asyncHandler(async (req, res) => {
         res.status(401)
         throw new Error('Email not verified')
     }
+
+    const user = await User.findOneAndUpdate({ email: userEmail }, verifiedEmail, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false
+    })
     res.json({ message: "Email verified" })
     // user.verified = true
     // await user.save().then(result => {

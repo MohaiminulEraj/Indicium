@@ -14,27 +14,41 @@ import discoverCardThumbnail4 from "../assets/images/discoverCardThumbnail4.png"
 import filledIcon from "../assets/images/Filled.png";
 import internetIcon from "../assets/images/internet.png";
 import shareSquare from "../assets/images/shareSquare.png";
+// import coverPic from "../assets/images/cover.png";
 import twitter from "../assets/images/twitter.png";
 import insta from "../assets/images/insta.png";
 import fbCircle from "../assets/images/fbCircle.png";
 import { Link } from "react-router-dom";
-
+import { FaCheck, FaTimes } from 'react-icons/fa'
+import { getUserDetails, updateCoverPhoto } from '../redux/actions/userActions'
 import ProfileDiscoverCard from "./components/ProfileDiscoverCard"
-import moreFill from "../assets/images/morefill.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import SigninPopup from "./components/SigninPopup";
-import SignUpPopup from "./components/SignUpPopup";
+import Message from './components/Message'
+import Loader from './components/Loader'
+// import moreFill from "../assets/images/morefill.png";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import SigninPopup from "./components/SigninPopup";
+// import SignUpPopup from "./components/SignUpPopup";
 
 const Profile = (props) => {
 
     const [activeItem, setActiveItem] = useState('onSale')
     const [showPopup, setShowPopup] = useState(false);
     const [showSignupPopup, setShowSignupPopup] = useState(false);
-
+    const [message, setMessage] = useState(null)
     const userLogin = useSelector((state) => state.userLogin)
     const { userInfo } = userLogin
     const userDetails = useSelector((state) => state.userDetails)
-    const { user } = userDetails
+    const { loading, error, user } = userDetails
+
+    const [coverPhoto, setCoverPhoto] = useState('');
+    const [coverPhotoPreview, setCoverPhotoPreview] = useState('');
+
+    const coverPhotoUpdate = useSelector((state) => state.coverPhotoUpdate)
+    const { success } = coverPhotoUpdate
+
+    const dispatch = useDispatch();
+
+
     let createdAt = new Date(user?.createdAt || '2022-01-04T11:14:09.314Z');
     createdAt = createdAt.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -42,13 +56,47 @@ const Profile = (props) => {
         day: 'numeric',
         timeZone: 'UTC'
     });
+    console.log(user?.coverPhoto?.url)
+    useEffect(() => {
+        if (!userInfo) {
+            window.location.href = '/'
+        } else {
+            if (!user || !user.name || success) {
+                // dispatch({ type: USER_UPDATE_PROFILE_RESET })
+                dispatch(getUserDetails(userInfo._id))
+            } else {
+                setCoverPhoto(user?.coverPhoto?.url)
+                // setAvatar(user?.avatar?.url)
+            }
+        }
+    }, [dispatch, user, userInfo])
+
     const onMenuItemClick = (id) => {
         console.log(id)
         setActiveItem(id)
     }
+    const coverPhotoUpdateBtn = (e) => {
+        if (e.target.name === 'coverPhoto') {
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (reader.readyState === 2) {
+                    setCoverPhoto(reader.result);
+                    setCoverPhotoPreview(reader.result);
+                }
+            }
+            if (e.target.files[0]) reader.readAsDataURL(e.target.files[0])
+        }
+    }
+
+    const submitCoverPhoto = (e) => {
+        e.preventDefault();
+        dispatch(updateCoverPhoto({ id: userInfo._id, coverPhoto }))
+        console.log('submit btn clicked')
+        // window.location.href = '/profile'
+    }
 
     return (
-        <div className="body">
+        <div style={{ backgroundColor: 'black' }} className="body">
 
             {/* Signup and register popups */}
             {/* {showPopup &&
@@ -69,7 +117,15 @@ const Profile = (props) => {
 
 
             {/* Cover Photo */}
-            <div className="profileCoverPhoto">
+            {/* <div style={{ backgroundImage: user?.coverPhoto?.url !== '' ? `url(${user?.coverPhoto?.url}` : '' }} className="profileCoverPhoto"> */}
+            {loading && <Loader />}
+            {message && <Message variant='danger'>{message}</Message>}
+            {success && <Message variant='success'>
+                Profile Updated
+                {window.location.href = '/profile'}
+            </Message>}
+            {error && <Message variant='danger'>{error}</Message>}
+            <div style={{ backgroundImage: coverPhoto !== '' ? `url(${coverPhoto}` : `` }} className="profileCoverPhoto">
                 <div className="row">
                     <div className="col-sm-7">
                     </div>
@@ -77,18 +133,41 @@ const Profile = (props) => {
                         <div className="row">
                             <div className="col-sm-4 text-center">
                                 <div className="profileCoverPhotoBtn">
-                                    <div className="profileCoverPhotoBtnText">Edit cover photo</div>
-                                    <img src={galleryIcon} style={{ width: 16, height: 16, marginLeft: 10 }} />
+                                    <input name='coverPhoto' id="uploadPhoto" onChange={coverPhotoUpdateBtn} type="file" className="uploadSignupBtnLayer" accept='images/*' />
+                                    <label className="profileCoverPhotoBtnText" style={{ cursor: 'pointer' }} htmlFor="uploadPhoto">
+                                        Edit cover photo
+                                        <img src={galleryIcon} style={{ width: 16, height: 16, marginLeft: 10 }} />
+                                    </label>
                                 </div>
                             </div>
-                            <div className="col-sm-4 text-center">
-                                <Link to="/update-profile">
-                                    <div className="profileCoverPhotoBtn">
-                                        <div className="profileCoverPhotoBtnText">Edit profile</div>
-                                        <img src={editIcon} style={{ width: 16, height: 16, marginLeft: 10 }} />
+                            {coverPhotoPreview !== '' ? (
+                                <>
+                                    <div className="col-sm-4 text-center">
+                                        {/* <input name='coverPhoto' id="uploadCoverPhoto" type="submit" className="uploadSignupBtnLayer" accept='images/*' /> */}
+                                        <div onClick={submitCoverPhoto} className="profileCoverPhotoBtn">
+                                            <label style={{ color: 'green', cursor: 'pointer' }} className="profileCoverPhotoBtnText" htmlFor="uploadCoverPhoto">
+                                                Submit  <FaCheck />
+                                            </label>
+                                        </div>
                                     </div>
-                                </Link>
-                            </div>
+                                    <div className="col-sm-4 text-center">
+                                        <a href="/profile">
+                                            <label className="profileCoverPhotoBtn">
+                                                <div style={{ color: 'red' }} className="profileCoverPhotoBtnText">Cancel  <FaTimes /></div>
+                                            </label>
+                                        </a>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="col-sm-4 text-center">
+                                    <Link to="/update-profile">
+                                        <div className="profileCoverPhotoBtn">
+                                            <div className="profileCoverPhotoBtnText">Edit profile</div>
+                                            <img src={editIcon} style={{ width: 16, height: 16, marginLeft: 10 }} />
+                                        </div>
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -146,19 +225,19 @@ const Profile = (props) => {
                                 </div> */}
                                 <div className="row socialActionButton" style={{ marginTop: 30 }}>
                                     <div className="col-sm-4">
-                                        <Link to={user?.twitter || '/profile'}>
+                                        <a to={user?.twitter} target="_blank" rel="noreferrer noopener">
                                             <img src={twitter} style={{ width: 25, height: 25, marginLeft: 10, marginRight: 10 }} />
-                                        </Link>
+                                        </a>
                                     </div>
                                     <div className="col-sm-4">
-                                        <Link to={user?.instagram || '/profile'}>
+                                        <a to={user?.instagram} target="_blank" rel="noreferrer noopener">
                                             <img src={insta} style={{ width: 25, height: 25, marginRight: 10, marginLeft: 10 }} />
-                                        </Link>
+                                        </a>
                                     </div>
                                     <div className="col-sm-4">
-                                        <Link to={user?.facebook || '/profile'}>
+                                        <a href={user?.facebook} target="_blank" rel="noreferrer noopener">
                                             <img src={fbCircle} style={{ width: 25, height: 25, marginRight: 10, marginLeft: 10 }} />
-                                        </Link>
+                                        </a>
                                     </div>
                                 </div>
 

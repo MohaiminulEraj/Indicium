@@ -621,6 +621,10 @@ a:hover {
   height: 100%;
 }
 
+.upr {
+  background-color: #000000;
+}
+
 .profileWrapper {
   width: 100%;
   height: 100%;
@@ -811,11 +815,13 @@ a:hover {
   border-radius: 6px;
 }
 
-#uploadPhoto {
+#uploadPhoto,
+.cancelBtn {
   opacity: 0;
   position: absolute;
   z-index: -1;
 }
+
 
 .artistCardBtn:hover {
   background-image: linear-gradient(to left, #fff, #fff);

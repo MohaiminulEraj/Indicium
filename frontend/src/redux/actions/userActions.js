@@ -7,7 +7,6 @@ import {
     USER_UPDATE_PROFILE_FAIL,
     USER_UPDATE_PROFILE_REQUEST,
     USER_UPDATE_PROFILE_SUCCESS,
-    USER_DETAILS_RESET,
     USER_LOGIN_FAIL,
     USER_LOGIN_REQUEST,
     USER_LOGIN_SUCCESS,
@@ -15,9 +14,9 @@ import {
     USER_REGISTER_FAIL,
     USER_REGISTER_REQUEST,
     USER_REGISTER_SUCCESS,
-    LOAD_USER_REQUEST,
-    LOAD_USER_SUCCESS,
-    LOAD_USER_FAIL,
+    UPDATE_COVER_PHOTO_REQUEST,
+    UPDATE_COVER_PHOTO_SUCCESS,
+    UPDATE_COVER_PHOTO_FAIL,
     VERIFY_USER_REQUEST,
     VERIFY_USER_SUCCESS,
     VERIFY_USER_FAIL,
@@ -120,7 +119,7 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(`/api/profile`, config)
-        console.log(data.data.createdAt)
+
         dispatch({
             type: USER_DETAILS_SUCCESS,
             payload: data.data,
@@ -140,6 +139,7 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
     }
 }
 
+// Update User
 export const updateUserProfile = (user) => async (dispatch, getState) => {
     try {
         dispatch({
@@ -184,30 +184,80 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
     }
 }
 
-// Loader user
-export const loadUser = () => async (dispatch) => {
+// Update Cover Photo
+export const updateCoverPhoto = (user) => async (dispatch, getState) => {
     try {
-
-        dispatch({ type: LOAD_USER_REQUEST });
-
-        const { data } = await axios.get('/api/profile/me')
-
         dispatch({
-            type: LOAD_USER_SUCCESS,
-            payload: data
+            type: UPDATE_COVER_PHOTO_REQUEST,
         })
 
-    } catch (error) {
+        const {
+            userLogin: { userInfo },
+        } = getState()
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${userInfo.token}`,
+            },
+        }
+
+        // const userInfoFromCookies = Cookies.get('userInfo')
+        //     ? JSON.parse(Cookies.get('userInfo'))
+        //     : null
+        // const userEmail = userInfoFromCookies ? userInfoFromCookies.email : null
+
+        const { data } = await axios.put(`/api/profile/cover-photo`, user, config)
 
         dispatch({
-            type: LOAD_USER_FAIL,
-            payload:
-                error.response && error.response.data.message
-                    ? error.response.data.message
-                    : error.message
+            type: UPDATE_COVER_PHOTO_SUCCESS,
+            payload: data,
+        })
+        // dispatch({
+        //     type: USER_LOGIN_SUCCESS,
+        //     payload: data,
+        // })
+        // localStorage.setItem('userInfo', JSON.stringify(data))
+
+    } catch (error) {
+        const message =
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        if (message === 'Not authorized, token failed') {
+            dispatch(logout())
+        }
+        dispatch({
+            type: UPDATE_COVER_PHOTO_FAIL,
+            payload: message,
         })
     }
 }
+
+// // Loader user
+// export const loadUser = () => async (dispatch) => {
+//     try {
+
+//         dispatch({ type: LOAD_USER_REQUEST });
+
+//         const { data } = await axios.get('/api/profile/me')
+
+//         dispatch({
+//             type: LOAD_USER_SUCCESS,
+//             payload: data
+//         })
+
+//     } catch (error) {
+
+//         dispatch({
+//             type: LOAD_USER_FAIL,
+//             payload:
+//                 error.response && error.response.data.message
+//                     ? error.response.data.message
+//                     : error.message
+//         })
+//     }
+// }
 
 export const verifyEmail = (code) => async (dispatch) => {
     try {
@@ -224,8 +274,8 @@ export const verifyEmail = (code) => async (dispatch) => {
             ? JSON.parse(Cookies.get('userInfo'))
             : null
         const userEmail = userInfoFromCookies ? userInfoFromCookies.email : null
-        console.log(userEmail)
-        const { data } = await axios.post(
+
+        const { data } = await axios.put(
             '/api/users/verify-email',
             { code, userEmail },
             config

@@ -27,9 +27,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
             throw new Error('User not found with this ID.')
         }
 
-        profile.createdAt = profile.createdAt.toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-
-
         res.status(200).json({
             success: true,
             data: profile
@@ -42,10 +39,10 @@ const getUserProfile = asyncHandler(async (req, res) => {
 });
 
 // @desc    Update user profile
-// @route   PUT /api/users/profile
+// @route   PUT /api/profile
 // @access  Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-    const newUserData = {
+    let newUserData = {
         name: req.body.name,
         walletPublicAdd: req.body.walletPublicAdd,
         location: req.body.location,
@@ -67,7 +64,9 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             const user = await User.findById(req.user.id)
 
             const image_id = user.avatar.public_id;
-            const res = await cloudinary.v2.uploader.destroy(image_id);
+            if (image_id !== undefined) {
+                const res = await cloudinary.v2.uploader.destroy(image_id);
+            }
 
             const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
                 folder: 'indicium/avatars',
@@ -96,10 +95,57 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     })
 })
 
+// @desc    Update Cover photo
+// @route   PUT /api/users/profile
+// @access  Private
+const updateCoverPhoto = asyncHandler(async (req, res) => {
+    let newCoverPhoto = {
+        coverPhoto: {
+            public_id: '',
+            url: ''
+        }
+    }
+    // Update avatar
+    try {
+        if (req.body.coverPhoto !== '') {
+            const user = await User.findById(req.user.id)
+
+            const image_id = user.coverPhoto.public_id;
+            if (image_id !== undefined) {
+                const res = await cloudinary.v2.uploader.destroy(image_id);
+            }
+
+            const result = await cloudinary.v2.uploader.upload(req.body.coverPhoto, {
+                folder: 'indicium/cover_photos',
+                // width: 150,
+                // crop: "scale"
+            })
+            newCoverPhoto.coverPhoto.public_id = result.public_id;
+            newCoverPhoto.coverPhoto.url = result.secure_url;
+            // newCoverPhoto.coverPhoto = {
+            //     public_id: result.public_id,
+            //     url: result.secure_url
+            // }
+        }
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+    const user = await User.findByIdAndUpdate(req.user.id, newCoverPhoto, {
+        new: true,
+        unValidators: true,
+        useFindAndModify: false
+    })
+
+    res.status(200).json({
+        success: true
+    })
+})
+
 
 // // @desc    Update user profile
 // // @route   PUT /api/users/profile
-// // @access  Private
+// // @access  Private  
 // const updateUserProfile = asyncHandler(async (req, res) => {
 //     try {
 //         const user = await User.findById(req.user._id)
@@ -174,5 +220,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
 export {
     getUserProfile,
-    updateUserProfile
+    updateUserProfile,
+    updateCoverPhoto
 }

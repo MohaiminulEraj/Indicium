@@ -20,6 +20,10 @@ import {
   USER_UPDATE_PROFILE_REQUEST,
   USER_UPDATE_PROFILE_SUCCESS,
   USER_UPDATE_PROFILE_RESET,
+  UPDATE_COVER_PHOTO_REQUEST,
+  UPDATE_COVER_PHOTO_SUCCESS,
+  UPDATE_COVER_PHOTO_FAIL,
+  // UPDATE_COVER_PHOTO_RESET,
   RESET_PASSWORD_REQUEST,
   RESET_PASSWORD_SUCCESS,
   RESET_PASSWORD_FAIL,
@@ -88,70 +92,82 @@ export const userUpdateProfileReducer = (state = {}, action) => {
   }
 }
 
-
-// Auth Reducers
-export const authReducer = (state = { isAuthenticated: null, loading: true, user: null }, action) => {
-  const { type, payload } = action;
-
-  switch (type) {
-    case LOAD_USER_SUCCESS:
-      return {
-        ...state,
-        isAuthenticated: true,
-        loading: false,
-        user: payload
-      };
-    case USER_REGISTER_SUCCESS:
-    case USER_LOGIN_SUCCESS:
-      return {
-        ...state,
-        ...payload,
-        isAuthenticated: true,
-        loading: false
-      };
-    // case ACCOUNT_DELETED:
-    // case AUTH_ERROR:
-    // case LOGOUT:
-    //   return {
-    //     ...state,
-    //     token: null,
-    //     isAuthenticated: false,
-    //     loading: false,
-    //     user: null
-    //   };
-    default:
-      return state;
-  }
-}
-
-// Load user reducer
-export const loadedUserReducer = (state = { loading: true, isAuthenticated: false, user: null }, action) => {
+export const coverPhotoUpdateReducer = (state = {}, action) => {
   switch (action.type) {
-
-    case LOAD_USER_REQUEST:
-      return {
-        loading: true,
-        isAuthenticated: false
-      }
-
-    case LOAD_USER_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        isAuthenticated: true,
-        user: action.payload
-      }
-
-    case LOAD_USER_FAIL:
-      return {
-        loading: false,
-        isAuthenticated: false,
-        error: action.payload
-      }
+    case UPDATE_COVER_PHOTO_REQUEST:
+      return { loading: true }
+    case UPDATE_COVER_PHOTO_SUCCESS:
+      return { loading: false, success: true, userInfo: action.payload }
+    case UPDATE_COVER_PHOTO_FAIL:
+      return { loading: false, error: action.payload }
     default:
       return state
   }
 }
+
+// // Auth Reducers
+// export const authReducer = (state = { isAuthenticated: null, loading: true, user: null }, action) => {
+//   const { type, payload } = action;
+
+//   switch (type) {
+//     case LOAD_USER_SUCCESS:
+//       return {
+//         ...state,
+//         isAuthenticated: true,
+//         loading: false,
+//         user: payload
+//       };
+//     case USER_REGISTER_SUCCESS:
+//     case USER_LOGIN_SUCCESS:
+//       return {
+//         ...state,
+//         ...payload,
+//         isAuthenticated: true,
+//         loading: false
+//       };
+//     // case ACCOUNT_DELETED:
+//     // case AUTH_ERROR:
+//     // case LOGOUT:
+//     //   return {
+//     //     ...state,
+//     //     token: null,
+//     //     isAuthenticated: false,
+//     //     loading: false,
+//     //     user: null
+//     //   };
+//     default:
+//       return state;
+//   }
+// }
+
+// // Load user reducer
+// export const loadedUserReducer = (state = { loading: true, isAuthenticated: false, user: null }, action) => {
+//   switch (action.type) {
+
+//     case LOAD_USER_REQUEST:
+//       return {
+//         loading: true,
+//         isAuthenticated: false
+//       }
+
+//     case LOAD_USER_SUCCESS:
+//       return {
+//         ...state,
+//         loading: false,
+//         isAuthenticated: true,
+//         user: action.payload
+//       }
+
+//     case LOAD_USER_FAIL:
+//       return {
+//         loading: false,
+//         isAuthenticated: false,
+//         error: action.payload
+//       }
+//     default:
+//       return state
+//   }
+// }
 
 
 export const verifyUserReducer = (state = {}, action) => {

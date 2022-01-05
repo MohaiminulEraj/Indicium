@@ -25,6 +25,17 @@ const UserSchema = new mongoose.Schema({
             // required: true,
         }
     },
+    coverPhoto: {
+        public_id: {
+            type: String,
+            // required: true,
+        },
+        url: {
+            type: String,
+            default: '',
+            // required: true,
+        }
+    },
     name: {
         type: String,
         // required: true,
@@ -34,7 +45,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         // required: true,
         // default: "u",
-        unique: true
+        // unique: true
     },
     location: {
         type: String,

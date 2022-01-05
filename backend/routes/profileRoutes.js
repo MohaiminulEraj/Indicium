@@ -2,7 +2,8 @@ import express from 'express'
 const router = express.Router()
 import {
     getUserProfile,
-    updateUserProfile
+    updateUserProfile,
+    updateCoverPhoto
 } from '../controllers/profileController.js'
 import { protect } from '../middleware/authMiddleware.js'
 
@@ -13,5 +14,7 @@ router
     .route('/')
     .get(protect, getUserProfile)
     .put(protect, updateUserProfile)
+
+router.route('/cover-photo').put(protect, updateCoverPhoto)
 
 export default router

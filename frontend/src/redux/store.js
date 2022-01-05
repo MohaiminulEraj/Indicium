@@ -6,11 +6,12 @@ import {
     userRegisterReducer,
     userDetailsReducer,
     userUpdateProfileReducer,
+    coverPhotoUpdateReducer,
     verifyUserReducer,
-    loadedUserReducer,
+    // loadedUserReducer,
     forgotPasswordReducer,
     resetPasswordReducer,
-    authReducer,
+    // authReducer,
 } from './reducers/userReducers'
 import { alertReducer } from './reducers/alert'
 import Cookies from 'js-cookie'
@@ -20,12 +21,13 @@ const reducer = combineReducers({
     userRegister: userRegisterReducer,
     userDetails: userDetailsReducer,
     userUpdateProfile: userUpdateProfileReducer,
+    coverPhotoUpdate: coverPhotoUpdateReducer,
     verifyUser: verifyUserReducer,
-    loadedUser: loadedUserReducer,
+    // loadedUser: loadedUserReducer,
     forgotPassword: forgotPasswordReducer,
     resetPassword: resetPasswordReducer,
     alert: alertReducer,
-    auth: authReducer
+    // auth: authReducer
 })
 
 const userInfoFromCookies = Cookies.get('userInfo')
