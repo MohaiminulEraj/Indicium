@@ -9,7 +9,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faUserAlt, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import mobileLogo from "../../assets/images/mobileLogo.png"
-import { logout } from "../../redux/actions/userActions";
+import { getUserDetails, logout } from "../../redux/actions/userActions";
+
 const CustomNavbar = (props) => {
 
   const dispatch = useDispatch()
@@ -18,6 +19,15 @@ const CustomNavbar = (props) => {
   const { userInfo } = userLogin
   const userDetails = useSelector((state) => state.userDetails)
   const { user } = userDetails
+
+  useEffect(() => {
+    if (userInfo) {
+      if (!user || !user.name) {
+        dispatch(getUserDetails(userInfo._id))
+      }
+    }
+  }, [dispatch, user, userInfo])
+
   const logoutHandler = () => {
     dispatch(logout())
   }
@@ -88,7 +98,7 @@ const CustomNavbar = (props) => {
                 <>
                   <Nav.Link>
                     <div className="navItemSignup">
-                      <Link to="/update-profile">Welcome {user ? user.name : 'User'}!</Link>
+                      <Link to="/profile">Welcome {user?.name?.split(" ")[0] || 'User'}!</Link>
                     </div>
                   </Nav.Link>
                   <Nav.Link href="#" >

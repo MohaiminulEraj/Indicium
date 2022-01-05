@@ -120,7 +120,7 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
         }
 
         const { data } = await axios.get(`/api/profile`, config)
-
+        console.log(data.data.createdAt)
         dispatch({
             type: USER_DETAILS_SUCCESS,
             payload: data.data,
@@ -168,6 +168,7 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
         //     payload: data,
         // })
         // localStorage.setItem('userInfo', JSON.stringify(data))
+
     } catch (error) {
         const message =
             error.response && error.response.data.message

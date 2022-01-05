@@ -16,14 +16,17 @@ import Loader from './components/Loader'
 import { USER_UPDATE_PROFILE_RESET } from '../redux/constants/userConstants'
 
 const UpdateProfile = (props) => {
+
     const dispatch = useDispatch()
 
+    const userLogin = useSelector((state) => state.userLogin)
+    const { userInfo } = userLogin
 
     const userDetails = useSelector((state) => state.userDetails)
     const { loading, error, user } = userDetails
 
-    const userLogin = useSelector((state) => state.userLogin)
-    const { userInfo } = userLogin
+    const userUpdateProfile = useSelector((state) => state.userUpdateProfile)
+    const { success } = userUpdateProfile
 
     const [showPopup, setShowPopup] = useState(false);
     const [showSignupPopup, setShowSignupPopup] = useState(false);
@@ -32,7 +35,7 @@ const UpdateProfile = (props) => {
     const [name, setName] = useState(user ? user.name : '');
     const [walletPublicAdd, setWalletPublicAdd] = useState(user ? user.walletPublicAdd : '')
     const [location, setLocation] = useState(user ? (user.location !== 'lc' && user.location) : '')
-    const [username, setusername] = useState(user ? user.username : '')
+    const [username, setUsername] = useState(user ? user.username : '')
     const [bio, setBio] = useState(user ? user.bio : '')
     const [instagram, setInstagram] = useState(user ? user.instagram : '')
     const [twitter, setTwitter] = useState(user ? user.twitter : '')
@@ -45,9 +48,6 @@ const UpdateProfile = (props) => {
     const [avatar, setAvatar] = useState('');
     const [avatarPreview, setAvatarPreview] = useState(user?.avatar?.url);
 
-
-    const userUpdateProfile = useSelector((state) => state.userUpdateProfile)
-    const { success } = userUpdateProfile
 
     const [message, setMessage] = useState(null)
 
@@ -124,7 +124,7 @@ const UpdateProfile = (props) => {
             <div className="navBarDiscoverSignup">
                 <CustomNavbar onSigninClick={() => setShowPopup(!showPopup)} onSignupClick={() => setShowSignupPopup(!showSignupPopup)} />
                 <div className="signupTitle">
-                    REGISTER NEW ACCOUNT
+                    {user?.status} ACCOUNT
                 </div>
                 <div className="signupTagline">
                     You can set preferred display name, create your profile URL and manage other personal settings.
@@ -303,28 +303,32 @@ const UpdateProfile = (props) => {
                             <div className="switchText">People Followed</div>
                         </div>
                         <div className="fullHr" style={{ marginTop: 30 }}></div>
-                        <div className="termsText">
-                            Please take a few minutes to read and understand Stacks Terms of Service.
-                            <br />
-                            To continue, you’ll need to accept the terms of services by checking the boxes.
-                        </div>
-                        <div className="row" style={{ marginTop: 20 }}>
-                            <div className="col-sm-12 rememberMeText" style={{ fontSize: 12 }}>
-                                <input
-                                    className="rememberMeToggleBtn"
-                                    onClick={() => setIagree(!iagree)}
-                                    type="checkbox"
-                                    id="agreement"
-                                    required
-                                />
-                                <label htmlFor="agreement">
-                                    I agree Stack terms of service
-                                </label>
-                                {/* {iagree && <FontAwesomeIcon icon={faCheck} color="white" style={{ fontSize: 10 }} />} */}
-                                {/* </div> */}
-                                {/* <input onClick={() => setIagree(!iagree)} style={{ backgroundColor: iagree ? "#41B6E6" : 'white' }} className="rememberMeToggleBtn" type="checkbox" /> */}
-                            </div>
-                        </div>
+                        {user?.status === 'REGISTER NEW' &&
+                            <>
+                                <div className="termsText">
+                                    Please take a few minutes to read and understand Stacks Terms of Service.
+                                    <br />
+                                    To continue, you’ll need to accept the terms of services by checking the boxes.
+                                </div>
+                                <div className="row" style={{ marginTop: 20 }}>
+                                    <div className="col-sm-12 rememberMeText" style={{ fontSize: 12 }}>
+                                        <input
+                                            className="rememberMeToggleBtn"
+                                            onClick={() => setIagree(!iagree)}
+                                            type="checkbox"
+                                            id="agreement"
+                                            required
+                                        />
+                                        <label htmlFor="agreement">
+                                            I agree Stack terms of service
+                                        </label>
+                                        {/* {iagree && <FontAwesomeIcon icon={faCheck} color="white" style={{ fontSize: 10 }} />} */}
+                                        {/* </div> */}
+                                        {/* <input onClick={() => setIagree(!iagree)} style={{ backgroundColor: iagree ? "#41B6E6" : 'white' }} className="rememberMeToggleBtn" type="checkbox" /> */}
+                                    </div>
+                                </div>
+                            </>
+                        }
                         {/* Save Profile Button starts here  */}
                         <button type="submit" className="saveProfileBtn">
                             Save Profile

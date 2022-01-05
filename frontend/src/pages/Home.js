@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from 'react-redux';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/Home.css";
 import "../styles/Responsive.css";
@@ -24,7 +25,10 @@ const Home = (props) => {
   const [activeSection, setActiveSection] = useState("home");
   const [showPopup, setShowPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
-  const [user, setUser] = useState()
+  // const [user, setUser] = useState()
+
+  const userDetails = useSelector((state) => state.userDetails)
+  const { user } = userDetails
 
   const firebaseConfig = {
     apiKey: "AIzaSyBwmB6BwxVg-FxBd7hvW1KO0VmtfFE9xHM",
@@ -36,21 +40,21 @@ const Home = (props) => {
     measurementId: "G-VKEGSVPE8T"
   };
 
-  useEffect(() => {
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        const uid = user.uid;
-        setUser(user)
-      } else {
-        // User is signed out
-        console.log(user)
-        setUser(null)
-      }
-    });
-  }, [])
+  // useEffect(() => {
+  //   const app = initializeApp(firebaseConfig);
+  //   const auth = getAuth();
+  //   onAuthStateChanged(auth, (user) => {
+  //     if (user) {
+  //       // User is signed in, see docs for a list of available properties
+  //       const uid = user.uid;
+  //       setUser(user)
+  //     } else {
+  //       // User is signed out
+  //       console.log(user)
+  //       setUser(null)
+  //     }
+  //   });
+  // }, [])
 
 
   return (

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/Home.css";
 import "../styles/Responsive.css";
@@ -16,7 +17,7 @@ import shareSquare from "../assets/images/shareSquare.png";
 import twitter from "../assets/images/twitter.png";
 import insta from "../assets/images/insta.png";
 import fbCircle from "../assets/images/fbCircle.png";
-
+import { Link } from "react-router-dom";
 
 import ProfileDiscoverCard from "./components/ProfileDiscoverCard"
 import moreFill from "../assets/images/morefill.png";
@@ -30,7 +31,17 @@ const Profile = (props) => {
     const [showPopup, setShowPopup] = useState(false);
     const [showSignupPopup, setShowSignupPopup] = useState(false);
 
-    
+    const userLogin = useSelector((state) => state.userLogin)
+    const { userInfo } = userLogin
+    const userDetails = useSelector((state) => state.userDetails)
+    const { user } = userDetails
+    let createdAt = new Date(user?.createdAt || '2022-01-04T11:14:09.314Z');
+    createdAt = createdAt.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC'
+    });
     const onMenuItemClick = (id) => {
         console.log(id)
         setActiveItem(id)
@@ -40,14 +51,14 @@ const Profile = (props) => {
         <div className="body">
 
             {/* Signup and register popups */}
-            {showPopup &&
+            {/* {showPopup &&
                 <SigninPopup showPopup={showPopup} setShowPopup={setShowPopup} />
             }
             {
                 showSignupPopup &&
                 <SignUpPopup showSignupPopup={showSignupPopup} setShowSignupPopup={setShowSignupPopup} />
 
-            }
+            } */}
             {/* Signup and register popups */}
 
 
@@ -71,10 +82,12 @@ const Profile = (props) => {
                                 </div>
                             </div>
                             <div className="col-sm-4 text-center">
-                                <div className="profileCoverPhotoBtn">
-                                    <div className="profileCoverPhotoBtnText">Edit profile</div>
-                                    <img src={editIcon} style={{ width: 16, height: 16, marginLeft: 10 }} />
-                                </div>
+                                <Link to="/update-profile">
+                                    <div className="profileCoverPhotoBtn">
+                                        <div className="profileCoverPhotoBtnText">Edit profile</div>
+                                        <img src={editIcon} style={{ width: 16, height: 16, marginLeft: 10 }} />
+                                    </div>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -91,9 +104,9 @@ const Profile = (props) => {
                             {/* Profile Vertical Card starts here */}
                             <div className="profileLeftCardWrapper">
                                 <div className="profileLeftCardImgWrapper">
-                                    <img src={profileAvatar} style={{ width: '100%', height: '100%' }} />
+                                    <img src={user?.avatar?.url || profileAvatar} style={{ width: '100%', height: '100%' }} />
                                 </div>
-                                <div className="profileLeftCardUsernameText">Enrico Coles</div>
+                                <div className="profileLeftCardUsernameText">{user?.name}</div>
                                 <div style={{ display: 'flex', alignItems: 'baseline' }}>
                                     <div className="profileLeftCardUsernameText2">0xc4c16a645...b21a</div>
                                     <img src={filledIcon} style={{ width: 16, height: 16, marginLeft: 10 }} />
@@ -113,10 +126,10 @@ const Profile = (props) => {
                                         top: 3
 
                                     }} />
-                                    <div className="profileLeftCardUsernameText2">website.com</div>
+                                    <div className="profileLeftCardUsernameText2">{user?.website || 'website.com'}</div>
                                 </div>
 
-                                <div className="row profileActionButton" style={{ marginTop: 30 }}>
+                                {/* <div className="row profileActionButton" style={{ marginTop: 30 }}>
                                     <div className="col-sm-6">
                                         <div className="profileFollowBtn">Follow</div>
                                     </div>
@@ -130,21 +143,27 @@ const Profile = (props) => {
                                             <img src={moreFill} style={{ width: '50%', height: '50%' }} />
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                                 <div className="row socialActionButton" style={{ marginTop: 30 }}>
                                     <div className="col-sm-4">
-                                        <img src={twitter} style={{ width: 25, height: 25, marginLeft: 10, marginRight: 10 }} />
+                                        <Link to={user?.twitter || '/profile'}>
+                                            <img src={twitter} style={{ width: 25, height: 25, marginLeft: 10, marginRight: 10 }} />
+                                        </Link>
                                     </div>
                                     <div className="col-sm-4">
-                                        <img src={insta} style={{ width: 25, height: 25, marginRight: 10, marginLeft: 10 }} />
+                                        <Link to={user?.instagram || '/profile'}>
+                                            <img src={insta} style={{ width: 25, height: 25, marginRight: 10, marginLeft: 10 }} />
+                                        </Link>
                                     </div>
                                     <div className="col-sm-4">
-                                        <img src={fbCircle} style={{ width: 25, height: 25, marginRight: 10, marginLeft: 10 }} />
+                                        <Link to={user?.facebook || '/profile'}>
+                                            <img src={fbCircle} style={{ width: 25, height: 25, marginRight: 10, marginLeft: 10 }} />
+                                        </Link>
                                     </div>
                                 </div>
 
                                 <div className="profileHrDivider"></div>
-                                <div className="profileLeftCardUsernameTextBottomLine">Member since Mar 15, 2021</div>
+                                <div className="profileLeftCardUsernameTextBottomLine">Member since {createdAt} </div>
                             </div>
                             {/* Profile Vertical Card starts here */}\
                         </div>

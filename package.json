@@ -29,7 +29,8 @@
     "nodemailer": "^6.7.2",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "normalize-url": "^7.0.2",
-    "twilio": "^3.72.0"
+    "twilio": "^3.72.0",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "concurrently": "^6.5.1",

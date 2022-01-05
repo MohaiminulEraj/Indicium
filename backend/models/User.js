@@ -1,17 +1,19 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
+import validator from 'validator'
 
 const UserSchema = new mongoose.Schema({
     email: {
         type: String,
-        // required: true,
+        required: true,
         lowercase: true,
         trim: true,
+        validate: [validator.isEmail, 'Please enter valid email address'],
         unique: true
     },
     password: {
         type: String,
-        // required: true,
+        required: true,
     },
     avatar: {
         public_id: {
@@ -75,6 +77,10 @@ const UserSchema = new mongoose.Schema({
     verified: {
         type: Boolean,
         default: false
+    },
+    status: {
+        type: String,
+        default: 'REGISTER NEW'
     }
 }, {
     timestamps: true
