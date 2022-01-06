@@ -120,33 +120,126 @@ const getUserProfile = asyncHandler(async (req, res) => {
 })
 
 const forgotPassword = asyncHandler(async (req, res) => {
-    crypto.randomBytes(32, (err, buffer) => {
-        if (err) {
-            console.log(err)
-        }
-        const token = buffer.toString("hex")
-        User.findOne({ email: req.body.email })
-            .then(user => {
-                if (!user) {
-                    return res.status(422).json({ error: "User dont exists with that email" })
-                }
-                user.resetToken = token
-                user.expireToken = Date.now() + 3600000
-                user.save().then((result) => {
-                    transporter.sendMail({
-                        to: user.email,
-                        from: process.env.EMAIL,
-                        subject: "password reset",
-                        html: `
-                    <p>You requested for password reset</p>
-                    <h5>click in this <a href="http://localhost:3000/new-password/${token}">link</a> to reset password</h5>
-                    `
-                    })
-                    res.json({ message: "check your email" })
-                }).catch(err => console.log(err))
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found with this email');
+    }
+    // Get reset token
+    const resetToken = user.getResetPasswordToken();
 
-            }).catch(err => console.log(err))
+    await user.save({ validateBeforeSave: false });
+
+
+    // Create reset password url
+    const resetUrl = `${req.protocol}://${req.get('host')}/password/reset/${resetToken}`;
+    console.log(resetUrl);
+    // const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nIf you have not requested this email, then ignore it.`
+
+    try {
+
+        await transporter.sendMail({
+            to: user.email,
+            from: process.env.EMAIL,
+            subject: "Indicium Password Recovery!",
+            html: `<p>You requested for password reset</p>
+                                <h5>click in this <a href="${resetUrl}">link</a> to reset password</h5>
+                                <p>If you have not requested this email, then ignore it. Reset token will expire in 30 minutes</p>
+                                <h5>You can copy and paste the link in the browser:${resetUrl}</h5>`
+        })
+        // await sendEmail({
+        //     email: user.email,
+        //     subject: 'ShopIT Password Recovery',
+        //     message
+        // })
+
+        res.status(200).json({
+            success: true,
+            message: `Email sent to: ${user.email}`
+        })
+
+    } catch (error) {
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save({ validateBeforeSave: false });
+        res.status(500)
+        throw new Error(error.message);
+    }
+})
+
+
+// const forgotPassword = asyncHandler(async (req, res) => {
+//     crypto.randomBytes(32, (err, buffer) => {
+//         if (err) {
+//             console.log(err)
+//         }
+//         const token = buffer.toString("hex")
+//         User.findOne({ email: req.body.email })
+//             .then(user => {
+//                 if (!user) {
+//                     return res.status(422).json({ error: "User dont exists with that email" })
+//                 }
+//                 user.resetToken = token
+//                 user.expireToken = Date.now() + 3600000
+//                 user.save().then((result) => {
+//                     transporter.sendMail({
+//                         to: user.email,
+//                         from: process.env.EMAIL,
+//                         subject: "password reset",
+//                         html: `
+//                     <p>You requested for password reset</p>
+//                     <h5>click in this <a href="http://localhost:3000/new-password/${token}">link</a> to reset password</h5>
+//                     `
+//                     })
+//                     res.json({ message: "check your email" })
+//                 }).catch(err => console.log(err))
+
+//             }).catch(err => console.log(err))
+//     })
+// })
+
+const resetPassword = asyncHandler(async (req, res) => {
+    // Hash URL token
+    const resetPasswordToken = crypto.createHash('sha256').update(req.params.token).digest('hex')
+
+    const user = await User.findOne({
+        resetPasswordToken,
+        resetPasswordExpire: { $gt: Date.now() }
     })
+
+    if (!user) {
+        return next(new ErrorHandler('Password reset token is invalid or has been expired', 400))
+    }
+
+    if (req.body.password !== req.body.confirmPassword) {
+        res.status(400)
+        throw new Error('Password does not match')
+    }
+
+    // Setup new password
+    user.password = req.body.password;
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    storeInCookies(user, 200, res)
+})
+
+const updatePassword = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.id).select('+password');
+
+    // Check previous user password
+    const isMatched = await user.comparePassword(req.body.oldPassword)
+    if (!isMatched) {
+        throw new Error('Old password is incorrect');
+    }
+
+    user.password = req.body.password;
+    await user.save();
+
+    storeInCookies(user, 200, res)
 })
 
 const verifyEmail = asyncHandler(async (req, res) => {
@@ -205,5 +298,7 @@ export {
     registerUser,
     getUserProfile,
     forgotPassword,
+    resetPassword,
+    updatePassword,
     verifyEmail
 }

@@ -25,7 +25,7 @@ const reducer = combineReducers({
     verifyUser: verifyUserReducer,
     // loadedUser: loadedUserReducer,
     forgotPassword: forgotPasswordReducer,
-    resetPassword: resetPasswordReducer,
+    // resetPassword: resetPasswordReducer,
     alert: alertReducer,
     // auth: authReducer
 })

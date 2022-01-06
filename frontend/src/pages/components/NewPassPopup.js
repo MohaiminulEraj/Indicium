@@ -4,12 +4,14 @@ import "../../styles/Home.css";
 import "../../styles/Responsive.css";
 import logo from "../../assets/images/logo.png"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faEye, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { faEye, faTimes } from "@fortawesome/free-solid-svg-icons";
+// import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
-import { login } from "../../redux/actions/userActions"
+// import { login } from "../../redux/actions/userActions"
 import Message from "./Message";
-import Loader from "./Loader";
+// import Loader from "./Loader";
+import { resetPassword, clearErrors } from '../../redux/actions/userActions'
+
 
 const NewPassPopup = (props) => {
     const [password, setPassword] = useState('')
@@ -18,20 +20,32 @@ const NewPassPopup = (props) => {
 
     const dispatch = useDispatch()
 
-    const userLogin = useSelector((state) => state.userLogin)
-    const { loading, error, userInfo } = userLogin
+    // const userLogin = useSelector((state) => state.userLogin)
+    // const { loading, error, userInfo } = userLogin
+    const { error, success } = useSelector(state => state.forgotPassword)
+
 
     // const redirect = props.location.search ? props.location.search.split('=')[1] : '/'
 
     useEffect(() => {
-
-        if (userInfo) {
-            window.location.href = '/'
+        if (error) {
+            alert.error(error);
+            dispatch(clearErrors());
         }
-    }, [userInfo])
+
+        if (success) {
+            window.location.href = '/signin'
+        }
+
+    }, [dispatch, success])
+
 
     const submitHandler = (e) => {
         e.preventDefault()
+        const formData = new FormData();
+        formData.set('password', password);
+        formData.set('confirmPassword', confirmPassword);
+        dispatch(resetPassword(props.match.params.token, formData))
     }
 
     return (
@@ -56,7 +70,7 @@ const NewPassPopup = (props) => {
                     {/* Popup Form Starts here */}
                     <div className="formWrapper">
                         {error && <Message variant='danger'>{error}</Message>}
-                        {loading && <Loader />}
+                        {/* {loading && <Loader />} */}
                         <form onSubmit={submitHandler}>
                             {/* Password Field */}
                             <div className="inputWrapper">

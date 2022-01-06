@@ -1,6 +1,8 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
 import validator from 'validator'
+import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -92,7 +94,9 @@ const UserSchema = new mongoose.Schema({
     status: {
         type: String,
         default: 'REGISTER NEW'
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date
 }, {
     timestamps: true
 });
@@ -109,6 +113,29 @@ UserSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
 })
 // module.exports = User = mongoose.model('User', UserSchema)
+
+// Return JWT token
+UserSchema.methods.getJwtToken = function () {
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_COOKIE_EXPIRES_IN
+    });
+}
+
+// Generate password reset token
+UserSchema.methods.getResetPasswordToken = function () {
+    // Generate token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    // Hash and set to resetPasswordToken
+    this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+
+    // Set token expire time
+    this.resetPasswordExpire = Date.now() + 30 * 60 * 1000
+
+    return resetToken
+
+}
+
 const User = mongoose.model('User', UserSchema)
 
 export default User
