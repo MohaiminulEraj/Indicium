@@ -4,6 +4,7 @@ import User from '../models/User.js';
 import gravatar from 'gravatar';
 import nodemailer from 'nodemailer';
 import sendgridTransport from 'nodemailer-sendgrid-transport';
+import sgMail from '@sendgrid/mail'
 import normalize from 'normalize-url';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
@@ -15,6 +16,7 @@ const transporter = nodemailer.createTransport(sendgridTransport({
         api_key: process.env.SENDGRID_API_KEY
     }
 }))
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -120,49 +122,56 @@ const getUserProfile = asyncHandler(async (req, res) => {
 })
 
 const forgotPassword = asyncHandler(async (req, res) => {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-        res.status(404)
-        throw new Error('User not found with this email');
-    }
-    // Get reset token
-    const resetToken = user.getResetPasswordToken();
-
-    await user.save({ validateBeforeSave: false });
-
-
-    // Create reset password url
-    const resetUrl = `${req.protocol}://${req.get('host')}/password/reset/${resetToken}`;
-    console.log(resetUrl);
-    // const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nIf you have not requested this email, then ignore it.`
-
     try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) {
+            res.status(404)
+            throw new Error('User not found with this email');
+        }
+        // console.log(user)
+        // Get reset token
+        const resetToken = user.getResetPasswordToken();
 
-        await transporter.sendMail({
+        // await user.save({ validateBeforeSave: false });
+
+
+        // Create reset password url
+        const resetUrl = `${req.protocol}://${req.get('host')}/password/reset/${resetToken}`;
+        // console.log(resetUrl);
+        // const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nIf you have not requested this email, then ignore it.`
+
+        const message = {
             to: user.email,
             from: process.env.EMAIL,
-            subject: "Indicium Password Recovery!",
-            html: `<p>You requested for password reset</p>
-                                <h5>click in this <a href="${resetUrl}">link</a> to reset password</h5>
-                                <p>If you have not requested this email, then ignore it. Reset token will expire in 30 minutes</p>
-                                <h5>You can copy and paste the link in the browser:${resetUrl}</h5>`
-        })
-        // await sendEmail({
-        //     email: user.email,
-        //     subject: 'ShopIT Password Recovery',
-        //     message
+            subject: 'Your password reset token is as follow',
+            text: `Your password reset token is as follow:\n\n${resetUrl}\n\nIf you have not requested this email, then ignore it.`,
+            html: `<p>Your password reset token is as follow:</p>\n\n<p>${resetUrl}</p>\n\n<p>If you have not requested this email, then ignore it.</p>`
+        };
+
+        await sgMail.send(message);
+
+
+        // await transporter.sendMail({
+        //     to: user.email,
+        //     from: process.env.EMAIL,
+        //     subject: "Indicium Password Recovery!",
+        //     html: `<p>You requested for password reset</p>
+        //                         <h5>click in this <a href="${resetUrl}">link</a> to reset password</h5>
+        //                         <p>If you have not requested this email, then ignore it. Reset token will expire in 30 minutes</p>
+        //                         <h5>You can copy and paste the link in the browser:${resetUrl}</h5>`
         // })
+
 
         res.status(200).json({
             success: true,
             message: `Email sent to: ${user.email}`
         })
-
-    } catch (error) {
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpire = undefined;
-        await user.save({ validateBeforeSave: false });
-        res.status(500)
+    }
+    catch (error) {
+        // user.resetPasswordToken = undefined;
+        // user.resetPasswordExpire = undefined;
+        // await user.save({ validateBeforeSave: false });
+        // res.status(500)
         throw new Error(error.message);
     }
 })
@@ -208,7 +217,8 @@ const resetPassword = asyncHandler(async (req, res) => {
     })
 
     if (!user) {
-        return next(new ErrorHandler('Password reset token is invalid or has been expired', 400))
+        res.status(400)
+        throw new Error('Password reset token is invalid or has been expired')
     }
 
     if (req.body.password !== req.body.confirmPassword) {

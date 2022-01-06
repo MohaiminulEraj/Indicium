@@ -342,7 +342,7 @@ export const forgotPassword = (email) => async (dispatch) => {
             }
         }
 
-        const { data } = await axios.post('/api/users/forgot-password', email, config)
+        const { data } = await axios.post('/api/users/forgot-password', { email }, config)
         console.log(data)
         dispatch({
             type: FORGOT_PASSWORD_SUCCESS,
