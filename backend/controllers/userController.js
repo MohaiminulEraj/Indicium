@@ -24,7 +24,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 const authUser = asyncHandler(async (req, res) => {
     const { email, password, rememberMe } = req.body
 
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email: email.toLowerCase() })
     if (!user) {
         res.status(404)
         throw new Error('User not found!')
@@ -35,7 +35,7 @@ const authUser = asyncHandler(async (req, res) => {
         } else {
             res.json({
                 _id: user._id,
-                email: user.email,
+                email: user.email.toLowerCase(),
                 token: generateToken(user._id),
             })
         }
@@ -54,25 +54,25 @@ const registerUser = asyncHandler(async (req, res) => {
     const client = new twilio(accountSid, authToken);
     const { email, password, rememberMe } = req.body
 
-    const userExists = await User.findOne({ email })
+    const userExists = await User.findOne({ email: email.toLowerCase() })
 
     if (userExists) {
         res.status(400)
         throw new Error('User already exists!')
     }
-    if (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/.test(password) == false) {
-        res.status(400)
-        throw new Error('Password must contain at least one uppercase letter, one lowercase letter, one number and one special character')
-    }
-    await client.verify
-        .services(process.env.SERVICE_ID)
-        .verifications.create({ to: email, channel: "email" })
-        .then((verification) => console.log(verification.sid))
-        .catch((err) => console.log(err.message));
+    // if (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/.test(password) == false) {
+    //     res.status(400)
+    //     throw new Error('Password must contain at least one uppercase letter, one lowercase letter, one number and one special character')
+    // }
+    // await client.verify
+    //     .services(process.env.SERVICE_ID)
+    //     .verifications.create({ to: email, channel: "email" })
+    //     .then((verification) => console.log(verification.sid))
+    //     .catch((err) => console.log(err.message));
 
     const avatar = {
         url: normalize(
-            gravatar.url(email, {
+            gravatar.url(email.toLowerCase(), {
                 s: '200',
                 r: 'pg',
                 d: 'mm'
@@ -81,7 +81,7 @@ const registerUser = asyncHandler(async (req, res) => {
         )
     }
     const user = await User.create({
-        email,
+        email: email.toLowerCase(),
         password,
         avatar,
     })
@@ -105,7 +105,7 @@ const registerUser = asyncHandler(async (req, res) => {
 })
 
 // @desc    Get user profile
-// @route   GET /api/users/profile
+// @route   GET /api/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id)

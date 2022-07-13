@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../styles/Home.css";
-import "../styles/Responsive.css";
-import Footer from "./components/Footer";
-import CustomNavbar from "./components/CustomNavbar";
-import discoverSingleThumbnail from "../assets/images/NFTSingle.png";
+import "../../styles/Home.css";
+import "../../styles/Responsive.css";
+import Footer from "../components/Footer";
+import CustomNavbar from "../components/CustomNavbar";
+import discoverSingleThumbnail from "../../assets/images/NFTSingle.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import heart from "../assets/images/heart.png";
-import share from "../assets/images/share.png";
-import dots from "../assets/images/dots.png";
-import dsCol2row2Img from "../assets/images/dsCol2row2Img.png";
+import heart from "../../assets/images/heart.png";
+import share from "../../assets/images/share.png";
+import dots from "../../assets/images/dots.png";
+import dsCol2row2Img from "../../assets/images/dsCol2row2Img.png";
 import { faChevronDown, faHourglass, faHourglassHalf, faTag } from "@fortawesome/free-solid-svg-icons";
-import profile from "../assets/images/profile.png"
+import profile from "../../assets/images/profile.png"
 
-import PopularCard from "./components/PopularCard";
-import popularCardThumbnail1 from "../assets/images/popularCardThumbnail1.png"
-import popularCardThumbnail2 from "../assets/images/popularCardThumbnail2.png"
-import popularCardThumbnail3 from "../assets/images/popularCardThumbnail3.png"
-import SigninPopup from "./components/SigninPopup";
-import SignUpPopup from "./components/SignUpPopup";
+import PopularCard from "../components/PopularCard";
+import popularCardThumbnail1 from "../../assets/images/popularCardThumbnail1.png"
+import popularCardThumbnail2 from "../../assets/images/popularCardThumbnail2.png"
+import popularCardThumbnail3 from "../../assets/images/popularCardThumbnail3.png"
+import SigninPopup from "../components/SigninPopup";
+import SignUpPopup from "../components/SignUpPopup";
 const DiscoverSingle = (props) => {
 
   const [showPopup, setShowPopup] = useState(false);

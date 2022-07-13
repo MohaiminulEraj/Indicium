@@ -1,5 +1,5 @@
 import React from "react";
-import Discover from "../../pages/Discover";
+import Discover from "../../pages/nft/Discover";
 
 const DiscoverRoute = () => {
   return <Discover />;

@@ -1515,6 +1515,14 @@ a:hover {
   margin-top: 20px;
 }
 
+.nftImgCardWrapper {
+  width: 300px;
+  height: 300px;
+  border-radius: 0px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
 .profileLeftCardImgWrapper2 {
   width: 140px;
   height: 140px;

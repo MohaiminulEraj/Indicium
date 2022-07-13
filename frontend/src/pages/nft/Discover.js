@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../styles/Home.css";
-import "../styles/Responsive.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import CustomNavbar from "./components/CustomNavbar";
+import "../../styles/Home.css";
+import "../../styles/Responsive.css";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import CustomNavbar from "../components/CustomNavbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import DiscoverCard from "./components/DiscoverCard";
-import discoverCardThumbnail1 from "../assets/images/discoverCardThumbnail1.png";
-import discoverCardThumbnail2 from "../assets/images/discoverCardThumbnail2.png";
-import discoverCardThumbnail3 from "../assets/images/discoverCardThumbnail3.png";
-import discoverCardThumbnail4 from "../assets/images/discoverCardThumbnail4.png";
-import SigninPopup from "./components/SigninPopup";
-import SignUpPopup from "./components/SignUpPopup";
+import DiscoverCard from "../components/DiscoverCard";
+import discoverCardThumbnail1 from "../../assets/images/discoverCardThumbnail1.png";
+import discoverCardThumbnail2 from "../../assets/images/discoverCardThumbnail2.png";
+import discoverCardThumbnail3 from "../../assets/images/discoverCardThumbnail3.png";
+import discoverCardThumbnail4 from "../../assets/images/discoverCardThumbnail4.png";
+import SigninPopup from "../components/SigninPopup";
+import SignUpPopup from "../components/SignUpPopup";
 const Discover = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
@@ -34,7 +34,7 @@ const Discover = (props) => {
 
 
       <div className="navBarDiscover">
-        <CustomNavbar onSigninClick={() => setShowPopup(!showPopup)} onSignupClick={() => setShowSignupPopup(!showSignupPopup)}  />
+        <CustomNavbar onSigninClick={() => setShowPopup(!showPopup)} onSignupClick={() => setShowSignupPopup(!showSignupPopup)} />
       </div>
 
       <div className="discoverSection">

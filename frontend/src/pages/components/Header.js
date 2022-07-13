@@ -22,9 +22,9 @@ const Header = (props) => {
 
       <div className="container header3rdSection header3rdSectionDesk">
         <div className="row">
-          <div className="col-3 header3rdSectionCol1">
-            <div className="gradientBtn">Learn More</div>
-          </div>
+          <a href="/create" className="col-3 header3rdSectionCol1">
+            <div className="gradientBtn">Create NFT</div>
+          </a>
           <div className="col-6 header3rdSectionCol2">
             <div className="astranautImg">
               <img className="header3rdSectionCol2Img" src={astranaut} />

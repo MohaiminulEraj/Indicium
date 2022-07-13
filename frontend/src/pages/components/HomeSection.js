@@ -192,7 +192,7 @@ const HomeSection = (props) => {
         </div>
       </div>
       {/* Section 5 */}
-      <div className="partnersSection">
+      {/* <div className="partnersSection">
         <div className="container">
           <div className="aboutUsSectionTitle ourPartnerTitle">
             Our Partners
@@ -279,7 +279,7 @@ const HomeSection = (props) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       {/* Section 5 */}
     </>
   );

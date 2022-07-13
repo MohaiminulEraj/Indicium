@@ -25,7 +25,8 @@ const SignUpPopup = (props) => {
 
     useEffect(() => {
         if (userInfo) {
-            window.location.href = '/verify-email'
+            // window.location.href = '/verify-email'
+            window.location.href = '/profile'
         }
     }, [userInfo])
 
@@ -56,7 +57,7 @@ const SignUpPopup = (props) => {
                     {/* Popup Content Starts here */}
                     <div className="ContentWrapper">
                         <div className="ContentWrapperText1">
-                            We have noticed you don’t have a Neftly account yet
+                            We have noticed you don’t have a Indicium account yet
                         </div>
                         {error && <Message variant='danger'>{error}</Message>}
                         {loading && <Loader />}
@@ -80,7 +81,7 @@ const SignUpPopup = (props) => {
                                     />
                                     <FontAwesomeIcon onClick={() => setShowPass(!showPass)} icon={faEye} color={showPass ? "white" : "#8FA3AD"} />
                                 </div>
-                                <small style={{ color: "white" }}>Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character, and at least 8 or more characters</small>
+                                {/* <small style={{ color: "white" }}>Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character, and at least 8 or more characters</small> */}
                             </div>
 
                             {/* Remember me and Forget Password */}

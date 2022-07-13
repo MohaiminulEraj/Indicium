@@ -51,9 +51,14 @@ const CustomNavbar = (props) => {
                   <Link to="/discover">Discover</Link>
                 </div>
               </Nav.Link>
-              <Nav.Link href="#link">
-                <div className="navItem">How it works</div>
+              <Nav.Link href="#home">
+                <div className="navItem">
+                  <Link to="/create">Create NFT</Link>
+                </div>
               </Nav.Link>
+              {/* <Nav.Link href="#link">
+                <div className="navItem">How it works</div>
+              </Nav.Link> */}
               <Nav.Link>
                 <div className="searchBar">
                   <div className="row searchBarRow">
