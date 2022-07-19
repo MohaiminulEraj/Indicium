@@ -5,8 +5,10 @@ import store from './redux/store';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import dotenv from "dotenv";
 import axios from 'axios'
 axios.baseUrl = 'http://localhost:5000'
+dotenv.config();
 ReactDOM.render(
   <Provider store={store}>
     <App />

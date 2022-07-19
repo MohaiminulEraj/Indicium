@@ -16,14 +16,38 @@ import blackImg from "../../assets/images/blackImg.png";
 import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
 import axios from "axios";
+import fs from 'fs';
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserDetails } from '../../redux/actions/userActions'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
+// import WalletBalance from '../components/providers/web3/WalletBalance';
+import { v4 as uuidv4 } from "uuid";
+import NftMarket from '../../contracts/NftMarket.json';
+import { ethers } from 'ethers';
+import pinataSDK from '@pinata/sdk';
+import { toast } from "react-toastify";
+import FormData from "form-data";
+import dotenv from 'dotenv';
+dotenv.config();
+
+// const PINATA_API_KEY = '00951809b073d0a55e9a';
+// const PINATA_SECRET_API_KEY = '3b1089f9a77e2f6cee967aeab3bcda8c9427e519b118f07bbf274ae00993983f';
+
+// let pinataApiKey_NFT = "06ce9ba7b279fe677acf";
+const pinataApiKey = process.env.REACT_APP_PINATA_API_KEY;
+// let pinataSecretKey_NFT = "558009c248624baee84c3a321cbeff8a8963ee851c19dd7d6395744de974f1ec";
+const pinataSecretKey = process.env.REACT_APP_PINATA_SECRET_API_KEY;
+const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN;
+
+const pinata = pinataSDK(pinataApiKey, pinataSecretKey);
+
 
 // import { useWeb3 } from '@providers/web3';
 
 const CreateNFT = (props) => {
+
+
     // const { ethereum, contract } = useWeb3();
     const dispatch = useDispatch()
 
@@ -41,7 +65,18 @@ const CreateNFT = (props) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState(0);
+    const [isMinted, setIsMinted] = useState(false);
+    const [totalMinted, setTotalMinted] = useState(0);
+    const [nftURI, setNftURI] = useState('');
+    let [file, setFile] = useState('')
+    const [image, setImage] = useState('');
 
+
+    let tokenId = "NftMarket"
+
+    const contentId = 'QmXVmZoTRgxin2v2aTsVoCjCXW6fg9FzGK1oQ64ZMrqKKB';
+    const metadataURI = `${contentId}/${tokenId}.json`;
+    const imageURI = `https://gateway.pinata.cloud/ipfs/${contentId}/${tokenId}.png`;
 
     useEffect(() => {
         if (!userInfo) {
@@ -51,73 +86,229 @@ const CreateNFT = (props) => {
         }
     }, [dispatch, user, userInfo])
 
-    // const getSignedData = async () => {
-    //     const messageToSign = await axios.get("/api/verify");
-    //     const accounts = await ethereum?.request({ method: "eth_requestAccounts" });
-    //     const account = accounts[0];
+    // useEffect(() => {
+    //     getCount();
+    // }, []);
 
-    //     const signedData = await ethereum?.request({
-    //         method: "personal_sign",
-    //         params: [JSON.stringify(messageToSign.data), account, messageToSign.data.id]
-    //     })
+    const getCount = async (contract) => {
+        const count = await contract?.count();
+        console.log(parseInt(count));
+        setTotalMinted(parseInt(count));
+    };
 
-    //     return { signedData, account };
-    // }
+
+    const getSignedData = async () => {
+
+        const jsonRes = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+            pinataMetadata: {
+                name: uuidv4()
+            },
+            pinataContent: {
+                name,
+                description
+            }
+        }, {
+            headers: {
+                pinata_api_key: pinataApiKey,
+                pinata_secret_api_key: pinataSecretKey
+            }
+        });
+        console.log(jsonRes.data)
+        return jsonRes?.data;
+        // const messageToSign = await axios.get("/api/verify");
+        // const accounts = await ethereum?.request({ method: "eth_requestAccounts" });
+        // const account = accounts[0];
+
+        // const signedData = await ethereum?.request({
+        //     method: "personal_sign",
+        //     params: [JSON.stringify(messageToSign.data), account, messageToSign.data.id]
+        // })
+
+        // return { signedData, account };
+    }
+
+    // useEffect(() => {
+    //     getMintedStatus();
+    // }, [isMinted]);
+
+    // const getMintedStatus = async (contract) => {
+    //     const result = await contract?.isContentOwned(metadataURI);
+    //     console.log(result)
+    //     setIsMinted(result);
+    // };
+
+    useEffect(() => {
+        setImage(image);
+        setNftURI(nftURI);
+    }, [image, nftURI]);
+
+
+    // Submiting Metadata
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        // console.log(e.target.files[0])
+        console.log(image)
+        const jsonRes = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+            pinataMetadata: {
+                name: uuidv4()
+            },
+            pinataContent: {
+                name,
+                description,
+                price,
+                image
+            }
+        }, {
+            headers: {
+                pinata_api_key: pinataApiKey,
+                pinata_secret_api_key: pinataSecretKey
+            }
+        });
+
+        // const res = await toast.promise(
+        //     jsonRes.data, {
+        //     pending: "Uploading metadata",
+        //     success: "Metadata uploaded",
+        //     error: "Metadata upload error"
+        // }
+        // )
+        // const data = res.data;
+
+        setNftURI(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
+        console.log(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
+        // console.log(nftURI)
+        createNft(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
+        // getMintedStatus(contract);
+        // getCount(contract);
+    }
+
+
+    async function getURI(contract) {
+        const uri = await contract.tokenURI(tokenId);
+        alert(uri);
+    }
+
 
     const handleImage = async (e) => {
-        if (!e.target.files || e.target.files.length === 0) {
-            console.error("Select a file");
-            return;
-        }
-
-        const file = e.target.files[0];
-        const buffer = await file.arrayBuffer();
-        const bytes = new Uint8Array(buffer);
-
         try {
-            // const { signedData, account } = await getSignedData();
-            // const promise = axios.post("/api/verify-image", {
-            //     address: account,
-            //     signature: signedData,
-            //     bytes,
-            //     contentType: file.type,
-            //     fileName: file.name.replace(/\.[^/.]+$/, "")
-            // });
+            // console.log(e.target.files[0].type)
+            if (e.target.name === 'avatar') {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    if (reader.readyState === 2) {
+                        setAvatar(reader.result);
+                        setAvatarPreview(reader.result);
+                        // blob = reader.result;
+                    }
+                }
+                if (e.target.files[0]) reader.readAsDataURL(e.target.files[0])
+                // setFile(e.target.files[0]);
+                // console.log(e.target.files)
+                let buffer = await e.target.files[0].arrayBuffer();
+                const bytes = new Uint8Array(buffer);
+                console.log(e.target.files)
+                buffer = Buffer.from(Object.values(bytes));
+                const formData = new FormData();
+                // console.log(new Blob(buffer, { type: 'image/png' }))
+                let filename = e.target.files[0].name.replace(/\.[^/.]+$/, "") + "-" + uuidv4();
+                console.log(filename)
+                formData.append(
+                    "file",
+                    new Blob(buffer, { type: 'image/png' }),
+                    filename
+                    // {
+                    //     contentType: e.target.files[0]?.type,
+                    //     filename: e.target.files[0].name.replace(/\.[^/.]+$/, "") + "-" + uuidv4()
+                    // }
+                );
 
-            // const res = await toast.promise(
-            //     promise, {
-            //     pending: "Uploading image",
-            //     success: "Image uploaded",
-            //     error: "Image upload error"
-            // }
-            // )
+                const fileRes = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", formData, {
+                    maxBodyLength: Infinity,
+                    headers: {
+                        // "Content-Type": `multipart/form-data; boundary=${formData.getBoundary()}`,
+                        pinata_api_key: pinataApiKey,
+                        pinata_secret_api_key: pinataSecretKey,
+                        "Content-Type": "multipart/form-data"
+                    }
+                });
+                console.log(fileRes.data)
+                setImage(pinataDomain + '/ipfs/' + fileRes?.data?.IpfsHash)
+                console.log(`${pinataDomain}/ipfs/${fileRes?.data?.IpfsHash}`)
+                // console.log(image)
+                // console.log(fileRes.data)
+                // const res = await toast.promise(
+                //     fileRes.data, {
+                //     pending: "Uploading image",
+                //     success: "Image uploaded",
+                //     error: "Image upload error"
+                // }
+                // )
 
-            // const data = res?.data;
+                // const data = res.data;
 
-            // setNftMeta({
-            //     ...nftMeta,
-            //     // image: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
-            // });
+
+                // pinata.pinFileToIPFS(fs.createReadStream(URL.createObjectURL(e.target.files[0])), {}).then((res) => {
+                //     console.log(res["IpfsHash"]);
+                //     setImage(`${pinataDomain}/ipfs/${res["IpfsHash"]}`)
+                // }).catch((err) => {
+                //     console.error(err);
+                // })
+
+            }
         } catch (e) {
             console.error(e.message);
         }
     }
 
+    const createNft = async (nftURI) => {
+        try {
+            window.ethereum.send('eth_requestAccounts');
+            const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-    }
+            const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
 
-    const avatarUpdate = (e) => {
-        if (e.target.name === 'avatar') {
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (reader.readyState === 2) {
-                    setAvatar(reader.result);
-                    setAvatarPreview(reader.result);
+            // get the end user
+            const signer = provider.getSigner();
+
+            // get the smart contract
+            const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+            console.log(contract)
+
+            const connection = contract.connect(signer);
+            const addr = connection.address;
+            console.log(nftURI);
+            const nftRes = await axios.get(nftURI);
+            console.log(nftRes)
+            const content = nftRes.data;
+
+            // Object.keys(content).forEach(key => {
+            //     if (!ALLOWED_FIELDS.includes(key)) {
+            //         throw new Error("Invalid Json structure");
+            //     }
+            // })
+            const tx = await contract?.mintToken(
+                nftURI,
+                ethers.utils.parseEther(price.toString()),
+                {
+                    value: ethers.utils.parseEther(0.025.toString())
                 }
+            );
+
+            await tx.wait();
+            console.log('tx', tx)
+            if (tx) {
+
+                window.location.href = '/';
             }
-            if (e.target.files[0]) reader.readAsDataURL(e.target.files[0])
+            // await toast.promise(
+            //     tx?.wait(), {
+            //     pending: "Minting Nft Token",
+            //     success: "Nft has ben created",
+            //     error: "Minting error"
+            // }
+            // );
+        } catch (e) {
+            console.error(e.message);
         }
     }
 
@@ -205,7 +396,7 @@ const CreateNFT = (props) => {
                                 <label style={{ cursor: 'pointer' }} htmlFor="uploadPhoto" className="uploadSignupBtnLayer">
                                     Upload
                                 </label>
-                                <input name='avatar' id="uploadPhoto" onChange={avatarUpdate} type="file" className="uploadSignupBtnLayer" accept='images/*' />
+                                <input name='avatar' id="uploadPhoto" onChange={handleImage} type="file" className="uploadSignupBtnLayer" accept='images/*' required />
 
                             </div>
                         </div>
@@ -222,7 +413,7 @@ const CreateNFT = (props) => {
                         <div className="signupInputLabel">Asset Price in ETH</div>
                         <div className="signupInputFieldWrapper">
                             <div className="signupInputFieldWrapperLayer"></div>
-                            <input type="number" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="0.8" className="signupInputField" required />
+                            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.8" className="signupInputField" required />
                         </div>
                     </div>
                     <div className="fullHr" style={{ marginTop: 30 }}></div>

@@ -30,6 +30,7 @@
     "nodemailer-sendgrid-transport": "^0.2.0",
     "normalize-url": "^7.0.2",
     "twilio": "^3.72.0",
+    "uuid": "^8.3.2",
     "validator": "^13.7.0"
   },
   "devDependencies": {

@@ -18,7 +18,7 @@ const app = express();
 connectDB();
 
 app.use(express.json()); // parsing body
-app.use('/api', cors()); // Enabling CORS for all /api routes
+app.use('/', cors()); // Enabling CORS for all / routes
 app.use(cookieParser()); // parsing cookies
 // app.use(require('./router'));    // Registering all app-routers here
 

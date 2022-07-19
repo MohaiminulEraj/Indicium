@@ -6,6 +6,7 @@ import astranautMobile from "../../assets/images/astranautMobile.png";
 import "../../styles/Home.css";
 import "../../styles/Responsive.css";
 import CustomNavbar from "./CustomNavbar";
+import { Link } from "react-router-dom";
 
 const Header = (props) => {
   return (
@@ -22,17 +23,21 @@ const Header = (props) => {
 
       <div className="container header3rdSection header3rdSectionDesk">
         <div className="row">
-          <a href="/create" className="col-3 header3rdSectionCol1">
-            <div className="gradientBtn">Create NFT</div>
-          </a>
+          {/* <a href="/create" className="col-3 header3rdSectionCol1"> */}
+          <div className="gradientBtn">
+            <Link to="/create">Create NFT</Link>
+          </div>
+          {/* </a> */}
           <div className="col-6 header3rdSectionCol2">
             <div className="astranautImg">
               <img className="header3rdSectionCol2Img" src={astranaut} />
             </div>
           </div>
-          <div className="col-3 header3rdSectionCol3">
-            <div className="gradientBtn">Marketplace</div>
-          </div>
+          <a href="/discover" className="col-3 header3rdSectionCol3">
+            <div className="gradientBtn">
+              Marketplace
+            </div>
+          </a>
         </div>
       </div>
       {/* Mobile Resposinve */}
