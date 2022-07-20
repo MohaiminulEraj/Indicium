@@ -56,7 +56,7 @@ const Profile = (props) => {
         day: 'numeric',
         timeZone: 'UTC'
     });
-    console.log(user?.coverPhoto?.url)
+    // console.log(user?.coverPhoto?.url)
     useEffect(() => {
         if (!userInfo) {
             window.location.href = '/'
@@ -322,6 +322,7 @@ const Profile = (props) => {
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} />
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail2} />
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail4} />
+                                <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} />
                             </div>
                             {/* Cards Ends  here */}
 

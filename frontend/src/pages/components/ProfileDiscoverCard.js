@@ -35,7 +35,7 @@ const ProfileDiscoverCard = (props) => {
           </div>
         </div>
         <div className="col-sm-4 text-center">
-          <div className="discoverCardRow2Col2Text">3 in stock</div>
+          <div className="discoverCardRow2Col2Text">4 in stock</div>
         </div>
       </div>
 
