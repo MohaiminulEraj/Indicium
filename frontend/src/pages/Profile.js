@@ -320,9 +320,9 @@ const Profile = (props) => {
                             {/* Cards Starts  here */}
                             <div className="row discoverCardWrapper">
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} />
-                                <ProfileDiscoverCard thumbnail={discoverCardThumbnail2} />
+                                {/* <ProfileDiscoverCard thumbnail={discoverCardThumbnail2} />
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail4} />
-                                <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} />
+                                <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} /> */}
                             </div>
                             {/* Cards Ends  here */}
 

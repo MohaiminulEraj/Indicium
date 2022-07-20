@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/Home.css";
 import "../../styles/Responsive.css";
-import Header from "../components/Header";
+// import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CustomNavbar from "../components/CustomNavbar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import DiscoverCard from "../components/DiscoverCard";
-import discoverCardThumbnail1 from "../../assets/images/discoverCardThumbnail1.png";
-import discoverCardThumbnail2 from "../../assets/images/discoverCardThumbnail2.png";
-import discoverCardThumbnail3 from "../../assets/images/discoverCardThumbnail3.png";
-import discoverCardThumbnail4 from "../../assets/images/discoverCardThumbnail4.png";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faChevronDown, faSpinner } from "@fortawesome/free-solid-svg-icons";
+// import DiscoverCard from "../components/DiscoverCard";
+// import discoverCardThumbnail1 from "../../assets/images/discoverCardThumbnail1.png";
+// import discoverCardThumbnail2 from "../../assets/images/discoverCardThumbnail2.png";
+// import discoverCardThumbnail3 from "../../assets/images/discoverCardThumbnail3.png";
+// import discoverCardThumbnail4 from "../../assets/images/discoverCardThumbnail4.png";
 import blackImg from "../../assets/images/blackImg.png";
 import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
@@ -25,9 +25,9 @@ import Loader from '../components/Loader'
 import { v4 as uuidv4 } from "uuid";
 import NftMarket from '../../contracts/NftMarket.json';
 import { ethers } from 'ethers';
-import pinataSDK from '@pinata/sdk';
-import { toast } from "react-toastify";
+// import pinataSDK from '@pinata/sdk';
 import FormData from "form-data";
+import { saveNftDetails } from "../../redux/actions/nftActions"
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -40,7 +40,7 @@ const pinataApiKey = process.env.REACT_APP_PINATA_API_KEY;
 const pinataSecretKey = process.env.REACT_APP_PINATA_SECRET_API_KEY;
 const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN;
 
-const pinata = pinataSDK(pinataApiKey, pinataSecretKey);
+// const pinata = pinataSDK(pinataApiKey, pinataSecretKey);
 
 
 // import { useWeb3 } from '@providers/web3';
@@ -49,13 +49,15 @@ const CreateNFT = (props) => {
 
 
     // const { ethereum, contract } = useWeb3();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
+    const saveNft = useSelector((state) => state.saveNft)
+    const { loading, error, nftDetails } = saveNft
 
     const userLogin = useSelector((state) => state.userLogin)
     const { userInfo } = userLogin
 
     const userDetails = useSelector((state) => state.userDetails)
-    const { loading, error, user } = userDetails
+    const { user } = userDetails
 
     const [showPopup, setShowPopup] = useState(false);
     const [showSignupPopup, setShowSignupPopup] = useState(false);
@@ -72,11 +74,11 @@ const CreateNFT = (props) => {
     const [image, setImage] = useState('');
 
 
-    let tokenId = "NftMarket"
+    // let tokenId = "NftMarket"
 
-    const contentId = 'QmXVmZoTRgxin2v2aTsVoCjCXW6fg9FzGK1oQ64ZMrqKKB';
-    const metadataURI = `${contentId}/${tokenId}.json`;
-    const imageURI = `https://gateway.pinata.cloud/ipfs/${contentId}/${tokenId}.png`;
+    // const contentId = 'QmXVmZoTRgxin2v2aTsVoCjCXW6fg9FzGK1oQ64ZMrqKKB';
+    // const metadataURI = `${contentId}/${tokenId}.json`;
+    // const imageURI = `https://gateway.pinata.cloud/ipfs/${contentId}/${tokenId}.png`;
 
     useEffect(() => {
         if (!userInfo) {
@@ -85,6 +87,12 @@ const CreateNFT = (props) => {
             dispatch(getUserDetails(userInfo._id))
         }
     }, [dispatch, user, userInfo])
+
+    useEffect(() => {
+        if (nftDetails) {
+            window.location.href = '/profile'
+        }
+    }, [nftDetails])
 
     // useEffect(() => {
     //     getCount();
@@ -183,10 +191,10 @@ const CreateNFT = (props) => {
     }
 
 
-    async function getURI(contract) {
-        const uri = await contract.tokenURI(tokenId);
-        alert(uri);
-    }
+    // async function getURI(contract) {
+    //     const uri = await contract.tokenURI(tokenId);
+    //     alert(uri);
+    // }
 
 
     const handleImage = async (e) => {
@@ -297,8 +305,9 @@ const CreateNFT = (props) => {
             await tx.wait();
             console.log('tx', tx)
             if (tx) {
-
-                window.location.href = '/';
+                dispatch(saveNftDetails(user?._id, nftURI))
+                setMessage('NFT created successfully!');
+                // window.location.href = '/';
             }
             // await toast.promise(
             //     tx?.wait(), {

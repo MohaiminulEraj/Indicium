@@ -95,7 +95,7 @@ export const register = (email, password, rememberMe) => async (dispatch) => {
         })
 
         Cookies.set('userInfo', JSON.stringify(data), { expires: rememberMe ? 30 : 1 })
-
+/*  */
     } catch (error) {
         dispatch({
             type: USER_REGISTER_FAIL,

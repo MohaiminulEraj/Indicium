@@ -13,6 +13,9 @@ import {
     resetPasswordReducer,
     // authReducer,
 } from './reducers/userReducers'
+import {
+    saveNftReducer
+} from './reducers/nftReducers'
 import { alertReducer } from './reducers/alert'
 import Cookies from 'js-cookie'
 
@@ -28,6 +31,8 @@ const reducer = combineReducers({
     // resetPassword: resetPasswordReducer,
     alert: alertReducer,
     // auth: authReducer
+    // NFT
+    saveNft: saveNftReducer,
 })
 
 const userInfoFromCookies = Cookies.get('userInfo')
