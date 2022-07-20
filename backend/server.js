@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 import userRoutes from './routes/userRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import nftRoutes from './routes/nftRoutes.js';
 // parsing .env file
 dotenv.config()
 
@@ -26,6 +27,7 @@ app.use(cookieParser()); // parsing cookies
 
 app.use('/api/users', userRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/nfts', nftRoutes);
 
 const __dirname = path.resolve()
 
