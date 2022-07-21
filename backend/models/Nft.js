@@ -12,7 +12,7 @@ const NftSchema = new mongoose.Schema({
     ipfsDataLink: {
         type: String,
         required: true,
-        unique: true
+        // unique: true
     }
 }, {
     timestamps: true
