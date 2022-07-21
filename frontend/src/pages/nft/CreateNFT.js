@@ -320,6 +320,7 @@ const CreateNFT = (props) => {
             // }
             // );
         } catch (e) {
+            setMessage(JSON.parse(e.message));
             console.error(e.message);
         }
     }
@@ -351,11 +352,7 @@ const CreateNFT = (props) => {
             {/* Navbar ends here */}
 
             {/* Form Starts here here */}
-            <div className="container my-2">
-                {message && <Message variant='warning'>{message}</Message>}
-                {error && <Message variant='danger'>{error}</Message>}
-                {loading && <Loader />}
-            </div>
+
             {/* {success && <Message variant='success'>Profile Updated</Message>} */}
             <form onSubmit={handleSubmit} className="signupFormSection row">
                 <div className="col-sm-6 signupFormSectionCol ">
@@ -370,7 +367,11 @@ const CreateNFT = (props) => {
                         <div className="signupInputWrapper">
                             <div className="signupInputLabel">This information will be displayed publicly so be careful what you share.</div>
                         </div>
-
+                        <div className="container my-4 px-2">
+                            {message && <Message variant='warning'>{message}</Message>}
+                            {error && <Message variant='danger'>{error}</Message>}
+                            {loading && <Loader />}
+                        </div>
                         {/* Form starts here */}
                     </div>
                 </div>
