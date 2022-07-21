@@ -11,7 +11,7 @@ import {
 export const saveNftReducer = (state = {}, action) => {
     switch (action.type) {
         case SAVE_NFT_DETAILS_REQUEST:
-            return { loading: true }
+            return { ...state, loading: true }
         case SAVE_NFT_DETAILS_SUCCESS:
             return { loading: false, nftDetails: action.payload }
         case SAVE_NFT_DETAILS_FAIL:

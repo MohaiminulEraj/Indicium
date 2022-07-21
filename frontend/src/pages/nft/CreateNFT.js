@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getUserDetails } from '../../redux/actions/userActions'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
+import Spinner from '../components/Spinner'
 // import WalletBalance from '../components/providers/web3/WalletBalance';
 import { v4 as uuidv4 } from "uuid";
 import NftMarket from '../../contracts/NftMarket.json';
@@ -51,7 +52,7 @@ const CreateNFT = (props) => {
     // const { ethereum, contract } = useWeb3();
     const dispatch = useDispatch();
     const saveNft = useSelector((state) => state.saveNft)
-    const { loading, error, nftDetails } = saveNft
+    const { error, nftDetails } = saveNft
 
     const userLogin = useSelector((state) => state.userLogin)
     const { userInfo } = userLogin
@@ -72,6 +73,7 @@ const CreateNFT = (props) => {
     const [nftURI, setNftURI] = useState('');
     let [file, setFile] = useState('')
     const [image, setImage] = useState('');
+    const [loading, setLoading] = useState(false);
 
 
     // let tokenId = "NftMarket"
@@ -90,6 +92,7 @@ const CreateNFT = (props) => {
 
     useEffect(() => {
         if (nftDetails) {
+            // console.log(Object.keys(nftDetails).length)
             window.location.href = '/profile'
         }
     }, [nftDetails])
@@ -154,6 +157,7 @@ const CreateNFT = (props) => {
     // Submiting Metadata
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         // console.log(e.target.files[0])
         console.log(image)
         const jsonRes = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
@@ -183,6 +187,7 @@ const CreateNFT = (props) => {
         // const data = res.data;
 
         if (jsonRes?.data?.IpfsHash) {
+            setLoading(false);
             setNftURI(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
             console.log(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
             setMessage('Successfully uploaded NFT Metadata to IPFS!')
@@ -203,6 +208,7 @@ const CreateNFT = (props) => {
         try {
             // console.log(e.target.files[0].type)
             if (e.target.name === 'avatar') {
+                setLoading(true);
                 const reader = new FileReader();
                 reader.onload = () => {
                     if (reader.readyState === 2) {
@@ -244,6 +250,7 @@ const CreateNFT = (props) => {
                 console.log(fileRes.data)
                 setImage(pinataDomain + '/ipfs/' + fileRes?.data?.IpfsHash)
                 console.log(`${pinataDomain}/ipfs/${fileRes?.data?.IpfsHash}`)
+                setLoading(false);
                 setMessage('Image uploaded to IPFS successfully!');
                 // console.log(image)
                 // console.log(fileRes.data)
@@ -273,6 +280,7 @@ const CreateNFT = (props) => {
 
     const createNft = async (nftURI) => {
         try {
+            setLoading(true);
             window.ethereum.send('eth_requestAccounts');
             const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
 
@@ -312,6 +320,7 @@ const CreateNFT = (props) => {
                 setMessage('NFT Minted successfully!');
                 // window.location.href = '/';
             }
+            setLoading(false);
             // await toast.promise(
             //     tx?.wait(), {
             //     pending: "Minting Nft Token",
@@ -370,7 +379,8 @@ const CreateNFT = (props) => {
                         <div className="container my-4 px-2">
                             {message && <Message variant='warning'>{message}</Message>}
                             {error && <Message variant='danger'>{error}</Message>}
-                            {loading && <Loader />}
+                            {loading && <Spinner />}
+                            {/* {<Spinner />} */}
                         </div>
                         {/* Form starts here */}
                     </div>
