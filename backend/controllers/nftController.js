@@ -20,7 +20,7 @@ const saveNftUrl = asyncHandler(async (req, res) => {
     const { id, ipfsDataLink } = req.body
 
     const nft = await Nft.create({
-        id, ipfsDataLink
+        userId: id, ipfsDataLink
     })
     if (nft) {
         res.status(201).json({
