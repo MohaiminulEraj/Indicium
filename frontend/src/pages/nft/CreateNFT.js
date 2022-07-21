@@ -61,12 +61,12 @@ const CreateNFT = (props) => {
 
     const [showPopup, setShowPopup] = useState(false);
     const [showSignupPopup, setShowSignupPopup] = useState(false);
-    const [message, setMessage] = useState(null)
+    const [message, setMessage] = useState(null);
     const [avatar, setAvatar] = useState('');
     const [avatarPreview, setAvatarPreview] = useState(blackImg);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [price, setPrice] = useState(0);
+    const [price, setPrice] = useState(null);
     const [isMinted, setIsMinted] = useState(false);
     const [totalMinted, setTotalMinted] = useState(0);
     const [nftURI, setNftURI] = useState('');
@@ -182,8 +182,11 @@ const CreateNFT = (props) => {
         // )
         // const data = res.data;
 
-        setNftURI(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
-        console.log(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
+        if (jsonRes?.data?.IpfsHash) {
+            setNftURI(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
+            console.log(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
+            setMessage('Successfully uploaded NFT Metadata to IPFS!')
+        }
         // console.log(nftURI)
         createNft(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
         // getMintedStatus(contract);
@@ -195,7 +198,6 @@ const CreateNFT = (props) => {
     //     const uri = await contract.tokenURI(tokenId);
     //     alert(uri);
     // }
-
 
     const handleImage = async (e) => {
         try {
@@ -242,6 +244,7 @@ const CreateNFT = (props) => {
                 console.log(fileRes.data)
                 setImage(pinataDomain + '/ipfs/' + fileRes?.data?.IpfsHash)
                 console.log(`${pinataDomain}/ipfs/${fileRes?.data?.IpfsHash}`)
+                setMessage('Image uploaded to IPFS successfully!');
                 // console.log(image)
                 // console.log(fileRes.data)
                 // const res = await toast.promise(
@@ -306,7 +309,7 @@ const CreateNFT = (props) => {
             console.log('tx', tx)
             if (tx) {
                 dispatch(saveNftDetails(user?._id, nftURI))
-                setMessage('NFT created successfully!');
+                setMessage('NFT Minted successfully!');
                 // window.location.href = '/';
             }
             // await toast.promise(
@@ -348,10 +351,12 @@ const CreateNFT = (props) => {
             {/* Navbar ends here */}
 
             {/* Form Starts here here */}
-            {message && <Message variant='danger'>{message}</Message>}
+            <div className="container my-2">
+                {message && <Message variant='warning'>{message}</Message>}
+                {error && <Message variant='danger'>{error}</Message>}
+                {loading && <Loader />}
+            </div>
             {/* {success && <Message variant='success'>Profile Updated</Message>} */}
-            {error && <Message variant='danger'>{error}</Message>}
-            {loading && <Loader />}
             <form onSubmit={handleSubmit} className="signupFormSection row">
                 <div className="col-sm-6 signupFormSectionCol ">
                     {/* Left form column Starts here here */}
@@ -384,6 +389,8 @@ const CreateNFT = (props) => {
                         </div>
                     </div>
 
+
+
                     {/* Description Field */}
                     <div className="signupInputWrapper">
                         <div className="signupInputLabel">Asset Description</div>
@@ -392,6 +399,10 @@ const CreateNFT = (props) => {
                             <textarea type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Add your Description here" className="signupInputField" />
                         </div>
                     </div>
+
+                    {/* <div className="signupFormCol1Row1Text1">My Account</div> */}
+
+                    {/* Form starts here */}
 
                     <div className="col-sm-6 nftImgCardWrapper">
                         {/* <img src={profileAvatar} style={{ width: '100%', height: '100%' }} /> */}
@@ -411,10 +422,6 @@ const CreateNFT = (props) => {
                         </div>
                     </div>
                     <div className="fullHr" style={{ marginTop: 30 }}></div>
-                    {/* <div className="signupFormCol1Row1Text1">My Account</div> */}
-
-                    {/* Form starts here */}
-
 
 
                     {/* { Wallet } */}
@@ -422,14 +429,15 @@ const CreateNFT = (props) => {
                         <div className="signupInputLabel">Asset Price in ETH</div>
                         <div className="signupInputFieldWrapper">
                             <div className="signupInputFieldWrapperLayer"></div>
-                            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.8" className="signupInputField" required />
+                            <input type="number" value={price} step={0.01} min={0} onChange={(e) => setPrice(e.target.value)} placeholder="0.8" className="signupInputField" required />
                         </div>
                     </div>
                     <div className="fullHr" style={{ marginTop: 30 }}></div>
                     {/* Save Profile Button starts here  */}
-                    <button type="submit" className="saveProfileBtn">
-                        List
+                    <button type="submit" className="saveProfileBtn" disabled={!loading && image ? false : true}>
+                        {loading ? "Uploading NFT Metadata.." : "List"}
                     </button>
+
 
 
 
