@@ -30,11 +30,33 @@ const saveNftUrl = asyncHandler(async (req, res) => {
         })
     } else {
         res.status(400)
-        throw new Error('Invalid user data')
+        throw new Error('Invalid NFT data')
     }
 })
 
+const getUsersNft = asyncHandler(async (req, res) => {
+    const { userId } = req.query
+    // console.log(req.body);
+    console.log(userId);
+    const nft = await Nft.find({
+        // userId: String(id)
+        userId: userId
+    })
+    // console.log('nft', nft);
+    if (nft) {
+        // return res.status(201).json({
+        //     _id: nft._id,
+        //     userId: nft.userId,
+        //     ipfsDataLink: nft.ipfsDataLink,
+        // })
+        res.status(201).json(nft)
+    } else {
+        res.status(400)
+        throw new Error('NFT Asset not found!')
+    }
+})
 
 export {
-    saveNftUrl
+    saveNftUrl,
+    getUsersNft
 }
