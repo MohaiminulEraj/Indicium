@@ -4,12 +4,32 @@ import discoverCardRow2Img1 from "../../assets/images/trendingImg6.png";
 import discoverCardRow3Col1Img from "../../assets/images/discoverCardRow3Col1Img.png";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
+import { getUsersNft } from "../../redux/actions/nftActions"
 
 const ProfileDiscoverCard = (props) => {
-
+  const dispatch = useDispatch();
+  const userLogin = useSelector((state) => state.userLogin)
+  const { userInfo } = userLogin
   const userDetails = useSelector((state) => state.userDetails)
-  const { loading, error, user } = userDetails
+  const { loading, user } = userDetails
+  const ownedNft = useSelector((state) => state.ownedNft)
 
+  const { nft, error } = ownedNft;
+  console.log(nft)
+
+  useEffect(() => {
+    if (!userInfo) {
+      window.location.href = '/'
+    }
+    // dispatch(getUsersNft(userInfo._id));
+    if (!nft) {
+      dispatch(getUsersNft(userInfo._id));
+    }
+    // else if (!user || !user.name) {
+    // dispatch(getUserDetails(userInfo._id))
+    // }
+  }, [dispatch, nft, userInfo])
+  console.log(nft.length)
   return (
     <>
       <Link to="/discoverSingle" className="col-sm-4 dicoverCard">

@@ -7,6 +7,7 @@ import {
     NFT_DETAILS_FAIL,
     NFT_DETAILS_REQUEST,
     NFT_DETAILS_SUCCESS,
+    NFT_DETAILS_RESET,
     CLEAR_ERRORS
 } from "../constants/nftConstants";
 import {
@@ -54,4 +55,52 @@ export const saveNftDetails = (id, ipfsDataLink) => async (dispatch) => {
                     : error.message,
         })
     }
+}
+
+export const getUsersNft = (id) => async (dispatch) => {
+    try {
+        dispatch({
+            type: NFT_DETAILS_REQUEST,
+        })
+
+        // const {
+        //     userLogin: { userInfo },
+        // } = getState()
+
+        const config = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        }
+        console.log(id)
+        const { data } = await axios.get(`http://localhost:5000/api/nfts/owned?userId=${id}`, config)
+
+        console.log(await data)
+        dispatch({
+            type: NFT_DETAILS_SUCCESS,
+            payload: data,
+        })
+        // NFT_DETAILS_FAIL
+    } catch (error) {
+        const message =
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        // if (message === 'Not authorized, token failed') {
+        //     dispatch(logout())
+        // }
+        dispatch({
+            type: NFT_DETAILS_FAIL,
+            payload: message,
+        })
+    }
+}
+
+
+// Clear Errors
+export const clearErrors = () => async (dispatch) => {
+    dispatch({
+        type: CLEAR_ERRORS
+    })
 }
