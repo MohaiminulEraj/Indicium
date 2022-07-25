@@ -37,7 +37,7 @@ const saveNftUrl = asyncHandler(async (req, res) => {
 const getUsersNft = asyncHandler(async (req, res) => {
     const { userId } = req.query
     // console.log(req.body);
-    console.log(userId);
+    // console.log(userId);
     const nft = await Nft.find({
         // userId: String(id)
         userId: userId

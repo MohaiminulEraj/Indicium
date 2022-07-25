@@ -21,9 +21,11 @@ import fbCircle from "../assets/images/fbCircle.png";
 import { Link } from "react-router-dom";
 import { FaCheck, FaTimes } from 'react-icons/fa'
 import { getUserDetails, updateCoverPhoto } from '../redux/actions/userActions'
+import { getUsersNft } from "../redux/actions/nftActions"
 import ProfileDiscoverCard from "./components/ProfileDiscoverCard"
 import Message from './components/Message'
 import Loader from './components/Loader'
+import axios from 'axios'
 // import moreFill from "../assets/images/morefill.png";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import SigninPopup from "./components/SigninPopup";
@@ -38,13 +40,19 @@ const Profile = (props) => {
     const userLogin = useSelector((state) => state.userLogin)
     const { userInfo } = userLogin
     const userDetails = useSelector((state) => state.userDetails)
-    const { loading, error, user } = userDetails
+    const { loading, user } = userDetails
 
     const [coverPhoto, setCoverPhoto] = useState('');
     const [coverPhotoPreview, setCoverPhotoPreview] = useState('');
 
     const coverPhotoUpdate = useSelector((state) => state.coverPhotoUpdate)
     const { success } = coverPhotoUpdate
+
+    const ownedNft = useSelector((state) => state.ownedNft)
+    const [nftMetadata, setNftMetadata] = useState({})
+
+    const { nft, error } = ownedNft;
+    console.log(nft)
 
     const dispatch = useDispatch();
 
@@ -70,6 +78,22 @@ const Profile = (props) => {
             }
         }
     }, [dispatch, user, userInfo])
+
+    useEffect(() => {
+        if (!nft) {
+            dispatch(getUsersNft(userInfo._id));
+        }
+        // if (nftMetadata) {
+        //     axios.get(`${nft[0].ipfsDataLink}`)
+        //         .then(res => {
+        //             console.log(res.data)
+        //             setNftMetadata(res.data)
+        //         })
+        //         .catch(err => {
+        //             console.log(err)
+        //         })
+        // }
+    }, [dispatch, nft])
 
     const onMenuItemClick = (id) => {
         console.log(id)
@@ -319,7 +343,16 @@ const Profile = (props) => {
 
                             {/* Cards Starts  here */}
                             <div className="row discoverCardWrapper">
-                                <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} />
+                                {
+                                    nft?.length === 0 ?
+                                        <div className="alert alert-danger mt-5 w-100"><b>You don't have any NFT Asset!</b></div>
+                                        :
+                                        nft?.map((myNft, index) => (
+                                            <ProfileDiscoverCard key={index} len={nft?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail1} />
+                                        ))
+                                }
+
+                                {/* <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} /> */}
                                 {/* <ProfileDiscoverCard thumbnail={discoverCardThumbnail2} />
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail4} />
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} /> */}

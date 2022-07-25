@@ -76,7 +76,6 @@ export const getUsersNft = (id) => async (dispatch) => {
         console.log(id)
         const { data } = await axios.get(`http://localhost:5000/api/nfts/owned?userId=${id}`, config)
 
-        console.log(await data)
         dispatch({
             type: NFT_DETAILS_SUCCESS,
             payload: data,
