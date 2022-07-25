@@ -21,7 +21,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/discover" element={<DiscoverRoute />} />
-        <Route path="/discoverSingle" element={<DiscoverRouteSingle />} />
+        <Route path="/discoverSingle/:id" element={<DiscoverRouteSingle />} />
         <Route path="/create" element={<PrivateRoute component={CreateNftRoute} />} />
         <Route path="/profile" element={<PrivateRoute component={ProfileRoute} />} />
         <Route path="/signin" element={<SigninRoute />} />

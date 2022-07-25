@@ -20,16 +20,17 @@ const Discover = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
   const getNft = useSelector((state) => state.getNft)
+  const { nfts, error } = getNft;
+
   const [nftMetadata, setNftMetadata] = useState({})
 
-  const { nft, error } = getNft;
-  console.log(nft)
+  console.log(nfts)
   const dispatch = useDispatch();
   useEffect(() => {
-    if (!nft) {
+    if (!nfts) {
       dispatch(getNfts());
     }
-  }, [dispatch, nft])
+  }, [dispatch, nfts])
   return (
     <div className="body">
       {/* Section2 */}
@@ -155,11 +156,11 @@ const Discover = (props) => {
 
           <div className="row discoverCardWrapper">
             {
-              nft?.length === 0 ?
-                <div className="alert alert-danger mt-5 w-100"><b>You don't have any NFT Asset!</b></div>
+              nfts?.length === 0 ?
+                <div className="alert alert-danger mt-5 w-100"><b>NFT Assets Not Found!</b></div>
                 :
-                nft?.map((myNft, index) => (
-                  <DiscoverCard key={index} len={nft?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail1} />
+                nfts?.map((myNft, index) => (
+                  <DiscoverCard key={index} id={myNft?._id} len={nfts?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail1} />
                 ))
             }
             {/* <DiscoverCard thumbnail={discoverCardThumbnail1} /> */}

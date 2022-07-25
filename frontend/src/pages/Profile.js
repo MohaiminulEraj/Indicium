@@ -51,8 +51,8 @@ const Profile = (props) => {
     const ownedNft = useSelector((state) => state.getNft)
     const [nftMetadata, setNftMetadata] = useState({})
 
-    const { nft, error } = ownedNft;
-    console.log(nft)
+    const { nfts, error } = ownedNft;
+    console.log(nfts)
 
     const dispatch = useDispatch();
 
@@ -80,11 +80,11 @@ const Profile = (props) => {
     }, [dispatch, user, userInfo])
 
     useEffect(() => {
-        if (!nft) {
+        if (!nfts) {
             dispatch(getNfts(userInfo._id));
         }
         // if (nftMetadata) {
-        //     axios.get(`${nft[0].ipfsDataLink}`)
+        //     axios.get(`${nfts[0].ipfsDataLink}`)
         //         .then(res => {
         //             console.log(res.data)
         //             setNftMetadata(res.data)
@@ -93,7 +93,7 @@ const Profile = (props) => {
         //             console.log(err)
         //         })
         // }
-    }, [dispatch, nft])
+    }, [dispatch, nfts])
 
     const onMenuItemClick = (id) => {
         console.log(id)
@@ -344,11 +344,11 @@ const Profile = (props) => {
                             {/* Cards Starts  here */}
                             <div className="row discoverCardWrapper">
                                 {
-                                    nft?.length === 0 ?
+                                    nfts?.length === 0 ?
                                         <div className="alert alert-danger mt-5 w-100"><b>You don't have any NFT Asset!</b></div>
                                         :
-                                        nft?.map((myNft, index) => (
-                                            <ProfileDiscoverCard key={index} len={nft?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail1} />
+                                        nfts?.map((myNft, index) => (
+                                            <ProfileDiscoverCard key={index} len={nfts?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail1} />
                                         ))
                                 }
 

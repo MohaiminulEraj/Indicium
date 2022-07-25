@@ -4,6 +4,10 @@ import {
     SAVE_NFT_DETAILS_REQUEST,
     SAVE_NFT_DETAILS_SUCCESS,
     SAVE_NFT_DETAILS_FAIL,
+    ALL_NFT_REQUEST,
+    ALL_NFT_SUCCESS,
+    ALL_NFT_FAIL,
+    ALL_NFT_RESET,
     NFT_DETAILS_FAIL,
     NFT_DETAILS_REQUEST,
     NFT_DETAILS_SUCCESS,
@@ -60,7 +64,7 @@ export const saveNftDetails = (id, ipfsDataLink) => async (dispatch) => {
 export const getNfts = (id) => async (dispatch) => {
     try {
         dispatch({
-            type: NFT_DETAILS_REQUEST,
+            type: ALL_NFT_REQUEST,
         })
 
         // const {
@@ -83,7 +87,7 @@ export const getNfts = (id) => async (dispatch) => {
         }
 
         dispatch({
-            type: NFT_DETAILS_SUCCESS,
+            type: ALL_NFT_SUCCESS,
             payload: data.data,
         })
         // NFT_DETAILS_FAIL
@@ -96,8 +100,29 @@ export const getNfts = (id) => async (dispatch) => {
         //     dispatch(logout())
         // }
         dispatch({
-            type: NFT_DETAILS_FAIL,
+            type: ALL_NFT_FAIL,
             payload: message,
+        })
+    }
+}
+
+export const getNftDetails = (id) => async (dispatch) => {
+    try {
+        dispatch({ type: NFT_DETAILS_REQUEST })
+
+        const { data } = await axios.get(`/api/nfts/${id}`)
+
+        dispatch({
+            type: NFT_DETAILS_SUCCESS,
+            payload: data,
+        })
+    } catch (error) {
+        dispatch({
+            type: NFT_DETAILS_FAIL,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message,
         })
     }
 }

@@ -3,10 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import "bootstrap/dist/css/bootstrap.min.css";
 import discoverCardRow2Img1 from "../../assets/images/trendingImg6.png";
 import discoverCardRow3Col1Img from "../../assets/images/discoverCardRow3Col1Img.png";
-import { Link } from "react-router-dom";
+import DiscoverSingle from '../nft/DiscoverSingle';
+import { Link, Route } from "react-router-dom";
 import axios from "axios";
 
-const DiscoverCard = ({ ipfsDataLink, len, thumbnail }) => {
+const DiscoverCard = ({ ipfsDataLink, len, thumbnail, id }) => {
   const [nftMetadata, setNftMetadata] = useState({})
   const [imgBlob, setImgBlob] = useState(null);
 
@@ -55,7 +56,9 @@ const DiscoverCard = ({ ipfsDataLink, len, thumbnail }) => {
   }, [])
 
   return (
-    <Link to="/discoverSingle" className="col-sm-3 dicoverCard">
+    <Link to={"/discoverSingle/:" + id} state={{ id }} className="col-sm-3 dicoverCard">
+      {/* <Link to={{ pathname: `/DiscoverSingle/:${id}`, query: { id } }} className="col-sm-3 dicoverCard"> */}
+      {/* <Link to={"/discoverSingle/:" + id} className="col-sm-3 dicoverCard"> */}
       <div className="discoverCardThumbnailWrapper">
         <img src={thumbnail} className="popularCardThumbnailImg" />
       </div>
