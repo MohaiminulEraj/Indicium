@@ -12,7 +12,13 @@ const DiscoverCard = ({ ipfsDataLink, len, thumbnail, id }) => {
   const [imgBlob, setImgBlob] = useState(null);
 
   async function getNftMetaData() {
-    const res = await axios.get(ipfsDataLink);
+    const config = {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }
+    const res = await axios.get(ipfsDataLink, config);
     setNftMetadata(res.data)
     console.log(res.data);
     const img = await axios.get(res.data.image);

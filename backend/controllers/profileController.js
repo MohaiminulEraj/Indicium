@@ -142,6 +142,32 @@ const updateCoverPhoto = asyncHandler(async (req, res) => {
     })
 })
 
+// @route    GET api/profile/me
+// @desc     Get current users profile
+// @access   Private
+const nftOwnerDetails = asyncHandler(async (req, res) => {
+    try {
+        // console.log(req.user.id)
+        // const profile = await Profile.findOne({
+        //     user: req.user._id,
+        // }).populate({ path: 'user', select: 'name avatar' });
+        const { id } = req.params
+        // console.log('USERD ID', id)
+        const profile = await User.findById(id).select('name avatar');
+        // const profile = await User.find({}).select('name avatar');;
+        if (!profile) {
+            res.status(400)
+            throw new Error('User not found with this ID.')
+        }
+
+        res.status(200).json(profile)
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 
 // // @desc    Update user profile
 // // @route   PUT /api/users/profile
@@ -221,5 +247,6 @@ const updateCoverPhoto = asyncHandler(async (req, res) => {
 export {
     getUserProfile,
     updateUserProfile,
+    nftOwnerDetails,
     updateCoverPhoto
 }

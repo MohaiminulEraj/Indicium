@@ -13,6 +13,12 @@ import {
     CLEAR_ERRORS
 } from "../constants/nftConstants";
 
+import {
+    NFT_OWNER_REQUEST,
+    NFT_OWNER_SUCCESS,
+    NFT_OWNER_FAIL,
+} from "../constants/userConstants";
+
 export const saveNftReducer = (state = {}, action) => {
     switch (action.type) {
         case SAVE_NFT_DETAILS_REQUEST:
@@ -44,10 +50,13 @@ export const getNftReducer = (state = {}, action) => {
 export const nftDetailsReducer = (state = { nft: {} }, action) => {
     switch (action.type) {
         case NFT_DETAILS_REQUEST:
+        case NFT_OWNER_REQUEST:
             return { ...state, loading: true }
         case NFT_DETAILS_SUCCESS:
+        case NFT_OWNER_SUCCESS:
             return { loading: false, nft: action.payload }
         case NFT_DETAILS_FAIL:
+        case NFT_OWNER_FAIL:
             return { loading: false, error: action.payload }
         // case NFT_DETAILS_RESET:
         //     return { nft: {} }

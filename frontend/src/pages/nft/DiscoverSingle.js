@@ -16,6 +16,7 @@ import dsCol2row2Img from "../../assets/images/dsCol2row2Img.png";
 import { faChevronDown, faHourglass, faHourglassHalf, faTag } from "@fortawesome/free-solid-svg-icons";
 import profile from "../../assets/images/profile.png"
 import { getNftDetails } from "../../redux/actions/nftActions"
+import { getUserDetails, getNftOwner } from "../../redux/actions/userActions"
 import PopularCard from "../components/PopularCard";
 import popularCardThumbnail1 from "../../assets/images/popularCardThumbnail1.png"
 import popularCardThumbnail2 from "../../assets/images/popularCardThumbnail2.png"
@@ -26,12 +27,17 @@ import axios from 'axios';
 const DiscoverSingle = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
+  const [ownerStatus, setOwnerStatus] = useState(false);
   const [nftMetadata, setNftMetadata] = useState(null)
   const nftDetails = useSelector((state) => state.nftDetails)
   const { nft, error } = nftDetails;
+  const userLogin = useSelector((state) => state.userLogin)
+  const { userInfo } = userLogin
   const userDetails = useSelector((state) => state.userDetails)
   const { loading, user } = userDetails
-  console.log(user)
+  const nftOwnerDetails = useSelector((state) => state.nftOwnerDetails)
+  const { nftOwner } = nftOwnerDetails
+  // console.log('nftOwner', nftOwner)
   const { state } = useLocation();
   let nftId = state?.id;
   if (!nftId) {
@@ -40,54 +46,68 @@ const DiscoverSingle = (props) => {
   const dispatch = useDispatch();
 
   async function getNftMetaData(ipfsDataLink) {
-    const res = await axios.get(ipfsDataLink);
-    setNftMetadata(res.data)
-    console.log(res.data);
-    const img = await axios.get(res.data.image);
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', ipfsDataLink);
-    xhr.responseType = 'blob';
-    // var blob = null;
-    xhr.onload = function (event) {
-      var blob = xhr.response;
-      // setImgBlob(blob);
-      console.log(blob);
+    const config = {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
     }
-    xhr.send();
+    let res = null;
+    if (ipfsDataLink) {
+      res = await axios.get(ipfsDataLink, config);
+    }
+    console.log(res?.data);
+    setNftMetadata(res?.data || null)
 
-    // var imgUrl = ipfsDataLink.createObjectURL(img?.request?.response)
-    // console.log(imgUrl)
-
-    // console.log(img?.request?.response.length);
-    // var bytes = new Uint8Array(img?.request?.response.length / 2);
-    // for (var i = 0; i < img?.request?.response.length; i += 2) {
-    //   bytes[i / 2] = parseInt(img?.request?.response.substring(i, i + 2), /* base = */ 16);
+    // const img = await axios.get(res.data.image);
+    // var xhr = new XMLHttpRequest();
+    // xhr.open('GET', ipfsDataLink);
+    // xhr.responseType = 'blob';
+    // // var blob = null;
+    // xhr.onload = function (event) {
+    //   var blob = xhr.response;
+    //   // setImgBlob(blob);
+    //   console.log(blob);
     // }
-    // let imagee = btoa(new Uint8Array(img?.request?.response).reduce((data, byte) => data + String.fromCharCode(byte), ''));
-    // let src = "data:image;base64," + imagee;
-    // console.log(src)
-    var blob = new Blob([img?.request?.response], { type: 'image/bmp' });
-    // image.src = URL.createObjectURL(blob);
-    const resp = new Buffer(img?.request?.response, 'binary').toString('base64');
-    var file = new File([blob], 'image.bmp', { type: 'image/bmp' });
-    console.log(file)
-    // setImgBlob(blob)
-    // console.log(resp);
-    // image.src = URL.createObjectURL(resp);
-    // console.log('blob', image);
-    // console.log(Base64.encode(blob))
-    // image.src = URL.createObjectURL(img?.request?.response);
+    // xhr.send();
   }
 
   useEffect(() => {
-    if (nft && nft._id !== nftId) {
+    if (!nft) {
+      dispatch(getNftDetails(nftId));
+    } else if (nft?._id !== nftId) {
       dispatch(getNftDetails(nftId));
     }
-    console.log(nft)
-    getNftMetaData(nft.ipfsDataLink);
-    // console.log(nftMetadata)
+    else {
+      getNftMetaData(nft?.ipfsDataLink);
+      console.log('nftLink', nft?.ipfsDataLink);
+    }
+    console.log('nftMetadata', nftMetadata)
+    console.log(nft?.userId)
+    if (nft?.userId && !ownerStatus) {
+      dispatch(getNftOwner(nft?.userId));
+      setOwnerStatus(true);
+    } else {
+      console.log('nftOwnerUpdated', nftOwner);
+    }
 
-  }, [dispatch, nft])
+    if (userInfo?._id && !user?.name) {
+      dispatch(getUserDetails(userInfo?._id));
+    }
+    // console.log(nftMetadata)
+    console.log('nft.userId', nft?.userId)
+  }, [dispatch, nft, nftOwner]);
+
+  // useEffect(() => {
+  //   console.log('nft.userId', nft?.userId)
+  //   if (!ownerStatus) {
+  //     dispatch(getNftOwner(nft?.userId));
+  //     setOwnerStatus(true);
+  //   } else {
+  //     console.log('nftOwnerUpdated', nftOwner);
+  //   }
+  // }, [dispatch, nftOwner])
+
   return (
     <div className="body">
       {/* Section2 */}
@@ -187,13 +207,13 @@ const DiscoverSingle = (props) => {
                 <div className="row dsCol2Row4">
                   <div className="col-sm-1">
                     <div className="dsCol2Row4ProfileWrapper">
-                      <img src={profile} className="dsCol2Row4Profile" />
+                      <img src={nftOwner?.avatar?.url || profile} className="dsCol2Row4Profile" />
                       <div className="dsCol2Row4ProfileDot"></div>
                     </div>
                   </div>
                   <div className="col-sm-2 dsCol2Row4ProfileTitleWrapper">
                     <div className="dsCol2Row4ProfileTitle">Creator</div>
-                    <div className="dsCol2Row4ProfileTitle2">Steve1889</div>
+                    <div className="dsCol2Row4ProfileTitle2">{nftOwner?.name || "Steve1889"}</div>
                   </div>
                 </div>
 

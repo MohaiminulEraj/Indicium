@@ -3,6 +3,10 @@ import {
   USER_DETAILS_REQUEST,
   USER_DETAILS_RESET,
   USER_DETAILS_SUCCESS,
+  NFT_OWNER_REQUEST,
+  NFT_OWNER_SUCCESS,
+  NFT_OWNER_FAIL,
+  NFT_OWNER_RESET,
   USER_LOGIN_FAIL,
   USER_LOGIN_REQUEST,
   USER_LOGIN_SUCCESS,
@@ -77,6 +81,21 @@ export const userDetailsReducer = (state = { user: {} }, action) => {
       return { loading: false, error: action.payload }
     case USER_DETAILS_RESET:
       return { user: {} }
+    default:
+      return state
+  }
+}
+
+export const nftOwnerDetailsReducer = (state = {}, action) => {
+  switch (action.type) {
+    case NFT_OWNER_REQUEST:
+      return { loading: true }
+    case NFT_OWNER_SUCCESS:
+      return { loading: false, nftOwner: action.payload }
+    case NFT_OWNER_FAIL:
+      return { loading: false, error: action.payload }
+    // case NFT_OWNER_RESET:
+    //   return { nftOwner: {} }
     default:
       return state
   }

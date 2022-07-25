@@ -4,6 +4,9 @@ import {
     USER_DETAILS_FAIL,
     USER_DETAILS_REQUEST,
     USER_DETAILS_SUCCESS,
+    NFT_OWNER_REQUEST,
+    NFT_OWNER_SUCCESS,
+    NFT_OWNER_FAIL,
     USER_UPDATE_PROFILE_FAIL,
     USER_UPDATE_PROFILE_REQUEST,
     USER_UPDATE_PROFILE_SUCCESS,
@@ -95,7 +98,7 @@ export const register = (email, password, rememberMe) => async (dispatch) => {
         })
 
         Cookies.set('userInfo', JSON.stringify(data), { expires: rememberMe ? 30 : 1 })
-/*  */
+        /*  */
     } catch (error) {
         dispatch({
             type: USER_REGISTER_FAIL,
@@ -235,6 +238,27 @@ export const updateCoverPhoto = (user) => async (dispatch, getState) => {
         dispatch({
             type: UPDATE_COVER_PHOTO_FAIL,
             payload: message,
+        })
+    }
+}
+
+export const getNftOwner = (id) => async (dispatch) => {
+    try {
+        dispatch({ type: NFT_OWNER_REQUEST })
+        console.log('getNftOwner', id)
+        const { data } = await axios.get(`/api/profile/nftOwner/${id}`)
+
+        dispatch({
+            type: NFT_OWNER_SUCCESS,
+            payload: data,
+        })
+    } catch (error) {
+        dispatch({
+            type: NFT_OWNER_FAIL,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message,
         })
     }
 }

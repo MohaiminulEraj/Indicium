@@ -5,6 +5,7 @@ import {
     userLoginReducer,
     userRegisterReducer,
     userDetailsReducer,
+    nftOwnerDetailsReducer,
     userUpdateProfileReducer,
     coverPhotoUpdateReducer,
     verifyUserReducer,
@@ -37,6 +38,7 @@ const reducer = combineReducers({
     saveNft: saveNftReducer,
     getNft: getNftReducer,
     nftDetails: nftDetailsReducer,
+    nftOwnerDetails: nftOwnerDetailsReducer
 })
 
 const userInfoFromCookies = Cookies.get('userInfo')
