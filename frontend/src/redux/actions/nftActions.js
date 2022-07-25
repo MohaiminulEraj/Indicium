@@ -57,7 +57,7 @@ export const saveNftDetails = (id, ipfsDataLink) => async (dispatch) => {
     }
 }
 
-export const getUsersNft = (id) => async (dispatch) => {
+export const getNfts = (id) => async (dispatch) => {
     try {
         dispatch({
             type: NFT_DETAILS_REQUEST,
@@ -74,11 +74,17 @@ export const getUsersNft = (id) => async (dispatch) => {
             },
         }
         console.log(id)
-        const { data } = await axios.get(`http://localhost:5000/api/nfts/owned?userId=${id}`, config)
+        let data = null;
+        if (id) {
+            data = await axios.get(`http://localhost:5000/api/nfts/owned?userId=${id}`, config)
+        }
+        else {
+            data = await axios.get(`http://localhost:5000/api/nfts/owned`, config)
+        }
 
         dispatch({
             type: NFT_DETAILS_SUCCESS,
-            payload: data,
+            payload: data.data,
         })
         // NFT_DETAILS_FAIL
     } catch (error) {

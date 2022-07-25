@@ -22,7 +22,7 @@ export const saveNftReducer = (state = {}, action) => {
     }
 }
 
-export const ownedNftReducer = (state = {}, action) => {
+export const getNftReducer = (state = {}, action) => {
     switch (action.type) {
         case NFT_DETAILS_REQUEST:
             return { ...state, loading: true }

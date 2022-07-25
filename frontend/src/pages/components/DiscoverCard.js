@@ -1,20 +1,73 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
 import "bootstrap/dist/css/bootstrap.min.css";
 import discoverCardRow2Img1 from "../../assets/images/trendingImg6.png";
 import discoverCardRow3Col1Img from "../../assets/images/discoverCardRow3Col1Img.png";
 import { Link } from "react-router-dom";
-const DiscoverCard = (props) => {
+import axios from "axios";
+
+const DiscoverCard = ({ ipfsDataLink, len, thumbnail }) => {
+  const [nftMetadata, setNftMetadata] = useState({})
+  const [imgBlob, setImgBlob] = useState(null);
+
+  async function getNftMetaData() {
+    const res = await axios.get(ipfsDataLink);
+    setNftMetadata(res.data)
+    console.log(res.data);
+    const img = await axios.get(res.data.image);
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', ipfsDataLink);
+    xhr.responseType = 'blob';
+    // var blob = null;
+    xhr.onload = function (event) {
+      var blob = xhr.response;
+      // setImgBlob(blob);
+      console.log(blob);
+    }
+    xhr.send();
+
+    // var imgUrl = ipfsDataLink.createObjectURL(img?.request?.response)
+    // console.log(imgUrl)
+
+    // console.log(img?.request?.response.length);
+    // var bytes = new Uint8Array(img?.request?.response.length / 2);
+    // for (var i = 0; i < img?.request?.response.length; i += 2) {
+    //   bytes[i / 2] = parseInt(img?.request?.response.substring(i, i + 2), /* base = */ 16);
+    // }
+    // let imagee = btoa(new Uint8Array(img?.request?.response).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+    // let src = "data:image;base64," + imagee;
+    // console.log(src)
+    var blob = new Blob([img?.request?.response], { type: 'image/bmp' });
+    // image.src = URL.createObjectURL(blob);
+    const resp = new Buffer(img?.request?.response, 'binary').toString('base64');
+    var file = new File([blob], 'image.bmp', { type: 'image/bmp' });
+    console.log(file)
+    // setImgBlob(blob)
+    // console.log(resp);
+    // image.src = URL.createObjectURL(resp);
+    // console.log('blob', image);
+    // console.log(Base64.encode(blob))
+    // image.src = URL.createObjectURL(img?.request?.response);
+  }
+
+  useEffect(() => {
+    getNftMetaData();
+  }, [])
+
   return (
     <Link to="/discoverSingle" className="col-sm-3 dicoverCard">
       <div className="discoverCardThumbnailWrapper">
-        <img src={props.thumbnail} className="popularCardThumbnailImg" />
+        <img src={thumbnail} className="popularCardThumbnailImg" />
       </div>
       <div className="row discoverCardRow1">
         <div className="col-sm-9">
-          <div className="discoverCardRow1Title">Amazing digit art</div>
+          <div className="discoverCardRow1Title">
+            {/* Amazing digit art */}
+            {nftMetadata?.name || "Amazing digit art"}
+          </div>
         </div>
         <div className="col-sm-3 popularCardLastRowButtonWrapper">
-          <div className="popularCardLastRowButton">2.45 ETH</div>
+          <div className="popularCardLastRowButton">{nftMetadata?.price} ETH</div>
         </div>
       </div>
 
@@ -33,7 +86,7 @@ const DiscoverCard = (props) => {
           </div>
         </div>
         <div className="col-sm-4 text-center">
-          <div className="discoverCardRow2Col2Text">3 in stock</div>
+          <div className="discoverCardRow2Col2Text">{len} in stock</div>
         </div>
       </div>
 

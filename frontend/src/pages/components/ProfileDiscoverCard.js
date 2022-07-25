@@ -51,11 +51,11 @@ const ProfileDiscoverCard = ({ ipfsDataLink, thumbnail, len }) => {
     // let src = "data:image;base64," + imagee;
     // console.log(src)
     var blob = new Blob([img?.request?.response], { type: 'image/bmp' });
-    // setImgBlob(blob)
     // image.src = URL.createObjectURL(blob);
     const resp = new Buffer(img?.request?.response, 'binary').toString('base64');
     var file = new File([blob], 'image.bmp', { type: 'image/bmp' });
     console.log(file)
+    // setImgBlob(blob)
     // console.log(resp);
     // image.src = URL.createObjectURL(resp);
     // console.log('blob', image);
@@ -113,12 +113,12 @@ const ProfileDiscoverCard = ({ ipfsDataLink, thumbnail, len }) => {
               <div className="discoverCardRow2ImgContainer" style={{ right: 0 }}>
                 <img src={user?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
               </div>
-              {/* <div className="discoverCardRow2ImgContainer" style={{ right: 10 }}>
+              <div className="discoverCardRow2ImgContainer" style={{ right: 10 }}>
                 <img src={user?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
               </div>
               <div className="discoverCardRow2ImgContainer" style={{ right: 20 }}>
                 <img src={user?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
-              </div> */}
+              </div>
             </div>
           </div>
           <div className="col-sm-4 text-center">

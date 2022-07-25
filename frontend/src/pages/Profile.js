@@ -21,7 +21,7 @@ import fbCircle from "../assets/images/fbCircle.png";
 import { Link } from "react-router-dom";
 import { FaCheck, FaTimes } from 'react-icons/fa'
 import { getUserDetails, updateCoverPhoto } from '../redux/actions/userActions'
-import { getUsersNft } from "../redux/actions/nftActions"
+import { getNfts } from "../redux/actions/nftActions"
 import ProfileDiscoverCard from "./components/ProfileDiscoverCard"
 import Message from './components/Message'
 import Loader from './components/Loader'
@@ -48,7 +48,7 @@ const Profile = (props) => {
     const coverPhotoUpdate = useSelector((state) => state.coverPhotoUpdate)
     const { success } = coverPhotoUpdate
 
-    const ownedNft = useSelector((state) => state.ownedNft)
+    const ownedNft = useSelector((state) => state.getNft)
     const [nftMetadata, setNftMetadata] = useState({})
 
     const { nft, error } = ownedNft;
@@ -81,7 +81,7 @@ const Profile = (props) => {
 
     useEffect(() => {
         if (!nft) {
-            dispatch(getUsersNft(userInfo._id));
+            dispatch(getNfts(userInfo._id));
         }
         // if (nftMetadata) {
         //     axios.get(`${nft[0].ipfsDataLink}`)

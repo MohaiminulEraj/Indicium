@@ -38,10 +38,15 @@ const getUsersNft = asyncHandler(async (req, res) => {
     const { userId } = req.query
     // console.log(req.body);
     // console.log(userId);
-    const nft = await Nft.find({
-        // userId: String(id)
-        userId: userId
-    })
+    let nft = null;
+    if (userId) {
+        nft = await Nft.find({
+            // userId: String(id)
+            userId: userId
+        })
+    } else {
+        nft = await Nft.find({})
+    }
     // console.log('nft', nft);
     if (nft) {
         // return res.status(201).json({

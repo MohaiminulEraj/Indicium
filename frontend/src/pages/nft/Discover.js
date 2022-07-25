@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/Home.css";
 import "../../styles/Responsive.css";
@@ -12,11 +13,23 @@ import discoverCardThumbnail1 from "../../assets/images/discoverCardThumbnail1.p
 import discoverCardThumbnail2 from "../../assets/images/discoverCardThumbnail2.png";
 import discoverCardThumbnail3 from "../../assets/images/discoverCardThumbnail3.png";
 import discoverCardThumbnail4 from "../../assets/images/discoverCardThumbnail4.png";
+import { getNfts } from "../../redux/actions/nftActions"
 import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
 const Discover = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
+  const getNft = useSelector((state) => state.getNft)
+  const [nftMetadata, setNftMetadata] = useState({})
+
+  const { nft, error } = getNft;
+  console.log(nft)
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!nft) {
+      dispatch(getNfts());
+    }
+  }, [dispatch, nft])
   return (
     <div className="body">
       {/* Section2 */}
@@ -141,16 +154,22 @@ const Discover = (props) => {
           </div>
 
           <div className="row discoverCardWrapper">
-            <DiscoverCard thumbnail={discoverCardThumbnail1} />
-            <DiscoverCard thumbnail={discoverCardThumbnail2} />
+            {
+              nft?.length === 0 ?
+                <div className="alert alert-danger mt-5 w-100"><b>You don't have any NFT Asset!</b></div>
+                :
+                nft?.map((myNft, index) => (
+                  <DiscoverCard key={index} len={nft?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail1} />
+                ))
+            }
+            {/* <DiscoverCard thumbnail={discoverCardThumbnail1} /> */}
+            {/* <DiscoverCard thumbnail={discoverCardThumbnail2} />
             <DiscoverCard thumbnail={discoverCardThumbnail3} />
             <DiscoverCard thumbnail={discoverCardThumbnail4} />
-          </div>
-          <div className="row discoverCardWrapper">
             <DiscoverCard thumbnail={discoverCardThumbnail4} />
             <DiscoverCard thumbnail={discoverCardThumbnail2} />
             <DiscoverCard thumbnail={discoverCardThumbnail3} />
-            <DiscoverCard thumbnail={discoverCardThumbnail1} />
+            <DiscoverCard thumbnail={discoverCardThumbnail1} /> */}
           </div>
 
           <div className="trendingSecBtnWrapper">
