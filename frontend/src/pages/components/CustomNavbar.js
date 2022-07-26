@@ -103,7 +103,10 @@ const CustomNavbar = (props) => {
                 <>
                   <Nav.Link>
                     <div className="navItemSignup">
-                      <Link to="/profile">Welcome {user?.name?.split(" ")[0] || 'User'}!</Link>
+                      <Link to="/profile">
+                        {/* Welcome {user?.name?.split(" ")[0] || 'User'}! */}
+                        Welcome {userInfo?.email.substr(0, userInfo?.email.indexOf('@')).toUpperCase() || 'User'}!
+                      </Link>
                     </div>
                   </Nav.Link>
                   <Nav.Link href="#" >

@@ -5,6 +5,7 @@ import discoverCardRow2Img1 from "../../assets/images/trendingImg6.png";
 import discoverCardRow3Col1Img from "../../assets/images/discoverCardRow3Col1Img.png";
 import DiscoverSingle from '../nft/DiscoverSingle';
 import { Link, Route } from "react-router-dom";
+import { getUserDetails, getNftOwner } from "../../redux/actions/userActions"
 import axios from "axios";
 
 const DiscoverCard = ({ ipfsDataLink, len, thumbnail, id }) => {

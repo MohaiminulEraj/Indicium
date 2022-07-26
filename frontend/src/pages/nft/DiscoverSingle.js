@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-
+import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/Home.css";
 import "../../styles/Responsive.css";
@@ -23,6 +23,7 @@ import popularCardThumbnail2 from "../../assets/images/popularCardThumbnail2.png
 import popularCardThumbnail3 from "../../assets/images/popularCardThumbnail3.png"
 import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
+import NftMarket from '../../contracts/NftMarket.json';
 import axios from 'axios';
 const DiscoverSingle = (props) => {
   const [showPopup, setShowPopup] = useState(false);
@@ -107,6 +108,39 @@ const DiscoverSingle = (props) => {
   //     console.log('nftOwnerUpdated', nftOwner);
   //   }
   // }, [dispatch, nftOwner])
+  // window.ethereum.send('eth_requestAccounts');
+  const contractAddress = '0x6026089Ec9A7f2E55e2439998d500A34D801575C';
+
+  // const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
+
+  // // get the end user
+  // const signer = provider.getSigner();
+  // const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+
+  // get the smart contract
+  // console.log(contract)
+
+  // async () => {
+  //   const nfts = [];
+  //   const coreNfts = await contract?.getAllNftsOnSale();
+
+  //   for (let i = 0; i < coreNfts.length; i++) {
+  //     const item = coreNfts[i];
+  //     const tokenURI = await contract?.tokenURI(item?.tokenId);
+  //     const metaRes = await fetch(tokenURI);
+  //     const meta = await metaRes.json();
+
+  //     nfts.push({
+  //       price: parseFloat(ethers.utils.formatEther(item.price)),
+  //       tokenId: item.tokenId.toNumber(),
+  //       creator: item.creator,
+  //       isListed: item.isListed,
+  //       meta
+  //     })
+  //   }
+
+  //   return nfts;
+  // }
 
   return (
     <div className="body">

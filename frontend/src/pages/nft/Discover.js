@@ -13,7 +13,7 @@ import discoverCardThumbnail1 from "../../assets/images/discoverCardThumbnail1.p
 import discoverCardThumbnail2 from "../../assets/images/discoverCardThumbnail2.png";
 import discoverCardThumbnail3 from "../../assets/images/discoverCardThumbnail3.png";
 import discoverCardThumbnail4 from "../../assets/images/discoverCardThumbnail4.png";
-import { getNfts } from "../../redux/actions/nftActions"
+import { getNfts } from "../../redux/actions/nftActions";
 import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
 const Discover = (props) => {
@@ -160,7 +160,7 @@ const Discover = (props) => {
                 <div className="alert alert-danger mt-5 w-100"><b>NFT Assets Not Found!</b></div>
                 :
                 nfts?.map((myNft, index) => (
-                  <DiscoverCard key={index} id={myNft?._id} len={nfts?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail1} />
+                  <DiscoverCard key={index} id={myNft?._id} len={nfts?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail2} />
                 ))
             }
             {/* <DiscoverCard thumbnail={discoverCardThumbnail1} /> */}
