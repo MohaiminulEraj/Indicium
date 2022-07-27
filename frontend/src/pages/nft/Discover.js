@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
+// import { useDispatch, useSelector } from 'react-redux';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/Home.css";
 import "../../styles/Responsive.css";
@@ -13,24 +13,31 @@ import discoverCardThumbnail1 from "../../assets/images/discoverCardThumbnail1.p
 import discoverCardThumbnail2 from "../../assets/images/discoverCardThumbnail2.png";
 import discoverCardThumbnail3 from "../../assets/images/discoverCardThumbnail3.png";
 import discoverCardThumbnail4 from "../../assets/images/discoverCardThumbnail4.png";
-import { getNfts } from "../../redux/actions/nftActions";
+// import { getNfts } from "../../redux/actions/nftActions";
 import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
+import axios from 'axios';
+
 const Discover = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
-  const getNft = useSelector((state) => state.getNft)
-  const { nfts, error } = getNft;
+  const [nfts, setNfts] = useState(null);
 
-  const [nftMetadata, setNftMetadata] = useState({})
-
-  console.log(nfts)
-  const dispatch = useDispatch();
+  async function getNfts() {
+    await axios.get(`/api/nfts/owned`).then(res => {
+      setNfts(res.data)
+      console.log('nfts', res.data)
+    }).catch(err => {
+      console.error(err)
+    })
+  }
+  // const dispatch = useDispatch();
   useEffect(() => {
     if (!nfts) {
-      dispatch(getNfts());
+      getNfts();
     }
-  }, [dispatch, nfts])
+  }, [nfts])
+
   return (
     <div className="body">
       {/* Section2 */}

@@ -78,7 +78,7 @@ const DiscoverSingle = (props) => {
     await axios.get(`/api/profile/nftOwner/${nftOwner}`).then(res => {
       setNftOwnerDetails(res.data)
       console.log('nftOwnerDetails', res.data)
-      setOwnerStatus(true)
+      // setOwnerStatus(true)
     }).catch(err => {
       console.error(err)
     })
@@ -138,7 +138,8 @@ const DiscoverSingle = (props) => {
       // const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
       // const contractAddress = '0x079fA92A1D65716a626690556b3FbbA160c4fbc0';
       const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-      const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
+      console.log('contractAddress', contractAddress);
+      const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
 
       // get the end user
       const signer = provider.getSigner();
@@ -164,7 +165,7 @@ const DiscoverSingle = (props) => {
           meta
         })
       }
-
+      console.log('nfts', nfts)
       return nfts;
     } catch (error) {
       console.error(error);

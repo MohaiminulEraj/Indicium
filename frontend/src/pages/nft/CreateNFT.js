@@ -282,7 +282,7 @@ const CreateNFT = (props) => {
         try {
             setLoading(true);
             window.ethereum.send('eth_requestAccounts');
-            const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
+            const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
             const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
 

@@ -83,7 +83,7 @@ export const getNfts = (id) => async (dispatch) => {
             data = await axios.get(`/api/nfts/owned?userId=${id}`, config)
         }
         else {
-            data = await axios.get(`http://localhost:5000/api/nfts/owned`, config)
+            data = await axios.get(`/api/nfts/owned`, config)
         }
 
         dispatch({

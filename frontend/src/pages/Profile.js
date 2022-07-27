@@ -37,10 +37,11 @@ const Profile = (props) => {
     const [showPopup, setShowPopup] = useState(false);
     const [showSignupPopup, setShowSignupPopup] = useState(false);
     const [message, setMessage] = useState(null)
+    const [nfts, setNfts] = useState(null);
     const userLogin = useSelector((state) => state.userLogin)
     const { userInfo } = userLogin
     const userDetails = useSelector((state) => state.userDetails)
-    const { loading, user } = userDetails
+    const { loading, user, error } = userDetails
 
     const [coverPhoto, setCoverPhoto] = useState('');
     const [coverPhotoPreview, setCoverPhotoPreview] = useState('');
@@ -48,14 +49,19 @@ const Profile = (props) => {
     const coverPhotoUpdate = useSelector((state) => state.coverPhotoUpdate)
     const { success } = coverPhotoUpdate
 
-    const ownedNft = useSelector((state) => state.getNft)
-    const [nftMetadata, setNftMetadata] = useState({})
 
-    const { nfts, error } = ownedNft;
-    console.log(nfts)
 
     const dispatch = useDispatch();
 
+    async function getNfts() {
+        await axios.get(`/api/nfts/owned?userId=${userInfo?._id}`).then(res => {
+            setNfts(res.data)
+            console.log('nfts', res.data)
+            // setOwnerStatus(true)
+        }).catch(err => {
+            console.error(err)
+        })
+    }
 
     let createdAt = new Date(user?.createdAt || '2022-01-04T11:14:09.314Z');
     createdAt = createdAt.toLocaleDateString('en-US', {
@@ -81,7 +87,8 @@ const Profile = (props) => {
 
     useEffect(() => {
         if (!nfts) {
-            dispatch(getNfts(userInfo._id));
+            // dispatch(getNfts(userInfo._id));
+            getNfts();
         }
         // if (nftMetadata) {
         //     axios.get(`${nfts[0].ipfsDataLink}`)
