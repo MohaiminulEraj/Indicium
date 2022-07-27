@@ -8,6 +8,8 @@ import Footer from "../components/Footer";
 import CustomNavbar from "../components/CustomNavbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { ethers } from "ethers";
+import NftMarket from '../../contracts/NftMarket.json';
 import DiscoverCard from "../components/DiscoverCard";
 import discoverCardThumbnail1 from "../../assets/images/discoverCardThumbnail1.png";
 import discoverCardThumbnail2 from "../../assets/images/discoverCardThumbnail2.png";
@@ -21,23 +23,93 @@ import axios from 'axios';
 const Discover = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
-  const [nfts, setNfts] = useState(null);
+  const [nfts, setNfts] = useState([]);
+  const [status, setStatus] = useState(false);
+  const [nftId, setNftId] = useState("");
+  let nftsFromChain = [];
+  const buyNftHandler = async () => {
+    try {
+      // const provider = ethers.getDefaultProvider('ropsten');
+      // const wallet = provider.getSigner();
+      // const contract = new ethers.Contract(NftMarket.networks['3'].address, NftMarket.abi, wallet);
+      // const tx = await contract.buyNft(nftId, { value: ethers.utils.parseEther('0.1') });
+      // console.log(tx.hash);
+
+      window.ethereum.send('eth_requestAccounts');
+      // const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
+      // const contractAddress = '0x079fA92A1D65716a626690556b3FbbA160c4fbc0';
+      const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+      console.log('contractAddress', contractAddress);
+      const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+
+      // get the end user
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+
+      // get the smart contract
+      console.log(contract)
+
+      // nftsFromChain = [];
+      const coreNfts = await contract?.getAllNftsOnSale();
+      let meta = null;
+      for (let i = 0; i < coreNfts.length; i++) {
+        const item = coreNfts[i];
+        const tokenURI = await contract?.tokenURI(item?.tokenId);
+        // console.log('tokenURI', tokenURI);
+        const metaRes = await fetch(tokenURI);
+        // console.log('metaRes', metaRes);
+        meta = await metaRes.json();
+        // console.log('meta', meta);
+
+        nftsFromChain.push({
+          price: parseFloat(ethers.utils.formatEther(item.price)),
+          tokenId: item.tokenId.toNumber(),
+          creator: item.creator,
+          isListed: item.isListed,
+          meta
+        })
+      }
+      setNfts([...nfts, nftsFromChain]);
+      console.log('nftsFromChain', nftsFromChain)
+
+      await axios.get(`/api/nfts/user/${meta?.creatorMongoUId}`).then(res => {
+        setNftId(res.data)
+        console.log('nftId', res.data)
+        // setOwnerStatus(true)
+      }).catch(err => {
+        console.error(err)
+      })
+      // return nftsFromChain;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    if (!status) {
+      buyNftHandler();
+      setStatus(true);
+    }
+  }, [nfts, nftsFromChain])
+
+  // console.log('nfts', nfts[0])
 
   async function getNfts() {
     await axios.get(`/api/nfts/owned`).then(res => {
       setNfts(res.data)
-      console.log('nfts', res.data)
+      console.log('nfts=>res.data=>', res.data)
     }).catch(err => {
       console.error(err)
     })
   }
   // const dispatch = useDispatch();
-  useEffect(() => {
-    if (!nfts) {
-      getNfts();
-    }
-  }, [nfts])
-
+  // useEffect(() => {
+  //   if (!status) {
+  //     getNfts();
+  //     setStatus(true);
+  //   }
+  // }, [nfts])
+  console.log('nfts', nfts)
   return (
     <div className="body">
       {/* Section2 */}
@@ -166,18 +238,34 @@ const Discover = (props) => {
               nfts?.length === 0 ?
                 <div className="alert alert-danger mt-5 w-100"><b>NFT Assets Not Found!</b></div>
                 :
-                nfts?.map((myNft, index) => (
-                  <DiscoverCard key={index} id={myNft?._id} len={nfts?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail2} />
-                ))
+                nfts[0]?.map((nft, index) => {
+                  // console.log('nft', nft)
+                  // <DiscoverCard key={index} ipfsDataLink={nft?.ipfsDataLink} thumbnail={discoverCardThumbnail3} />
+                  return (
+                    <DiscoverCard
+                      key={index}
+                      creator={nft?.creator}
+                      id={nft?.meta?.creatorMongoUId || null}
+                      name={nft.meta.name}
+                      image={nft.meta.image}
+                      description={nft.meta.description}
+                      price={nft.price.toString()}
+                      tokenId={nft.tokenId.toString()}
+                      len={nfts[0].length}
+                      thumbnail={discoverCardThumbnail2}
+                    />
+                  )
+                  // console.log(nft, index)
+                  // ))
+                })
             }
-            {/* <DiscoverCard thumbnail={discoverCardThumbnail1} /> */}
             {/* <DiscoverCard thumbnail={discoverCardThumbnail2} />
-            <DiscoverCard thumbnail={discoverCardThumbnail3} />
-            <DiscoverCard thumbnail={discoverCardThumbnail4} />
-            <DiscoverCard thumbnail={discoverCardThumbnail4} />
-            <DiscoverCard thumbnail={discoverCardThumbnail2} />
-            <DiscoverCard thumbnail={discoverCardThumbnail3} />
-            <DiscoverCard thumbnail={discoverCardThumbnail1} /> */}
+                <DiscoverCard thumbnail={discoverCardThumbnail3} />
+                <DiscoverCard thumbnail={discoverCardThumbnail4} />
+                <DiscoverCard thumbnail={discoverCardThumbnail4} />
+                <DiscoverCard thumbnail={discoverCardThumbnail2} />
+                <DiscoverCard thumbnail={discoverCardThumbnail3} />
+              <DiscoverCard thumbnail={discoverCardThumbnail1} /> */}
           </div>
 
           <div className="trendingSecBtnWrapper">

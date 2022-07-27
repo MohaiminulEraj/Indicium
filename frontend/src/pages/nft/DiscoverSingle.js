@@ -37,14 +37,25 @@ const DiscoverSingle = (props) => {
   const { nft, error } = nftDetails;
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin;
-  const [nftOwnerDetails, setNftOwnerDetails] = useState({})
-  const { nftOwner } = nftOwnerDetails
+  // const [nftOwnerDetails, setNftOwnerDetails] = useState({})
+  // const { nftOwner } = nftOwnerDetails
   // console.log('nftOwner', nftOwner)
   const { state } = useLocation();
   let nftId = state?.id;
+  let name = state?.name;
+  let description = state?.description;
+  let image = state?.image;
+  let price = state?.price;
+  let creator = state?.creator;
+  let len = state?.len;
+  let tokenId = state?.tokenId;
+  let nftOwnerDetails = state?.nftOwnerDetails;
+  console.log('nftOwnerDetails', nftOwnerDetails)
+
   if (!nftId) {
     nftId = window.location.pathname.substring(17);
   }
+  console.log('name', name)
   const dispatch = useDispatch();
 
   async function getNftMetaData(ipfsDataLink) {
@@ -74,15 +85,15 @@ const DiscoverSingle = (props) => {
     // xhr.send();
   }
 
-  async function getNftOwnerDetails(nftOwner) {
-    await axios.get(`/api/profile/nftOwner/${nftOwner}`).then(res => {
-      setNftOwnerDetails(res.data)
-      console.log('nftOwnerDetails', res.data)
-      // setOwnerStatus(true)
-    }).catch(err => {
-      console.error(err)
-    })
-  }
+  // async function getNftOwnerDetails(nftOwner) {
+  //   await axios.get(`/api/profile/nftOwner/${nftOwner}`).then(res => {
+  //     setNftOwnerDetails(res.data)
+  //     console.log('nftOwnerDetails', res.data)
+  //     // setOwnerStatus(true)
+  //   }).catch(err => {
+  //     console.error(err)
+  //   })
+  // }
 
 
   useEffect(() => {
@@ -97,24 +108,24 @@ const DiscoverSingle = (props) => {
     }
     console.log('nftMetadata', nftMetadata)
     console.log(nft?.userId)
-    if (nft?.userId && !ownerStatus) {
-      getNftOwnerDetails(nft?.userId)
-      // axios.get(`/api/profile/nftOwner/${nft?.userId}`).then(res => {
-      //   setNftOwnerDetails(res.data)
-      //   console.log('nftOwnerDetails', nftOwnerDetails)
-      //   setOwnerStatus(true)
-      // }).catch(err => {
-      //   console.log(err)
-      // })
-      // setNftOwnerDetails(data);
-      // setOwnerStatus(true);
-    } else {
-      console.log('nftOwnerUpdated', nftOwner);
-    }
+    // if (nft?.userId && !ownerStatus) {
+    //   getNftOwnerDetails(nft?.userId)
+    // axios.get(`/api/profile/nftOwner/${nft?.userId}`).then(res => {
+    //   setNftOwnerDetails(res.data)
+    //   console.log('nftOwnerDetails', nftOwnerDetails)
+    //   setOwnerStatus(true)
+    // }).catch(err => {
+    //   console.log(err)
+    // })
+    // setNftOwnerDetails(data);
+    // setOwnerStatus(true);
+    // } else {
+    //   console.log('nftOwnerUpdated', nftOwner);
+    // }
     // console.log(nftMetadata)
     console.log('nft.userId', nft?.userId)
 
-  }, [dispatch, nft, nftOwner]);
+  }, [dispatch, nft]);
 
   // useEffect(() => {
   //   console.log('nft.userId', nft?.userId)
@@ -154,8 +165,11 @@ const DiscoverSingle = (props) => {
       for (let i = 0; i < coreNfts.length; i++) {
         const item = coreNfts[i];
         const tokenURI = await contract?.tokenURI(item?.tokenId);
+        console.log('tokenURI', tokenURI);
         const metaRes = await fetch(tokenURI);
+        console.log('metaRes', metaRes);
         const meta = await metaRes.json();
+        console.log('meta', meta);
 
         nfts.push({
           price: parseFloat(ethers.utils.formatEther(item.price)),
@@ -237,7 +251,7 @@ const DiscoverSingle = (props) => {
               </div>
 
               <div className="col-sm-6 discoverSingleCol2Wrapper">
-                <div className="discoverSingleCol2Title">{nftMetadata?.name || "3D Glassy Pyramid"}</div>
+                <div className="discoverSingleCol2Title">{name || "3D Glassy Pyramid"}</div>
                 <div className="discoverSingleCol2Row1 row">
                   <div className="col-sm-4">
                     <div className="discoverSingleCol2Row1Col1Text">
@@ -278,7 +292,7 @@ const DiscoverSingle = (props) => {
                   </div>
                 </div>
                 <div className="dsCol2Row3Text1">
-                  {nftMetadata?.price || "2.00"} ETH
+                  {price || "2.00"} ETH
                   <span className="dsCol2Row3Text2">($3,618.36)</span>
                 </div>
 
@@ -312,7 +326,7 @@ const DiscoverSingle = (props) => {
                   </div>
                 </div>
 
-                <div className="dsCol2Row5Text">{nftMetadata?.description || "Glassy Cube on the Block is a collection of 10,000 unique Cube NFTs. They live, as you have guessed by the name, in the Ethereum blockchain. They were aesthetically perfected to please the human eye and their owners have exclusive access to a community wallet."}
+                <div className="dsCol2Row5Text">{description || "Glassy Cube on the Block is a collection of 10,000 unique Cube NFTs. They live, as you have guessed by the name, in the Ethereum blockchain. They were aesthetically perfected to please the human eye and their owners have exclusive access to a community wallet."}
                 </div>
 
                 <div className="dsCol2Row6 row">

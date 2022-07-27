@@ -74,7 +74,7 @@ const CreateNFT = (props) => {
     let [file, setFile] = useState('')
     const [image, setImage] = useState('');
     const [loading, setLoading] = useState(false);
-
+    const [status, setStatus] = useState("Uploading NFT Metadata..");
 
     // let tokenId = "NftMarket"
 
@@ -93,7 +93,8 @@ const CreateNFT = (props) => {
     useEffect(() => {
         if (nftDetails) {
             // console.log(Object.keys(nftDetails).length)
-            window.location.href = '/profile'
+            // window.location.href = '/profile'
+            console.log('Nft Minted Successfully!', nftDetails)
         }
     }, [nftDetails])
 
@@ -168,7 +169,8 @@ const CreateNFT = (props) => {
                 name,
                 description,
                 price,
-                image
+                image,
+                creatorMongoUId: userInfo?._id
             }
         }, {
             headers: {
@@ -280,11 +282,12 @@ const CreateNFT = (props) => {
 
     const createNft = async (nftURI) => {
         try {
-            setLoading(true);
             window.ethereum.send('eth_requestAccounts');
+            setLoading(true);
+            setStatus('Minting NFT...');
             const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
-            const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
+            const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
 
             // get the end user
             const signer = provider.getSigner();
@@ -297,7 +300,7 @@ const CreateNFT = (props) => {
             const addr = connection.address;
             console.log(nftURI);
             const nftRes = await axios.get(nftURI);
-            console.log(nftRes)
+            console.log('nftRes', nftRes)
             const content = nftRes.data;
 
             // Object.keys(content).forEach(key => {
@@ -329,7 +332,7 @@ const CreateNFT = (props) => {
             // }
             // );
         } catch (e) {
-            setMessage(JSON.parse(e.message));
+            setMessage(e.message);
             console.error(e.message);
         }
     }
@@ -446,7 +449,7 @@ const CreateNFT = (props) => {
                     <div className="fullHr" style={{ marginTop: 30 }}></div>
                     {/* Save Profile Button starts here  */}
                     <button type="submit" className="saveProfileBtn" disabled={!loading && image ? false : true}>
-                        {loading ? "Uploading NFT Metadata.." : "List"}
+                        {loading ? status : "List"}
                     </button>
 
 

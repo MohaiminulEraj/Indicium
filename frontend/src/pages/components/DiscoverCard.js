@@ -8,10 +8,32 @@ import { Link, Route } from "react-router-dom";
 import { getUserDetails, getNftOwner } from "../../redux/actions/userActions"
 import axios from "axios";
 
-const DiscoverCard = ({ ipfsDataLink, len, thumbnail, id }) => {
+const DiscoverCard = ({ image, len, thumbnail, id, creator, name, description, price, tokenId }) => {
   const [nftMetadata, setNftMetadata] = useState({})
   const [imgBlob, setImgBlob] = useState(null);
+  const [nftOwnerDetails, setNftOwnerDetails] = useState({})
+  const [nftId, setNftId] = useState("");
 
+  async function getNftOwnerDetails() {
+    if (id) {
+      await axios.get(`/api/profile/nftOwner/${id}`).then(res => {
+        setNftOwnerDetails(res.data)
+        console.log('nftOwnerDetails', res.data)
+        // setOwnerStatus(true)
+      }).catch(err => {
+        console.error(err)
+      })
+
+      await axios.get(`/api/nfts/user/${id}`).then(res => {
+        setNftId(res.data)
+        console.log('nftId', res.data)
+        // setOwnerStatus(true)
+      }).catch(err => {
+        console.error(err)
+      })
+    }
+  }
+  console.log('nftId=>', nftId)
   async function getNftMetaData() {
     const config = {
       headers: {
@@ -19,20 +41,20 @@ const DiscoverCard = ({ ipfsDataLink, len, thumbnail, id }) => {
         'Content-Type': 'application/json',
       },
     }
-    const res = await axios.get(ipfsDataLink, config);
+    const res = await axios.get(image, config);
     setNftMetadata(res.data)
     console.log(res.data);
-    const img = await axios.get(res.data.image);
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', ipfsDataLink);
-    xhr.responseType = 'blob';
-    // var blob = null;
-    xhr.onload = function (event) {
-      var blob = xhr.response;
-      // setImgBlob(blob);
-      console.log(blob);
-    }
-    xhr.send();
+    // const img = await axios.get(res.data.image);
+    // var xhr = new XMLHttpRequest();
+    // xhr.open('GET', image);
+    // xhr.responseType = 'blob';
+    // // var blob = null;
+    // xhr.onload = function (event) {
+    //   var blob = xhr.response;
+    //   // setImgBlob(blob);
+    //   console.log(blob);
+    // }
+    // xhr.send();
 
     // var imgUrl = ipfsDataLink.createObjectURL(img?.request?.response)
     // console.log(imgUrl)
@@ -45,11 +67,11 @@ const DiscoverCard = ({ ipfsDataLink, len, thumbnail, id }) => {
     // let imagee = btoa(new Uint8Array(img?.request?.response).reduce((data, byte) => data + String.fromCharCode(byte), ''));
     // let src = "data:image;base64," + imagee;
     // console.log(src)
-    var blob = new Blob([img?.request?.response], { type: 'image/bmp' });
-    // image.src = URL.createObjectURL(blob);
-    const resp = new Buffer(img?.request?.response, 'binary').toString('base64');
-    var file = new File([blob], 'image.bmp', { type: 'image/bmp' });
-    console.log(file)
+    // var blob = new Blob([img?.request?.response], { type: 'image/bmp' });
+    // // image.src = URL.createObjectURL(blob);
+    // const resp = new Buffer(img?.request?.response, 'binary').toString('base64');
+    // var file = new File([blob], 'image.bmp', { type: 'image/bmp' });
+    // console.log(file)
     // setImgBlob(blob)
     // console.log(resp);
     // image.src = URL.createObjectURL(resp);
@@ -59,11 +81,12 @@ const DiscoverCard = ({ ipfsDataLink, len, thumbnail, id }) => {
   }
 
   useEffect(() => {
-    getNftMetaData();
+    // getNftMetaData();
+    getNftOwnerDetails();
   }, [])
 
   return (
-    <Link to={"/discoverSingle/:" + id} state={{ id }} className="col-sm-3 dicoverCard">
+    <Link to={"/discoverSingle/:" + nftId[3]} state={{ nftId, image, len, creator, name, description, price, tokenId, nftOwnerDetails }} className="col-sm-3 dicoverCard">
       {/* <Link to={{ pathname: `/DiscoverSingle/:${id}`, query: { id } }} className="col-sm-3 dicoverCard"> */}
       {/* <Link to={"/discoverSingle/:" + id} className="col-sm-3 dicoverCard"> */}
       <div className="discoverCardThumbnailWrapper">
@@ -73,11 +96,11 @@ const DiscoverCard = ({ ipfsDataLink, len, thumbnail, id }) => {
         <div className="col-sm-9">
           <div className="discoverCardRow1Title">
             {/* Amazing digit art */}
-            {nftMetadata?.name || "Amazing digit art"}
+            {name || "Amazing digit art"}
           </div>
         </div>
         <div className="col-sm-3 popularCardLastRowButtonWrapper">
-          <div className="popularCardLastRowButton">{nftMetadata?.price} ETH</div>
+          <div className="popularCardLastRowButton">{price} ETH</div>
         </div>
       </div>
 
@@ -85,13 +108,13 @@ const DiscoverCard = ({ ipfsDataLink, len, thumbnail, id }) => {
         <div className="col-sm-8">
           <div className="discoverCardRow2ImgsWrapper">
             <div className="discoverCardRow2ImgContainer" style={{ right: 0 }}>
-              <img src={discoverCardRow2Img1} className="discoverCardRow2Img" />
+              <img src={nftOwnerDetails?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
             </div>
             <div className="discoverCardRow2ImgContainer" style={{ right: 10 }}>
-              <img src={discoverCardRow2Img1} className="discoverCardRow2Img" />
+              <img src={nftOwnerDetails?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
             </div>
             <div className="discoverCardRow2ImgContainer" style={{ right: 20 }}>
-              <img src={discoverCardRow2Img1} className="discoverCardRow2Img" />
+              <img src={nftOwnerDetails?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
             </div>
           </div>
         </div>
