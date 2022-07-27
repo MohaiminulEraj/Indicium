@@ -33,10 +33,8 @@ const DiscoverSingle = (props) => {
   const nftDetails = useSelector((state) => state.nftDetails)
   const { nft, error } = nftDetails;
   const userLogin = useSelector((state) => state.userLogin)
-  const { userInfo } = userLogin
-  const userDetails = useSelector((state) => state.userDetails)
-  const { loading, user } = userDetails
-  const nftOwnerDetails = useSelector((state) => state.nftOwnerDetails)
+  const { userInfo } = userLogin;
+  const [nftOwnerDetails, setNftOwnerDetails] = useState({})
   const { nftOwner } = nftOwnerDetails
   // console.log('nftOwner', nftOwner)
   const { state } = useLocation();
@@ -73,6 +71,17 @@ const DiscoverSingle = (props) => {
     // xhr.send();
   }
 
+  async function getNftOwnerDetails(nftOwner) {
+    await axios.get(`/api/profile/nftOwner/${nftOwner}`).then(res => {
+      setNftOwnerDetails(res.data)
+      console.log('nftOwnerDetails', res.data)
+      setOwnerStatus(true)
+    }).catch(err => {
+      console.error(err)
+    })
+  }
+
+
   useEffect(() => {
     if (!nft) {
       dispatch(getNftDetails(nftId));
@@ -86,17 +95,22 @@ const DiscoverSingle = (props) => {
     console.log('nftMetadata', nftMetadata)
     console.log(nft?.userId)
     if (nft?.userId && !ownerStatus) {
-      dispatch(getNftOwner(nft?.userId));
-      setOwnerStatus(true);
+      getNftOwnerDetails(nft?.userId)
+      // axios.get(`/api/profile/nftOwner/${nft?.userId}`).then(res => {
+      //   setNftOwnerDetails(res.data)
+      //   console.log('nftOwnerDetails', nftOwnerDetails)
+      //   setOwnerStatus(true)
+      // }).catch(err => {
+      //   console.log(err)
+      // })
+      // setNftOwnerDetails(data);
+      // setOwnerStatus(true);
     } else {
       console.log('nftOwnerUpdated', nftOwner);
     }
-
-    if (userInfo?._id && !user?.name) {
-      dispatch(getUserDetails(userInfo?._id));
-    }
     // console.log(nftMetadata)
     console.log('nft.userId', nft?.userId)
+
   }, [dispatch, nft, nftOwner]);
 
   // useEffect(() => {
@@ -108,18 +122,49 @@ const DiscoverSingle = (props) => {
   //     console.log('nftOwnerUpdated', nftOwner);
   //   }
   // }, [dispatch, nftOwner])
-  // window.ethereum.send('eth_requestAccounts');
-  const contractAddress = '0x6026089Ec9A7f2E55e2439998d500A34D801575C';
 
-  // const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
+  const buyNftHandler = async () => {
+    // const provider = ethers.getDefaultProvider('ropsten');
+    // const wallet = provider.getSigner();
+    // const contract = new ethers.Contract(NftMarket.networks['3'].address, NftMarket.abi, wallet);
+    // const tx = await contract.buyNft(nftId, { value: ethers.utils.parseEther('0.1') });
+    // console.log(tx.hash);
 
-  // // get the end user
-  // const signer = provider.getSigner();
-  // const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+    window.ethereum.send('eth_requestAccounts');
+    // const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
+    const contractAddress = '0x079fA92A1D65716a626690556b3FbbA160c4fbc0';
 
-  // get the smart contract
-  // console.log(contract)
+    const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
 
+    // get the end user
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+
+    // get the smart contract
+    console.log(contract)
+
+    const nfts = [];
+    const coreNfts = await contract?.getAllNftsOnSale();
+
+    for (let i = 0; i < coreNfts.length; i++) {
+      const item = coreNfts[i];
+      const tokenURI = await contract?.tokenURI(item?.tokenId);
+      const metaRes = await fetch(tokenURI);
+      const meta = await metaRes.json();
+
+      nfts.push({
+        price: parseFloat(ethers.utils.formatEther(item.price)),
+        tokenId: item.tokenId.toNumber(),
+        creator: item.creator,
+        isListed: item.isListed,
+        meta
+      })
+    }
+
+    return nfts;
+  }
+
+  buyNftHandler();
   // async () => {
   //   const nfts = [];
   //   const coreNfts = await contract?.getAllNftsOnSale();
@@ -241,13 +286,13 @@ const DiscoverSingle = (props) => {
                 <div className="row dsCol2Row4">
                   <div className="col-sm-1">
                     <div className="dsCol2Row4ProfileWrapper">
-                      <img src={nftOwner?.avatar?.url || profile} className="dsCol2Row4Profile" />
+                      <img src={nftOwnerDetails?.avatar?.url || profile} className="dsCol2Row4Profile" />
                       <div className="dsCol2Row4ProfileDot"></div>
                     </div>
                   </div>
                   <div className="col-sm-2 dsCol2Row4ProfileTitleWrapper">
                     <div className="dsCol2Row4ProfileTitle">Creator</div>
-                    <div className="dsCol2Row4ProfileTitle2">{nftOwner?.name || "Steve1889"}</div>
+                    <div className="dsCol2Row4ProfileTitle2">{nftOwnerDetails?.name || "Steve1889"}</div>
                   </div>
                 </div>
 
