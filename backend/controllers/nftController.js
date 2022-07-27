@@ -72,9 +72,22 @@ const getNftById = asyncHandler(async (req, res) => {
     }
 })
 
+const getNftByUserId = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    let nft = await Nft.find({
+        userId: id
+    }).select('_id')
+    if (nft) {
+        res.status(201).json(nft)
+    } else {
+        res.status(400)
+        throw new Error('NFT Asset not found!')
+    }
+})
 
 export {
     saveNftUrl,
     getUsersNft,
-    getNftById
+    getNftById,
+    getNftByUserId
 }
