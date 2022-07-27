@@ -25,6 +25,9 @@ import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
 import NftMarket from '../../contracts/NftMarket.json';
 import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
+
 const DiscoverSingle = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
@@ -124,47 +127,59 @@ const DiscoverSingle = (props) => {
   // }, [dispatch, nftOwner])
 
   const buyNftHandler = async () => {
-    // const provider = ethers.getDefaultProvider('ropsten');
-    // const wallet = provider.getSigner();
-    // const contract = new ethers.Contract(NftMarket.networks['3'].address, NftMarket.abi, wallet);
-    // const tx = await contract.buyNft(nftId, { value: ethers.utils.parseEther('0.1') });
-    // console.log(tx.hash);
+    try {
+      // const provider = ethers.getDefaultProvider('ropsten');
+      // const wallet = provider.getSigner();
+      // const contract = new ethers.Contract(NftMarket.networks['3'].address, NftMarket.abi, wallet);
+      // const tx = await contract.buyNft(nftId, { value: ethers.utils.parseEther('0.1') });
+      // console.log(tx.hash);
 
-    window.ethereum.send('eth_requestAccounts');
-    // const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
-    const contractAddress = '0x079fA92A1D65716a626690556b3FbbA160c4fbc0';
+      window.ethereum.send('eth_requestAccounts');
+      // const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
+      // const contractAddress = '0x079fA92A1D65716a626690556b3FbbA160c4fbc0';
+      const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+      const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
 
-    const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
+      // get the end user
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
 
-    // get the end user
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+      // get the smart contract
+      console.log(contract)
 
-    // get the smart contract
-    console.log(contract)
+      const nfts = [];
+      const coreNfts = await contract?.getAllNftsOnSale();
 
-    const nfts = [];
-    const coreNfts = await contract?.getAllNftsOnSale();
+      for (let i = 0; i < coreNfts.length; i++) {
+        const item = coreNfts[i];
+        const tokenURI = await contract?.tokenURI(item?.tokenId);
+        const metaRes = await fetch(tokenURI);
+        const meta = await metaRes.json();
 
-    for (let i = 0; i < coreNfts.length; i++) {
-      const item = coreNfts[i];
-      const tokenURI = await contract?.tokenURI(item?.tokenId);
-      const metaRes = await fetch(tokenURI);
-      const meta = await metaRes.json();
+        nfts.push({
+          price: parseFloat(ethers.utils.formatEther(item.price)),
+          tokenId: item.tokenId.toNumber(),
+          creator: item.creator,
+          isListed: item.isListed,
+          meta
+        })
+      }
 
-      nfts.push({
-        price: parseFloat(ethers.utils.formatEther(item.price)),
-        tokenId: item.tokenId.toNumber(),
-        creator: item.creator,
-        isListed: item.isListed,
-        meta
-      })
+      return nfts;
+    } catch (error) {
+      console.error(error);
     }
-
-    return nfts;
   }
 
   buyNftHandler();
+
+  // const buyNft = () => {
+  //   try {
+
+  //   } catch (error) {
+
+  //   }
+  // }
   // async () => {
   //   const nfts = [];
   //   const coreNfts = await contract?.getAllNftsOnSale();
