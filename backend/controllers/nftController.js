@@ -17,16 +17,17 @@ dotenv.config()
 // @access  Public
 const saveNftUrl = asyncHandler(async (req, res) => {
 
-    const { id, ipfsDataLink } = req.body
+    const { id, ipfsDataLink, image } = req.body
 
     const nft = await Nft.create({
-        userId: id, ipfsDataLink
+        userId: id, ipfsDataLink, image
     })
     if (nft) {
         res.status(201).json({
             _id: nft._id,
             userId: nft.id,
             ipfsDataLink: nft.ipfsDataLink,
+            image: nft.image,
         })
     } else {
         res.status(400)
