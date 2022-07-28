@@ -27,7 +27,7 @@ export const logout = () => (dispatch) => {
 }
 
 
-export const saveNftDetails = (id, ipfsDataLink) => async (dispatch) => {
+export const saveNftDetails = (id, ipfsDataLink, image) => async (dispatch) => {
     try {
         dispatch({
             type: SAVE_NFT_DETAILS_REQUEST,
@@ -41,7 +41,7 @@ export const saveNftDetails = (id, ipfsDataLink) => async (dispatch) => {
 
         const { data } = await axios.post(
             '/api/nfts',
-            { id, ipfsDataLink },
+            { id, ipfsDataLink, image },
             config
         )
 

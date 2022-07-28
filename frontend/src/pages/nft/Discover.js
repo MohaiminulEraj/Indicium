@@ -36,8 +36,7 @@ const Discover = (props) => {
       // console.log(tx.hash);
 
       window.ethereum.send('eth_requestAccounts');
-      // const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
-      // const contractAddress = '0x079fA92A1D65716a626690556b3FbbA160c4fbc0';
+
       const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
       console.log('contractAddress', contractAddress);
       const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
@@ -109,7 +108,7 @@ const Discover = (props) => {
   //     setStatus(true);
   //   }
   // }, [nfts])
-  console.log('nfts', nfts)
+  console.log('nfts', nfts[0])
   return (
     <div className="body">
       {/* Section2 */}
@@ -235,7 +234,7 @@ const Discover = (props) => {
 
           <div className="row discoverCardWrapper">
             {
-              nfts?.length === 0 ?
+              nfts[0]?.length === 0 ?
                 <div className="alert alert-danger mt-5 w-100"><b>NFT Assets Not Found!</b></div>
                 :
                 nfts[0]?.map((nft, index) => {
@@ -247,7 +246,7 @@ const Discover = (props) => {
                       creator={nft?.creator}
                       id={nft?.meta?.creatorMongoUId || null}
                       name={nft.meta.name}
-                      image={nft.meta.image}
+                      image={nft.meta.image.substring(34)}
                       description={nft.meta.description}
                       price={nft.price.toString()}
                       tokenId={nft.tokenId.toString()}

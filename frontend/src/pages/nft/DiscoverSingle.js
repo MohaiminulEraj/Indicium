@@ -24,6 +24,10 @@ import popularCardThumbnail3 from "../../assets/images/popularCardThumbnail3.png
 import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
 import NftMarket from '../../contracts/NftMarket.json';
+import Message from '../components/Message'
+import Loader from '../components/Loader'
+import Spinner from '../components/Spinner'
+import { Link } from "react-router-dom";
 import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -37,10 +41,20 @@ const DiscoverSingle = (props) => {
   const { nft, error } = nftDetails;
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin;
+  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+  const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+  const [message, setMessage] = useState("");
+  const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN + "/ipfs/";
+
+  // get the end user
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+  console.log('contract', contract);
   // const [nftOwnerDetails, setNftOwnerDetails] = useState({})
   // const { nftOwner } = nftOwnerDetails
   // console.log('nftOwner', nftOwner)
   const { state } = useLocation();
+  let tokenId = state?.tokenId || null;
   let nftId = state?.id;
   let name = state?.name;
   let description = state?.description;
@@ -48,15 +62,17 @@ const DiscoverSingle = (props) => {
   let price = state?.price;
   let creator = state?.creator;
   let len = state?.len;
-  let tokenId = state?.tokenId;
   let nftOwnerDetails = state?.nftOwnerDetails;
   console.log('nftOwnerDetails', nftOwnerDetails)
 
-  if (!nftId) {
-    nftId = window.location.pathname.substring(17);
-  }
   console.log('name', name)
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!tokenId) {
+      window.location.href = '/discover';
+    }
+  }, [tokenId])
 
   async function getNftMetaData(ipfsDataLink) {
     const config = {
@@ -71,18 +87,6 @@ const DiscoverSingle = (props) => {
     }
     console.log(res?.data);
     setNftMetadata(res?.data || null)
-
-    // const img = await axios.get(res.data.image);
-    // var xhr = new XMLHttpRequest();
-    // xhr.open('GET', ipfsDataLink);
-    // xhr.responseType = 'blob';
-    // // var blob = null;
-    // xhr.onload = function (event) {
-    //   var blob = xhr.response;
-    //   // setImgBlob(blob);
-    //   console.log(blob);
-    // }
-    // xhr.send();
   }
 
   // async function getNftOwnerDetails(nftOwner) {
@@ -95,47 +99,11 @@ const DiscoverSingle = (props) => {
   //   })
   // }
 
+  window.ethereum.on('accountsChanged', function (accounts) {
+    // Time to reload your interface with accounts[0]!
+    console.log('accounts', accounts);
+  })
 
-  useEffect(() => {
-    if (!nft) {
-      dispatch(getNftDetails(nftId));
-    } else if (nft?._id !== nftId) {
-      dispatch(getNftDetails(nftId));
-    }
-    else {
-      getNftMetaData(nft?.ipfsDataLink);
-      console.log('nftLink', nft?.ipfsDataLink);
-    }
-    console.log('nftMetadata', nftMetadata)
-    console.log(nft?.userId)
-    // if (nft?.userId && !ownerStatus) {
-    //   getNftOwnerDetails(nft?.userId)
-    // axios.get(`/api/profile/nftOwner/${nft?.userId}`).then(res => {
-    //   setNftOwnerDetails(res.data)
-    //   console.log('nftOwnerDetails', nftOwnerDetails)
-    //   setOwnerStatus(true)
-    // }).catch(err => {
-    //   console.log(err)
-    // })
-    // setNftOwnerDetails(data);
-    // setOwnerStatus(true);
-    // } else {
-    //   console.log('nftOwnerUpdated', nftOwner);
-    // }
-    // console.log(nftMetadata)
-    console.log('nft.userId', nft?.userId)
-
-  }, [dispatch, nft]);
-
-  // useEffect(() => {
-  //   console.log('nft.userId', nft?.userId)
-  //   if (!ownerStatus) {
-  //     dispatch(getNftOwner(nft?.userId));
-  //     setOwnerStatus(true);
-  //   } else {
-  //     console.log('nftOwnerUpdated', nftOwner);
-  //   }
-  // }, [dispatch, nftOwner])
 
   const buyNftHandler = async () => {
     try {
@@ -146,76 +114,91 @@ const DiscoverSingle = (props) => {
       // console.log(tx.hash);
 
       window.ethereum.send('eth_requestAccounts');
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const account = accounts[0];
+
       // const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
       // const contractAddress = '0x079fA92A1D65716a626690556b3FbbA160c4fbc0';
-      const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-      console.log('contractAddress', contractAddress);
-      const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+      // const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+      // console.log('contractAddress', contractAddress);
+      // const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
 
-      // get the end user
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+      // // get the end user
+      // const signer = provider.getSigner();
+      // const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
 
-      // get the smart contract
-      console.log(contract)
+      // // get the smart contract
+      // console.log(contract)
 
       const nfts = [];
-      const coreNfts = await contract?.getAllNftsOnSale();
+      if (tokenId && tokenId !== 'myToken') {
+        const coreNfts = await contract?.getNftItem(tokenId);
+        console.log('coreNfts', coreNfts);
 
-      for (let i = 0; i < coreNfts.length; i++) {
-        const item = coreNfts[i];
-        const tokenURI = await contract?.tokenURI(item?.tokenId);
+        // for (let i = 0; i < coreNfts.length; i++) {
+        //   const item = coreNfts[i];
+        //   console.log('item', item)
+        //   const tokenURI = await contract?.tokenURI(item?.tokenId);
+        //   console.log('tokenURI', tokenURI);
+        //   const metaRes = await fetch(tokenURI);
+        //   // console.log('metaRes', metaRes);
+        //   const meta = await metaRes.json();
+        //   // console.log('meta', meta);
+
+        //   nfts.push({
+        //     price: parseFloat(ethers.utils.formatEther(item.price)),
+        //     tokenId: item.tokenId.toNumber(),
+        //     creator: item.creator,
+        //     isListed: item.isListed,
+        //     meta
+        //   })
+        // }
+
+        const tokenURI = await contract?.tokenURI(coreNfts?.tokenId);
         console.log('tokenURI', tokenURI);
         const metaRes = await fetch(tokenURI);
-        console.log('metaRes', metaRes);
+        // console.log('metaRes', metaRes);
         const meta = await metaRes.json();
-        console.log('meta', meta);
+        // console.log('meta', meta);
 
         nfts.push({
-          price: parseFloat(ethers.utils.formatEther(item.price)),
-          tokenId: item.tokenId.toNumber(),
-          creator: item.creator,
-          isListed: item.isListed,
+          price: parseFloat(ethers.utils.formatEther(coreNfts.price)),
+          tokenId: coreNfts.tokenId.toNumber(),
+          creator: coreNfts.creator,
+          isListed: coreNfts.isListed,
           meta
         })
+        // console.log('nfts', nfts)
+        return nfts;
+
       }
-      console.log('nfts', nfts)
-      return nfts;
+      return null;
     } catch (error) {
+      setMessage(error);
       console.error(error);
     }
   }
 
-  buyNftHandler();
 
-  // const buyNft = () => {
-  //   try {
+  const buyNft = async () => {
+    const nfts = await buyNftHandler();
+    if (nfts !== null) {
+      console.log('nfts', nfts[0]);
+      try {
+        const buyNft = await contract?.buyNft(nfts[0].tokenId);
+        console.log('buyNft', JSON.parse(buyNft));
 
-  //   } catch (error) {
+      } catch (error) {
+        setMessage(JSON.parse(JSON.stringify(error.error.stack)));
+        console.error(JSON.parse(JSON.stringify(error.error.stack)));
+      }
+    } else {
+      setMessage('You Already Own this NFT!');
+    }
+    // console.log(event);
+    // console.log(param);
+  };
 
-  //   }
-  // }
-  // async () => {
-  //   const nfts = [];
-  //   const coreNfts = await contract?.getAllNftsOnSale();
-
-  //   for (let i = 0; i < coreNfts.length; i++) {
-  //     const item = coreNfts[i];
-  //     const tokenURI = await contract?.tokenURI(item?.tokenId);
-  //     const metaRes = await fetch(tokenURI);
-  //     const meta = await metaRes.json();
-
-  //     nfts.push({
-  //       price: parseFloat(ethers.utils.formatEther(item.price)),
-  //       tokenId: item.tokenId.toNumber(),
-  //       creator: item.creator,
-  //       isListed: item.isListed,
-  //       meta
-  //     })
-  //   }
-
-  //   return nfts;
-  // }
 
   return (
     <div className="body">
@@ -244,7 +227,7 @@ const DiscoverSingle = (props) => {
               <div className="col-sm-5">
                 <div className="discoverSingleContainerCol1Thumbnail">
                   <img
-                    src={discoverSingleThumbnail}
+                    src={pinataDomain + image || discoverSingleThumbnail}
                     className="discoverSingleThumbnail"
                   />
                 </div>
@@ -256,7 +239,7 @@ const DiscoverSingle = (props) => {
                   <div className="col-sm-4">
                     <div className="discoverSingleCol2Row1Col1Text">
                       <span>Views: 0</span>
-                      <span>In stock: 1</span>
+                      <span>In stock: {len}</span>
                     </div>
                   </div>
 
@@ -297,19 +280,20 @@ const DiscoverSingle = (props) => {
                 </div>
 
                 <div className="row dsCol2Row3">
-                  <div className="col-sm-6" style={{ display: 'flex' }}>
-                    <div className="trendingSecBtnWrapper dsCol2Row3Btn">
-                      <div className="trendingSecBtn">
+                  <div className="col-sm-3" style={{ display: 'flex' }}>
+                    <div className="trendingSecBtnWrapper dsCol2Row3Btn"
+                    >
+                      <button onClick={buyNft} className="trendingSecBtn">
                         <FontAwesomeIcon icon={faTag} />
                         <span style={{ marginLeft: 10 }}> Buy Now</span>
-                      </div>
+                      </button>
                     </div>
-                    <div className="trendingSecBtnWrapper dsCol2Row3Btn">
+                    {/* <div className="trendingSecBtnWrapper dsCol2Row3Btn">
                       <div className="trendingSecBtn">
                         <FontAwesomeIcon icon={faHourglassHalf} />
                         <span style={{ marginLeft: 10 }}>Make offer</span>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -347,6 +331,10 @@ const DiscoverSingle = (props) => {
                       #Art
                     </div>
                   </div>
+                  <div className="col-sm-12 mt-4">
+                    {message && <Message variant='danger'>{tokenId !== "myToken" && tokenId !== null ? message.substring(57, 81) + "!" : message}</Message>}
+                  </div>
+
                 </div>
               </div>
             </div>

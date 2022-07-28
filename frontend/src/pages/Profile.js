@@ -359,7 +359,6 @@ const Profile = (props) => {
                                         ))
                                 }
 
-                                {/* <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} /> */}
                                 {/* <ProfileDiscoverCard thumbnail={discoverCardThumbnail2} />
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail4} />
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} /> */}

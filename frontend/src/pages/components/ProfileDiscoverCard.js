@@ -11,56 +11,19 @@ import axios from 'axios';
 
 const ProfileDiscoverCard = ({ ipfsDataLink, thumbnail, len }) => {
   const dispatch = useDispatch();
-  const userLogin = useSelector((state) => state.userLogin)
-  const { userInfo } = userLogin
-  const userDetails = useSelector((state) => state.userDetails)
-  const { loading, user } = userDetails
+  const userLogin = useSelector((state) => state.userLogin);
+  const { userInfo } = userLogin;
+  const userDetails = useSelector((state) => state.userDetails);
+  const { loading, user } = userDetails;
   // const ownedNft = useSelector((state) => state.ownedNft)
-  const [nftMetadata, setNftMetadata] = useState({})
-  const [imgBlob, setImgBlob] = useState(null);
-  // const [image, setImage] = useState(new Image())
-  // const { nft, error } = ownedNft;
-  // console.log(nft)
-  // var image = new Image();
-  // var blob = '';
+  const [nftMetadata, setNftMetadata] = useState({});
+  const [image, setImage] = useState("");
+
   async function getNftMetaData() {
     const res = await axios.get(ipfsDataLink);
     setNftMetadata(res.data)
-    console.log(res.data);
-    const img = await axios.get(res.data.image);
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', ipfsDataLink);
-    xhr.responseType = 'blob';
-    // var blob = null;
-    xhr.onload = function (event) {
-      var blob = xhr.response;
-      setImgBlob(blob);
-      console.log(blob);
-    }
-    xhr.send();
-
-    // var imgUrl = ipfsDataLink.createObjectURL(img?.request?.response)
-    // console.log(imgUrl)
-
-    // console.log(img?.request?.response.length);
-    // var bytes = new Uint8Array(img?.request?.response.length / 2);
-    // for (var i = 0; i < img?.request?.response.length; i += 2) {
-    //   bytes[i / 2] = parseInt(img?.request?.response.substring(i, i + 2), /* base = */ 16);
-    // }
-    // let imagee = btoa(new Uint8Array(img?.request?.response).reduce((data, byte) => data + String.fromCharCode(byte), ''));
-    // let src = "data:image;base64," + imagee;
-    // console.log(src)
-    var blob = new Blob([img?.request?.response], { type: 'image/bmp' });
-    // image.src = URL.createObjectURL(blob);
-    const resp = new Buffer(img?.request?.response, 'binary').toString('base64');
-    var file = new File([blob], 'image.bmp', { type: 'image/bmp' });
-    console.log(file)
-    // setImgBlob(blob)
-    // console.log(resp);
-    // image.src = URL.createObjectURL(resp);
-    // console.log('blob', image);
-    // console.log(Base64.encode(blob))
-    // image.src = URL.createObjectURL(img?.request?.response);
+    console.log('res.data', res.data)
+    setImage(res.data.image);
   }
   useEffect(() => {
     if (!userInfo) {
@@ -69,26 +32,15 @@ const ProfileDiscoverCard = ({ ipfsDataLink, thumbnail, len }) => {
 
     if (nftMetadata) {
       getNftMetaData();
-      //   axios.get(`${ipfsDataLink}`)
-      //     .then(res => {
-      //       console.log(res.data)
-      //       setNftMetadata(res.data)
-      //     })
-      //     .catch(err => {
-      //       console.log(err)
-      //     })
-      // }
-      // else if (!user || !user.name) {
-      // dispatch(getUserDetails(userInfo._id))
     }
   }, [dispatch, userInfo])
 
   // console.log(nft[0])
   return (
     <>
-      <Link to="/discoverSingle" className="col-sm-4 dicoverCard">
+      <Link to="/discoverSingle" state={{ image: image?.substring(34), len: `${len} (Yours)`, name: nftMetadata.name, price: nftMetadata.price, userIdMongo: nftMetadata.creatorMongoUId, description: nftMetadata.description, tokenId: "myToken", nftOwnerDetails: { name: user?.name, avatar: { url: user?.avatar?.url } } }} className="col-sm-4 dicoverCard">
         <div className="discoverCardThumbnailWrapper">
-          <img src={imgBlob || thumbnail} className="popularCardThumbnailImg" />
+          <img src={image || thumbnail} className="popularCardThumbnailImg" />
           {/* <img src={{ uri: blob }} style={{ height: 200, width: null, flex: 1 }} /> */}
           {/* <img src={URL.createObjectURL(image)} /> */}
         </div>

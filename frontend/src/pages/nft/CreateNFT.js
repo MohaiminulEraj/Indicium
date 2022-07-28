@@ -16,7 +16,7 @@ import blackImg from "../../assets/images/blackImg.png";
 import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
 import axios from "axios";
-import fs from 'fs';
+// import fs from 'fs-extra';
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserDetails } from '../../redux/actions/userActions'
 import Message from '../components/Message'
@@ -68,10 +68,9 @@ const CreateNFT = (props) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState(null);
-    const [isMinted, setIsMinted] = useState(false);
+    // const [isMinted, setIsMinted] = useState(false);
     const [totalMinted, setTotalMinted] = useState(0);
     const [nftURI, setNftURI] = useState('');
-    let [file, setFile] = useState('')
     const [image, setImage] = useState('');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState("Uploading NFT Metadata..");
@@ -93,8 +92,8 @@ const CreateNFT = (props) => {
     useEffect(() => {
         if (nftDetails) {
             // console.log(Object.keys(nftDetails).length)
-            // window.location.href = '/profile'
-            console.log('Nft Minted Successfully!', nftDetails)
+            window.location.href = '/profile'
+            // console.log('Nft Minted Successfully!', nftDetails)
         }
     }, [nftDetails])
 
@@ -179,15 +178,6 @@ const CreateNFT = (props) => {
             }
         });
 
-        // const res = await toast.promise(
-        //     jsonRes.data, {
-        //     pending: "Uploading metadata",
-        //     success: "Metadata uploaded",
-        //     error: "Metadata upload error"
-        // }
-        // )
-        // const data = res.data;
-
         if (jsonRes?.data?.IpfsHash) {
             setLoading(false);
             setNftURI(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
@@ -208,7 +198,7 @@ const CreateNFT = (props) => {
 
     const handleImage = async (e) => {
         try {
-            // console.log(e.target.files[0].type)
+
             if (e.target.name === 'avatar') {
                 setLoading(true);
                 const reader = new FileReader();
@@ -217,62 +207,33 @@ const CreateNFT = (props) => {
                         setAvatar(reader.result);
                         setAvatarPreview(reader.result);
                         // blob = reader.result;
+                        console.log('reader.result', reader.result);
                     }
                 }
                 if (e.target.files[0]) reader.readAsDataURL(e.target.files[0])
-                // setFile(e.target.files[0]);
-                // console.log(e.target.files)
-                let buffer = await e.target.files[0].arrayBuffer();
-                const bytes = new Uint8Array(buffer);
-                console.log(e.target.files)
-                buffer = Buffer.from(Object.values(bytes));
+
                 const formData = new FormData();
-                // console.log(new Blob(buffer, { type: 'image/png' }))
                 let filename = e.target.files[0].name.replace(/\.[^/.]+$/, "") + "-" + uuidv4();
-                console.log(filename)
                 formData.append(
                     "file",
-                    new Blob(buffer, { type: 'image/png' }),
+                    e.target.files[0],
                     filename
-                    // {
-                    //     contentType: e.target.files[0]?.type,
-                    //     filename: e.target.files[0].name.replace(/\.[^/.]+$/, "") + "-" + uuidv4()
-                    // }
                 );
 
                 const fileRes = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", formData, {
                     maxBodyLength: Infinity,
                     headers: {
-                        // "Content-Type": `multipart/form-data; boundary=${formData.getBoundary()}`,
+                        "Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
                         pinata_api_key: pinataApiKey,
                         pinata_secret_api_key: pinataSecretKey,
-                        "Content-Type": "multipart/form-data"
                     }
                 });
-                console.log(fileRes.data)
+
+
                 setImage(pinataDomain + '/ipfs/' + fileRes?.data?.IpfsHash)
                 console.log(`${pinataDomain}/ipfs/${fileRes?.data?.IpfsHash}`)
                 setLoading(false);
                 setMessage('Image uploaded to IPFS successfully!');
-                // console.log(image)
-                // console.log(fileRes.data)
-                // const res = await toast.promise(
-                //     fileRes.data, {
-                //     pending: "Uploading image",
-                //     success: "Image uploaded",
-                //     error: "Image upload error"
-                // }
-                // )
-
-                // const data = res.data;
-
-
-                // pinata.pinFileToIPFS(fs.createReadStream(URL.createObjectURL(e.target.files[0])), {}).then((res) => {
-                //     console.log(res["IpfsHash"]);
-                //     setImage(`${pinataDomain}/ipfs/${res["IpfsHash"]}`)
-                // }).catch((err) => {
-                //     console.error(err);
-                // })
 
             }
         } catch (e) {
@@ -303,11 +264,6 @@ const CreateNFT = (props) => {
             console.log('nftRes', nftRes)
             const content = nftRes.data;
 
-            // Object.keys(content).forEach(key => {
-            //     if (!ALLOWED_FIELDS.includes(key)) {
-            //         throw new Error("Invalid Json structure");
-            //     }
-            // })
             const tx = await contract?.mintToken(
                 nftURI,
                 ethers.utils.parseEther(price.toString()),
@@ -319,18 +275,10 @@ const CreateNFT = (props) => {
             await tx.wait();
             console.log('tx', tx)
             if (tx) {
-                dispatch(saveNftDetails(user?._id, nftURI))
+                dispatch(saveNftDetails(user?._id, nftURI, image))
                 setMessage('NFT Minted successfully!');
-                // window.location.href = '/';
             }
             setLoading(false);
-            // await toast.promise(
-            //     tx?.wait(), {
-            //     pending: "Minting Nft Token",
-            //     success: "Nft has ben created",
-            //     error: "Minting error"
-            // }
-            // );
         } catch (e) {
             setMessage(e.message);
             console.error(e.message);

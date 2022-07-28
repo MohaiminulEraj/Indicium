@@ -7,13 +7,14 @@ import DiscoverSingle from '../nft/DiscoverSingle';
 import { Link, Route } from "react-router-dom";
 import { getUserDetails, getNftOwner } from "../../redux/actions/userActions"
 import axios from "axios";
+import canvas from "canvas";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const DiscoverCard = ({ image, len, thumbnail, id, creator, name, description, price, tokenId }) => {
-  const [nftMetadata, setNftMetadata] = useState({})
-  const [imgBlob, setImgBlob] = useState(null);
   const [nftOwnerDetails, setNftOwnerDetails] = useState({})
   const [nftId, setNftId] = useState("");
-
+  const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN + "/ipfs/";
   async function getNftOwnerDetails() {
     if (id) {
       await axios.get(`/api/profile/nftOwner/${id}`).then(res => {
@@ -33,64 +34,17 @@ const DiscoverCard = ({ image, len, thumbnail, id, creator, name, description, p
       })
     }
   }
-  console.log('nftId=>', nftId)
-  async function getNftMetaData() {
-    const config = {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    }
-    const res = await axios.get(image, config);
-    setNftMetadata(res.data)
-    console.log(res.data);
-    // const img = await axios.get(res.data.image);
-    // var xhr = new XMLHttpRequest();
-    // xhr.open('GET', image);
-    // xhr.responseType = 'blob';
-    // // var blob = null;
-    // xhr.onload = function (event) {
-    //   var blob = xhr.response;
-    //   // setImgBlob(blob);
-    //   console.log(blob);
-    // }
-    // xhr.send();
-
-    // var imgUrl = ipfsDataLink.createObjectURL(img?.request?.response)
-    // console.log(imgUrl)
-
-    // console.log(img?.request?.response.length);
-    // var bytes = new Uint8Array(img?.request?.response.length / 2);
-    // for (var i = 0; i < img?.request?.response.length; i += 2) {
-    //   bytes[i / 2] = parseInt(img?.request?.response.substring(i, i + 2), /* base = */ 16);
-    // }
-    // let imagee = btoa(new Uint8Array(img?.request?.response).reduce((data, byte) => data + String.fromCharCode(byte), ''));
-    // let src = "data:image;base64," + imagee;
-    // console.log(src)
-    // var blob = new Blob([img?.request?.response], { type: 'image/bmp' });
-    // // image.src = URL.createObjectURL(blob);
-    // const resp = new Buffer(img?.request?.response, 'binary').toString('base64');
-    // var file = new File([blob], 'image.bmp', { type: 'image/bmp' });
-    // console.log(file)
-    // setImgBlob(blob)
-    // console.log(resp);
-    // image.src = URL.createObjectURL(resp);
-    // console.log('blob', image);
-    // console.log(Base64.encode(blob))
-    // image.src = URL.createObjectURL(img?.request?.response);
-  }
 
   useEffect(() => {
-    // getNftMetaData();
     getNftOwnerDetails();
   }, [])
 
   return (
-    <Link to={"/discoverSingle/:" + nftId[3]} state={{ nftId, image, len, creator, name, description, price, tokenId, nftOwnerDetails }} className="col-sm-3 dicoverCard">
+    <Link to={"/discoverSingle"} state={{ nftId, image, len, creator, name, description, price, tokenId, nftOwnerDetails }} className="col-sm-3 dicoverCard">
       {/* <Link to={{ pathname: `/DiscoverSingle/:${id}`, query: { id } }} className="col-sm-3 dicoverCard"> */}
       {/* <Link to={"/discoverSingle/:" + id} className="col-sm-3 dicoverCard"> */}
       <div className="discoverCardThumbnailWrapper">
-        <img src={thumbnail} className="popularCardThumbnailImg" />
+        <img src={pinataDomain + image || thumbnail} className="popularCardThumbnailImg" />
       </div>
       <div className="row discoverCardRow1">
         <div className="col-sm-9">
