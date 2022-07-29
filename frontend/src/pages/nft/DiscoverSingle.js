@@ -182,8 +182,7 @@ const DiscoverSingle = (props) => {
 
   const buyNft = async () => {
     if (!userInfo?._id) {
-      // setMessage('Please login to buy this NFT!');
-      alert('Please login to buy this NFT!')
+      setShowPopup(true);
       return;
     }
     const nfts = await buyNftHandler();
