@@ -181,6 +181,11 @@ const DiscoverSingle = (props) => {
 
 
   const buyNft = async () => {
+    if (!userInfo?._id) {
+      // setMessage('Please login to buy this NFT!');
+      alert('Please login to buy this NFT!')
+      return;
+    }
     const nfts = await buyNftHandler();
     if (nfts !== null) {
       console.log('nfts', nfts[0]);
@@ -332,7 +337,7 @@ const DiscoverSingle = (props) => {
                     </div>
                   </div>
                   <div className="col-sm-12 mt-4">
-                    {message && <Message variant='danger'>{tokenId !== "myToken" && tokenId !== null ? message.substring(57, 81) + "!" : message}</Message>}
+                    {message && <Message variant='danger'>{tokenId !== "myToken" && tokenId !== null && message ? message?.substring(57, 81) + "!" : message}</Message>}
                   </div>
 
                 </div>
