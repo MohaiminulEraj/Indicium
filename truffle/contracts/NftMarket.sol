@@ -107,12 +107,18 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return items;
     }
 
-    function getOwnedNfts() public view returns (NftItem[] memory) {
-        uint256 ownedItemsCount = ERC721.balanceOf(msg.sender);
+    function getOwnedNfts(address account)
+        public
+        view
+        returns (NftItem[] memory)
+    {
+        uint256 ownedItemsCount = ERC721.balanceOf(account);
+        // uint256 ownedItemsCount = ERC721.balanceOf(msg.sender);
         NftItem[] memory items = new NftItem[](ownedItemsCount);
 
         for (uint256 i = 0; i < ownedItemsCount; i++) {
-            uint256 tokenId = tokenOfOwnerByIndex(msg.sender, i);
+            uint256 tokenId = tokenOfOwnerByIndex(account, i);
+            // uint256 tokenId = tokenOfOwnerByIndex(msg.sender, i);
             NftItem storage item = _idToNftItem[tokenId];
             items[i] = item;
         }
@@ -120,11 +126,11 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return items;
     }
 
-    function mintToken(string memory tokenURI, uint256 price)
-        public
-        payable
-        returns (uint256)
-    {
+    function mintToken(
+        string memory tokenURI,
+        address account,
+        uint256 price
+    ) public payable returns (uint256) {
         require(!tokenURIExists(tokenURI), "Token URI already exists");
         require(
             msg.value == listingPrice,
@@ -136,7 +142,8 @@ contract NftMarket is ERC721URIStorage, Ownable {
 
         uint256 newTokenId = _tokenIds.current();
 
-        _safeMint(msg.sender, newTokenId);
+        _safeMint(account, newTokenId);
+        // _safeMint(msg.sender, newTokenId);
         _setTokenURI(newTokenId, tokenURI);
         _createNftItem(newTokenId, price);
         _usedTokenURIs[tokenURI] = true;
@@ -144,17 +151,19 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return newTokenId;
     }
 
-    function buyNft(uint256 tokenId) public payable {
+    function buyNft(uint256 tokenId, address account) public payable {
         uint256 price = _idToNftItem[tokenId].price;
         address owner = ERC721.ownerOf(tokenId);
 
-        require(msg.sender != owner, "You already own this NFT");
-        require(msg.value == price, "Please submit the asking price");
+        require(account != owner, "You already own this NFT");
+        // require(msg.sender != owner, "You already own this NFT");
+        // require(msg.value == price, "Please submit the asking price");
 
-        _idToNftItem[tokenId].isListed = false;
-        _listedItems.decrement();
+        // _idToNftItem[tokenId].isListed = false;
+        // _listedItems.decrement();
 
-        _transfer(owner, msg.sender, tokenId);
+        _transfer(owner, account, tokenId);
+        // _transfer(owner, msg.sender, tokenId);
         payable(owner).transfer(msg.value);
     }
 
