@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // import { getUsersNft } from "../../redux/actions/nftActions"
 import axios from 'axios';
 
-const ProfileDiscoverCard = ({ ipfsDataLink, thumbnail, len }) => {
+const ProfileDiscoverCard = ({ thumbnail, len, tokenId, owner, creatorMongoUId, name, image, price, description }) => {
   const dispatch = useDispatch();
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -17,13 +17,13 @@ const ProfileDiscoverCard = ({ ipfsDataLink, thumbnail, len }) => {
   const { loading, user } = userDetails;
   // const ownedNft = useSelector((state) => state.ownedNft)
   const [nftMetadata, setNftMetadata] = useState({});
-  const [image, setImage] = useState("");
+  // const [image, setImage] = useState("");
 
   async function getNftMetaData() {
-    const res = await axios.get(ipfsDataLink);
-    setNftMetadata(res.data)
-    console.log('res.data', res.data)
-    setImage(res.data.image);
+    // const res = await axios.get(ipfsDataLink);
+    // setNftMetadata(res.data)
+    // console.log('res.data', res.data)
+    // setImage(res.data.image);
   }
   useEffect(() => {
     if (!userInfo) {
@@ -38,7 +38,7 @@ const ProfileDiscoverCard = ({ ipfsDataLink, thumbnail, len }) => {
   // console.log(nft[0])
   return (
     <>
-      <Link to="/discoverSingle" state={{ image: image?.substring(34), len: `${len} (Yours)`, name: nftMetadata.name, price: nftMetadata.price, userIdMongo: nftMetadata.creatorMongoUId, description: nftMetadata.description, tokenId: "myToken", nftOwnerDetails: { name: user?.name, avatar: { url: user?.avatar?.url } } }} className="col-sm-4 dicoverCard">
+      <Link to="/discoverSingle" state={{ image, len: `${len} (Yours)`, name: name, price: price, userIdMongo: creatorMongoUId, owner, description, tokenId, nftOwnerDetails: { name: user?.name, avatar: { url: user?.avatar?.url } } }} className="col-sm-4 dicoverCard">
         <div className="discoverCardThumbnailWrapper">
           <img src={image || thumbnail} className="popularCardThumbnailImg" />
           {/* <img src={{ uri: blob }} style={{ height: 200, width: null, flex: 1 }} /> */}
@@ -48,13 +48,13 @@ const ProfileDiscoverCard = ({ ipfsDataLink, thumbnail, len }) => {
           <div className="col-sm-9">
             <div className="discoverCardRow1Title">
               {/* Amazing digit art */}
-              {nftMetadata.name}
+              {name}
             </div>
           </div>
           <div className="col-sm-3 popularCardLastRowButtonWrapper">
             <div className="popularCardLastRowButton">
               {/* 2.45 ETH */}
-              {nftMetadata.price} ETH
+              {price} ETH
             </div>
           </div>
         </div>

@@ -29,6 +29,7 @@ import Loader from '../components/Loader'
 import Spinner from '../components/Spinner'
 import { Link } from "react-router-dom";
 import axios from 'axios';
+import useSWR from "swr";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -36,7 +37,8 @@ const DiscoverSingle = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
   const [ownerStatus, setOwnerStatus] = useState(false);
-  const [nftMetadata, setNftMetadata] = useState(null)
+  const [nftMetadata, setNftMetadata] = useState(null);
+  const [account, setAccount] = useState(null);
   const nftDetails = useSelector((state) => state.nftDetails)
   const { nft, error } = nftDetails;
   const userLogin = useSelector((state) => state.userLogin)
@@ -45,10 +47,15 @@ const DiscoverSingle = (props) => {
   const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
   const [message, setMessage] = useState("");
   const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN + "/ipfs/";
+  const [status, setStatus] = useState(false);
 
-  // get the end user
   const signer = provider.getSigner();
   const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+
+  // get the end user
+  if (!status && account === null) {
+    setStatus(true);
+  }
   console.log('contract', contract);
   // const [nftOwnerDetails, setNftOwnerDetails] = useState({})
   // const { nftOwner } = nftOwnerDetails
@@ -65,8 +72,22 @@ const DiscoverSingle = (props) => {
   let nftOwnerDetails = state?.nftOwnerDetails;
   console.log('nftOwnerDetails', nftOwnerDetails)
 
-  console.log('name', name)
-  // const dispatch = useDispatch();
+  // const { data, mutate, isValidating, ...swr } = useSWR(
+  //   provider ? "web3/useAccount" : null,
+  //   async () => {
+  //     const accounts = await provider?.listAccounts();
+  //     const account = accounts[0];
+  //     // setAccount(accounts[0]);
+  //     if (!account) {
+  //       throw "Cannot retreive account! Please, connect to web3 wallet."
+  //     }
+
+  //     return account;
+  //   }, {
+  //   revalidateOnFocus: false,
+  //   shouldRetryOnError: false
+  // }
+  // )
 
   useEffect(() => {
     if (!tokenId) {
@@ -74,6 +95,29 @@ const DiscoverSingle = (props) => {
     }
   }, [tokenId])
 
+  const handleAccountsChanged = async () => {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account = accounts[0];
+    setAccount(accounts[0]);
+    console.log('handleAccountsChangedFunc', account);
+    if (account.length === 0) {
+      setMessage("Please, connect to web3 wallet.");
+      console.error("Please, connect to Web3 wallet");
+    }
+    // else if (accounts[0] !== data) {
+    //   mutate(accounts[0]);
+    // }
+  }
+
+
+  useEffect(() => {
+    handleAccountsChanged();
+    // window.ethereum?.on("accountsChanged", handleAccountsChanged);
+    // return () => {
+    //   window.ethereum?.removeListener("accountsChanged", handleAccountsChanged);
+    // }
+  })
+  console.log('loggedMetaMaskAccount', account)
   async function getNftMetaData(ipfsDataLink) {
     const config = {
       headers: {
@@ -101,6 +145,7 @@ const DiscoverSingle = (props) => {
 
   window.ethereum.on('accountsChanged', function (accounts) {
     // Time to reload your interface with accounts[0]!
+    setAccount(accounts[0]);
     console.log('accounts', accounts);
   })
 
@@ -113,9 +158,8 @@ const DiscoverSingle = (props) => {
       // const tx = await contract.buyNft(nftId, { value: ethers.utils.parseEther('0.1') });
       // console.log(tx.hash);
 
-      window.ethereum.send('eth_requestAccounts');
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const account = accounts[0];
+      // window.ethereum.send('eth_requestAccounts');
+
 
       // const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
       // const contractAddress = '0x079fA92A1D65716a626690556b3FbbA160c4fbc0';
@@ -129,7 +173,7 @@ const DiscoverSingle = (props) => {
 
       // // get the smart contract
       // console.log(contract)
-
+      console.log('funct called', tokenId);
       const nfts = [];
       if (tokenId && tokenId !== 'myToken') {
         const coreNfts = await contract?.getNftItem(tokenId);
@@ -168,7 +212,7 @@ const DiscoverSingle = (props) => {
           isListed: coreNfts.isListed,
           meta
         })
-        // console.log('nfts', nfts)
+        console.log('nfts', nfts)
         return nfts;
 
       }
@@ -181,23 +225,34 @@ const DiscoverSingle = (props) => {
 
 
   const buyNft = async () => {
-    if (!userInfo?._id) {
-      setShowPopup(true);
-      return;
-    }
-    const nfts = await buyNftHandler();
-    if (nfts !== null) {
-      console.log('nfts', nfts[0]);
-      try {
-        const buyNft = await contract?.buyNft(nfts[0].tokenId);
-        console.log('buyNft', JSON.parse(buyNft));
-
-      } catch (error) {
-        setMessage(JSON.parse(JSON.stringify(error.error.stack)));
-        console.error(JSON.parse(JSON.stringify(error.error.stack)));
+    try {
+      if (!userInfo?._id) {
+        setShowPopup(true);
+        return;
       }
-    } else {
-      setMessage('You Already Own this NFT!');
+      const nfts = await buyNftHandler();
+      if (nfts !== null) {
+        console.log('creator', nfts[0].creator);
+        console.log('account', account);
+        try {
+          console.log('b4BuyNft');
+          const buyNft = await contract?.buyNft(nfts[0].tokenId, account);
+          setMessage('NFT bought successfully');
+          console.log('buyNft', JSON.parse(buyNft));
+          window.location.href = '/profile'
+
+        } catch (error) {
+          if (error?.error?.stack) {
+            setMessage(JSON.parse(JSON.stringify(error?.error?.stack))?.substring(57, 81) + "!");
+            console.error(JSON.parse(JSON.stringify(error?.error?.stack)));
+          }
+        }
+      } else {
+        setMessage('You Already Own this NFT!');
+      }
+    } catch (error) {
+      setMessage(error);
+      console.error(error);
     }
     // console.log(event);
     // console.log(param);
@@ -336,7 +391,7 @@ const DiscoverSingle = (props) => {
                     </div>
                   </div>
                   <div className="col-sm-12 mt-4">
-                    {message && <Message variant='danger'>{tokenId !== "myToken" && tokenId !== null && message ? message?.substring(57, 81) + "!" : message}</Message>}
+                    {message && <Message variant='danger'>{tokenId !== "myToken" && tokenId !== null && message}</Message>}
                   </div>
 
                 </div>

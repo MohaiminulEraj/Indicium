@@ -2311,12 +2311,12 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0x1D491D2ca27a5B0dD63E5755F3d5495BA245C349",
-      "transactionHash": "0x7cc835bf70dfb250e05b6c06e13f09ddfb8710f281124d73c5357460c3cf5eca"
+      "address": "0x154B22a109fd90e7b99A5279B5249873c8DB4Dbd",
+      "transactionHash": "0x224b039a39e2ba41160f40b8ff94765942b24c8a770622b0bc04d3f4bcc710bc"
     }
   },
   "schemaVersion": "3.4.5",
-  "updatedAt": "2022-07-28T19:16:05.337Z",
+  "updatedAt": "2022-07-30T21:06:53.378Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

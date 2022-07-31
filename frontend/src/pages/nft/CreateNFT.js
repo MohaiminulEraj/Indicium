@@ -74,13 +74,23 @@ const CreateNFT = (props) => {
     const [image, setImage] = useState('');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState("Uploading NFT Metadata..");
+    const [account, setAccount] = useState('');
 
     // let tokenId = "NftMarket"
 
     // const contentId = 'QmXVmZoTRgxin2v2aTsVoCjCXW6fg9FzGK1oQ64ZMrqKKB';
     // const metadataURI = `${contentId}/${tokenId}.json`;
     // const imageURI = `https://gateway.pinata.cloud/ipfs/${contentId}/${tokenId}.png`;
+    window.ethereum.send('eth_requestAccounts');
+    const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
+    const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+
+    // get the end user
+    const signer = provider.getSigner();
+
+    // get the smart contract
+    const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
     useEffect(() => {
         if (!userInfo) {
             window.location.href = '/'
@@ -243,29 +253,31 @@ const CreateNFT = (props) => {
 
     const createNft = async (nftURI) => {
         try {
-            window.ethereum.send('eth_requestAccounts');
             setLoading(true);
             setStatus('Minting NFT...');
-            const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
-            const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
-
-            // get the end user
-            const signer = provider.getSigner();
-
-            // get the smart contract
-            const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
             console.log(contract)
 
             const connection = contract.connect(signer);
             const addr = connection.address;
+            console.log('addr', addr)
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+            setAccount(accounts[0]);
+            window.ethereum.on('accountsChanged', function (accounts) {
+                // Time to reload your interface with accounts[0]!
+                setAccount(accounts[0]);
+                console.log('accounts', accounts);
+            })
             console.log(nftURI);
             const nftRes = await axios.get(nftURI);
             console.log('nftRes', nftRes)
             const content = nftRes.data;
 
+            console.log('loggedAccount', account)
             const tx = await contract?.mintToken(
                 nftURI,
+                account,
                 ethers.utils.parseEther(price.toString()),
                 {
                     value: ethers.utils.parseEther(0.025.toString())

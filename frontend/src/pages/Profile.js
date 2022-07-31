@@ -21,6 +21,8 @@ import fbCircle from "../assets/images/fbCircle.png";
 import { Link } from "react-router-dom";
 import { FaCheck, FaTimes } from 'react-icons/fa'
 import { getUserDetails, updateCoverPhoto } from '../redux/actions/userActions'
+import { ethers } from "ethers";
+import NftMarket from '../contracts/NftMarket.json';
 import { getNfts } from "../redux/actions/nftActions"
 import ProfileDiscoverCard from "./components/ProfileDiscoverCard"
 import Message from './components/Message'
@@ -37,30 +39,66 @@ const Profile = (props) => {
     const [showPopup, setShowPopup] = useState(false);
     const [showSignupPopup, setShowSignupPopup] = useState(false);
     const [message, setMessage] = useState(null)
-    const [nfts, setNfts] = useState(null);
+    const [nfts, setNfts] = useState([]);
     const userLogin = useSelector((state) => state.userLogin)
     const { userInfo } = userLogin
     const userDetails = useSelector((state) => state.userDetails)
     const { loading, user, error } = userDetails
-
+    const [account, setAccount] = useState(null);
     const [coverPhoto, setCoverPhoto] = useState('');
     const [coverPhotoPreview, setCoverPhotoPreview] = useState('');
 
     const coverPhotoUpdate = useSelector((state) => state.coverPhotoUpdate)
     const { success } = coverPhotoUpdate
+    let nftsFromChain = [];
 
+    window.ethereum.send('eth_requestAccounts');
 
+    const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+    console.log('contractAddress', contractAddress);
+    const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+
+    // get the end user
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
 
     const dispatch = useDispatch();
-
+    window.ethereum.on('accountsChanged', function (accounts) {
+        // Time to reload your interface with accounts[0]!
+        setAccount(accounts[0]);
+        console.log('accounts', accounts);
+    })
     async function getNfts() {
-        await axios.get(`/api/nfts/owned?userId=${userInfo?._id}`).then(res => {
-            setNfts(res.data)
-            console.log('nfts', res.data)
-            // setOwnerStatus(true)
-        }).catch(err => {
-            console.error(err)
-        })
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = accounts[0];
+        setAccount(accounts[0]);
+        const coreNfts = await contract.getOwnedNfts(account);
+        let meta = null;
+        for (let i = 0; i < coreNfts.length; i++) {
+            const item = coreNfts[i];
+            const tokenURI = await contract?.tokenURI(item?.tokenId);
+            // console.log('tokenURI', tokenURI);
+            const metaRes = await fetch(tokenURI);
+            // console.log('metaRes', metaRes);
+            meta = await metaRes.json();
+            // console.log('meta', meta);
+
+            nftsFromChain.push({
+                price: parseFloat(ethers.utils.formatEther(item.price)),
+                tokenId: item.tokenId.toNumber(),
+                creator: item.creator,
+                isListed: item.isListed,
+                meta
+            })
+        }
+        setNfts([...nfts, nftsFromChain]);
+        // await axios.get(`/api/nfts/owned?userId=${userInfo?._id}`).then(res => {
+        //     setNfts(res.data)
+        //     console.log('nfts', res.data)
+        //     // setOwnerStatus(true)
+        // }).catch(err => {
+        //     console.error(err)
+        // })
     }
 
     let createdAt = new Date(user?.createdAt || '2022-01-04T11:14:09.314Z');
@@ -86,7 +124,7 @@ const Profile = (props) => {
     }, [dispatch, user, userInfo])
 
     useEffect(() => {
-        if (!nfts) {
+        if (nfts.length === 0) {
             // dispatch(getNfts(userInfo._id));
             getNfts();
         }
@@ -100,7 +138,9 @@ const Profile = (props) => {
         //             console.log(err)
         //         })
         // }
-    }, [dispatch, nfts])
+    }, [dispatch, nfts, account])
+    console.log('account', account)
+    console.log('nfts', nfts[0])
 
     const onMenuItemClick = (id) => {
         console.log(id)
@@ -351,11 +391,21 @@ const Profile = (props) => {
                             {/* Cards Starts  here */}
                             <div className="row discoverCardWrapper">
                                 {
-                                    nfts?.length === 0 ?
+                                    nfts[0]?.length === 0 ?
                                         <div className="alert alert-danger mt-5 w-100"><b>You don't have any NFT Asset!</b></div>
                                         :
-                                        nfts?.map((myNft, index) => (
-                                            <ProfileDiscoverCard key={index} len={nfts?.length} ipfsDataLink={myNft?.ipfsDataLink} thumbnail={discoverCardThumbnail1} />
+                                        nfts[0]?.map((myNft, index) => (
+                                            <ProfileDiscoverCard
+                                                key={index}
+                                                len={nfts[0]?.length}
+                                                tokenId={myNft?.tokenId}
+                                                owner={myNft?.creator}
+                                                creatorMongoUId={myNft?.meta?.creatorMongoUId}
+                                                image={myNft?.meta?.image}
+                                                price={myNft?.meta?.price}
+                                                name={myNft?.meta?.name}
+                                                description={myNft?.meta?.description}
+                                                thumbnail={discoverCardThumbnail1} />
                                         ))
                                 }
 
