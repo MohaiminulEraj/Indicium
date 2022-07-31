@@ -322,7 +322,7 @@ const Profile = (props) => {
                             <div className="row" style={{ marginTop: 30 }}>
                                 <div className="col-sm-8">
                                     <div className="row">
-                                        <div className="col-sm-2 profileRightMenuItemCol">
+                                        <div className="col-sm-4 profileRightMenuItemCol">
                                             <div className={
                                                 activeItem == "onSale"
                                                     ?
@@ -333,7 +333,7 @@ const Profile = (props) => {
                                                 on Sale
                                             </div>
                                         </div>
-                                        <div className="col-sm-2 profileRightMenuItemCol" onClick={() => onMenuItemClick("Collectibles")}>
+                                        <div className="col-sm-4 profileRightMenuItemCol" onClick={() => onMenuItemClick("Collectibles")}>
                                             <div className={
                                                 activeItem == "Collectibles"
                                                     ?
@@ -343,17 +343,17 @@ const Profile = (props) => {
                                                 Collectibles
                                             </div>
                                         </div>
-                                        <div className="col-sm-2 profileRightMenuItemCol" onClick={() => onMenuItemClick("Created")}>
+                                        <div className="col-sm-4 profileRightMenuItemCol" onClick={() => onMenuItemClick("Unlisted")}>
                                             <div className={
-                                                activeItem == "Created"
+                                                activeItem == "Unlisted"
                                                     ?
                                                     "profileRightMenuItemActive"
                                                     :
                                                     "profileRightMenuItemNonActive"}>
-                                                Created
+                                                Unlisted
                                             </div>
                                         </div>
-                                        <div className="col-sm-2 profileRightMenuItemCol" onClick={() => onMenuItemClick("Likes")}>
+                                        {/* <div className="col-sm-2 profileRightMenuItemCol" onClick={() => onMenuItemClick("Likes")}>
                                             <div className={
                                                 activeItem == "Likes"
                                                     ?
@@ -382,7 +382,7 @@ const Profile = (props) => {
                                                     "profileRightMenuItemNonActive"}>
                                                 Followers
                                             </div>
-                                        </div>Î
+                                        </div>Î */}
                                     </div>
                                 </div>
                             </div>
@@ -395,6 +395,7 @@ const Profile = (props) => {
                                         <div className="alert alert-danger mt-5 w-100"><b>You don't have any NFT Asset!</b></div>
                                         :
                                         nfts[0]?.map((myNft, index) => (
+                                            ((activeItem === "onSale" && myNft?.isListed) || (activeItem === "Unlisted" && !myNft?.isListed)) &&
                                             <ProfileDiscoverCard
                                                 key={index}
                                                 len={nfts[0]?.length}
