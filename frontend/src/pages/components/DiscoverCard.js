@@ -44,7 +44,7 @@ const DiscoverCard = ({ image, len, thumbnail, id, creator, name, description, p
       {/* <Link to={{ pathname: `/DiscoverSingle/:${id}`, query: { id } }} className="col-sm-3 dicoverCard"> */}
       {/* <Link to={"/discoverSingle/:" + id} className="col-sm-3 dicoverCard"> */}
       <div className="discoverCardThumbnailWrapper">
-        <img src={pinataDomain + image || thumbnail} className="popularCardThumbnailImg" />
+        <img src={image || thumbnail} className="popularCardThumbnailImg" />
       </div>
       <div className="row discoverCardRow1">
         <div className="col-sm-9">

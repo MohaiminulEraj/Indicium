@@ -286,7 +286,7 @@ const DiscoverSingle = (props) => {
               <div className="col-sm-5">
                 <div className="discoverSingleContainerCol1Thumbnail">
                   <img
-                    src={pinataDomain + image || discoverSingleThumbnail}
+                    src={image || discoverSingleThumbnail}
                     className="discoverSingleThumbnail"
                   />
                 </div>

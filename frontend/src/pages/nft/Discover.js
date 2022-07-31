@@ -246,7 +246,7 @@ const Discover = (props) => {
                       creator={nft?.creator}
                       id={nft?.meta?.creatorMongoUId || null}
                       name={nft.meta.name}
-                      image={nft.meta.image.substring(34)}
+                      image={nft.meta.image}
                       description={nft.meta.description}
                       price={nft.price.toString()}
                       tokenId={nft.tokenId.toString()}
