@@ -41,7 +41,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
         bool isListed
     );
 
-    constructor() ERC721("Adela", "ADEL") {}
+    constructor() ERC721("AnchorNft", "ANCHOR") {}
 
     // function _baseURI() internal pure override returns (string memory) {
     //     return "ipfs://";
@@ -145,7 +145,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
         _safeMint(account, newTokenId);
         // _safeMint(msg.sender, newTokenId);
         _setTokenURI(newTokenId, tokenURI);
-        _createNftItem(newTokenId, price);
+        _createNftItem(newTokenId, price, account);
         _usedTokenURIs[tokenURI] = true;
 
         return newTokenId;
@@ -159,39 +159,52 @@ contract NftMarket is ERC721URIStorage, Ownable {
         // require(msg.sender != owner, "You already own this NFT");
         // require(msg.value == price, "Please submit the asking price");
 
-        // _idToNftItem[tokenId].isListed = false;
-        // _listedItems.decrement();
+        _idToNftItem[tokenId].isListed = false;
+        _listedItems.decrement();
 
         _transfer(owner, account, tokenId);
         // _transfer(owner, msg.sender, tokenId);
+        // payable(owner).transfer(price);
         payable(owner).transfer(msg.value);
     }
 
-    function placeNftOnSale(uint256 tokenId, uint256 newPrice) public payable {
+    function placeNftOnSale(
+        uint256 tokenId,
+        uint256 newPrice,
+        address account
+    ) public payable {
         require(
-            ERC721.ownerOf(tokenId) == msg.sender,
+            ERC721.ownerOf(tokenId) == account,
             "You are not owner of this nft"
         );
+        // require(
+        //     ERC721.ownerOf(tokenId) == msg.sender,
+        //     "You are not owner of this nft"
+        // );
         require(
             _idToNftItem[tokenId].isListed == false,
             "Item is already on sale"
         );
-        require(
-            msg.value == listingPrice,
-            "Price must be equal to listing price"
-        );
+        // require(
+        //     msg.value == listingPrice,
+        //     "Price must be equal to listing price"
+        // );
 
         _idToNftItem[tokenId].isListed = true;
         _idToNftItem[tokenId].price = newPrice;
         _listedItems.increment();
     }
 
-    function _createNftItem(uint256 tokenId, uint256 price) private {
+    function _createNftItem(
+        uint256 tokenId,
+        uint256 price,
+        address account
+    ) private {
         require(price > 0, "Price must be at least 1 wei");
 
-        _idToNftItem[tokenId] = NftItem(tokenId, price, msg.sender, true);
+        _idToNftItem[tokenId] = NftItem(tokenId, price, account, true);
 
-        emit NftItemCreated(tokenId, price, msg.sender, true);
+        emit NftItemCreated(tokenId, price, account, true);
     }
 
     function _beforeTokenTransfer(
