@@ -236,15 +236,16 @@ const DiscoverSingle = (props) => {
         console.log('account', account);
         try {
           console.log('b4BuyNft');
-          const buyNft = await contract?.buyNft(nfts[0].tokenId, account);
+          const buyNft = await contract?.buyNft(tokenId, account);
           setMessage('NFT bought successfully');
           console.log('buyNft', JSON.parse(buyNft));
           window.location.href = '/profile'
 
         } catch (error) {
           if (error?.error?.stack) {
-            setMessage(JSON.parse(JSON.stringify(error?.error?.stack))?.substring(57, 81) + "!");
-            console.error(JSON.parse(JSON.stringify(error?.error?.stack)));
+            setMessage(JSON.parse(JSON.stringify(error?.reason)) + "!");
+            // setMessage(JSON.parse(JSON.stringify(error?.error?.stack))?.substring(57, 81) + "!");
+            console.error(JSON.parse(JSON.stringify(error)));
           }
         }
       } else {

@@ -3,6 +3,7 @@ import "./App.css";
 import DiscoverRoute from "./routes/landing-pages/DiscoverRoute";
 import CreateNftRoute from "./routes/landing-pages/CreateNftRoute";
 import DiscoverRouteSingle from "./routes/landing-pages/DiscoverSingleRoute";
+import ListNftRoute from "./routes/landing-pages/ListNftRoute";
 import HomeRoute from "./routes/landing-pages/HomeRoute";
 import ProfileRoute from "./routes/landing-pages/ProfileRoute";
 import SignupRoute from "./routes/landing-pages/SignupRoute";
@@ -22,6 +23,7 @@ function App() {
       <Routes>
         <Route path="/discover" element={<DiscoverRoute />} />
         <Route path="/discoverSingle" element={<DiscoverRouteSingle />} />
+        <Route path="/listNft" element={<ListNftRoute />} />
         <Route path="/create" element={<PrivateRoute component={CreateNftRoute} />} />
         <Route path="/profile" element={<PrivateRoute component={ProfileRoute} />} />
         <Route path="/signin" element={<SigninRoute />} />

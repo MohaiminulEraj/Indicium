@@ -1,304 +1,159 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import { ethers } from "ethers";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/Home.css";
 import "../../styles/Responsive.css";
-// import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CustomNavbar from "../components/CustomNavbar";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faChevronDown, faSpinner } from "@fortawesome/free-solid-svg-icons";
-// import DiscoverCard from "../components/DiscoverCard";
-// import discoverCardThumbnail1 from "../../assets/images/discoverCardThumbnail1.png";
-// import discoverCardThumbnail2 from "../../assets/images/discoverCardThumbnail2.png";
-// import discoverCardThumbnail3 from "../../assets/images/discoverCardThumbnail3.png";
-// import discoverCardThumbnail4 from "../../assets/images/discoverCardThumbnail4.png";
-import blackImg from "../../assets/images/blackImg.png";
+import discoverSingleThumbnail from "../../assets/images/NFTSingle.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import heart from "../../assets/images/heart.png";
+import share from "../../assets/images/share.png";
+import dots from "../../assets/images/dots.png";
+import dsCol2row2Img from "../../assets/images/dsCol2row2Img.png";
+import { faChevronDown, faHourglass, faHourglassHalf, faTag } from "@fortawesome/free-solid-svg-icons";
+import profile from "../../assets/images/profile.png"
+import { getNftDetails } from "../../redux/actions/nftActions"
+import { getUserDetails, getNftOwner } from "../../redux/actions/userActions"
+import PopularCard from "../components/PopularCard";
+import popularCardThumbnail1 from "../../assets/images/popularCardThumbnail1.png"
+import popularCardThumbnail2 from "../../assets/images/popularCardThumbnail2.png"
+import popularCardThumbnail3 from "../../assets/images/popularCardThumbnail3.png"
 import SigninPopup from "../components/SigninPopup";
 import SignUpPopup from "../components/SignUpPopup";
-import axios from "axios";
-// import fs from 'fs-extra';
-import { useDispatch, useSelector } from 'react-redux'
-import { getUserDetails } from '../../redux/actions/userActions'
+import NftMarket from '../../contracts/NftMarket.json';
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import Spinner from '../components/Spinner'
-// import WalletBalance from '../components/providers/web3/WalletBalance';
-import { v4 as uuidv4 } from "uuid";
-import NftMarket from '../../contracts/NftMarket.json';
-import { ethers } from 'ethers';
-// import pinataSDK from '@pinata/sdk';
-import FormData from "form-data";
-import { saveNftDetails } from "../../redux/actions/nftActions"
+import { Link } from "react-router-dom";
+import axios from 'axios';
+import useSWR from "swr";
 import dotenv from 'dotenv';
 dotenv.config();
 
-// const PINATA_API_KEY = '00951809b073d0a55e9a';
-// const PINATA_SECRET_API_KEY = '3b1089f9a77e2f6cee967aeab3bcda8c9427e519b118f07bbf274ae00993983f';
-
-// let pinataApiKey_NFT = "06ce9ba7b279fe677acf";
-const pinataApiKey = process.env.REACT_APP_PINATA_API_KEY;
-// let pinataSecretKey_NFT = "558009c248624baee84c3a321cbeff8a8963ee851c19dd7d6395744de974f1ec";
-const pinataSecretKey = process.env.REACT_APP_PINATA_SECRET_API_KEY;
-const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN;
-
-// const pinata = pinataSDK(pinataApiKey, pinataSecretKey);
-
-
-// import { useWeb3 } from '@providers/web3';
-
-const ListNFT = (props) => {
-
-
-    // const { ethereum, contract } = useWeb3();
-    const dispatch = useDispatch();
-    const saveNft = useSelector((state) => state.saveNft)
-    const { error, nftDetails } = saveNft
-
-    const userLogin = useSelector((state) => state.userLogin)
-    const { userInfo } = userLogin
-
-    const userDetails = useSelector((state) => state.userDetails)
-    const { user } = userDetails
-
+const DiscoverSingle = (props) => {
     const [showPopup, setShowPopup] = useState(false);
     const [showSignupPopup, setShowSignupPopup] = useState(false);
-    const [message, setMessage] = useState(null);
-    const [avatar, setAvatar] = useState('');
-    const [avatarPreview, setAvatarPreview] = useState(blackImg);
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [price, setPrice] = useState(null);
-    // const [isMinted, setIsMinted] = useState(false);
-    const [totalMinted, setTotalMinted] = useState(0);
-    const [nftURI, setNftURI] = useState('');
-    const [image, setImage] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState("Uploading NFT Metadata..");
-    const [account, setAccount] = useState('');
-
-    // let tokenId = "NftMarket"
-
-    // const contentId = 'QmXVmZoTRgxin2v2aTsVoCjCXW6fg9FzGK1oQ64ZMrqKKB';
-    // const metadataURI = `${contentId}/${tokenId}.json`;
-    // const imageURI = `https://gateway.pinata.cloud/ipfs/${contentId}/${tokenId}.png`;
-    window.ethereum.send('eth_requestAccounts');
+    const [ownerStatus, setOwnerStatus] = useState(false);
+    const [nftMetadata, setNftMetadata] = useState(null);
+    const [account, setAccount] = useState(null);
+    const nftDetails = useSelector((state) => state.nftDetails)
+    const { nft, error } = nftDetails;
+    const userLogin = useSelector((state) => state.userLogin)
+    const { userInfo } = userLogin;
     const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-
     const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+    const [message, setMessage] = useState("");
+    const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN + "/ipfs/";
+    const [status, setStatus] = useState(false);
+    const [price, setPrice] = useState(null);
+
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
 
     // get the end user
-    const signer = provider.getSigner();
-
-    // get the smart contract
-    const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
-    useEffect(() => {
-        if (!userInfo) {
-            window.location.href = '/'
-        } else if (!user || !user.name) {
-            dispatch(getUserDetails(userInfo._id))
-        }
-    }, [dispatch, user, userInfo])
-
-    useEffect(() => {
-        if (nftDetails) {
-            // console.log(Object.keys(nftDetails).length)
-            window.location.href = '/profile'
-            // console.log('Nft Minted Successfully!', nftDetails)
-        }
-    }, [nftDetails])
-
-    // useEffect(() => {
-    //     getCount();
-    // }, []);
-
-    const getCount = async (contract) => {
-        const count = await contract?.count();
-        console.log(parseInt(count));
-        setTotalMinted(parseInt(count));
-    };
-
-
-    const getSignedData = async () => {
-
-        const jsonRes = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
-            pinataMetadata: {
-                name: uuidv4()
-            },
-            pinataContent: {
-                name,
-                description
-            }
-        }, {
-            headers: {
-                pinata_api_key: pinataApiKey,
-                pinata_secret_api_key: pinataSecretKey
-            }
-        });
-        console.log(jsonRes.data)
-        return jsonRes?.data;
-        // const messageToSign = await axios.get("/api/verify");
-        // const accounts = await ethereum?.request({ method: "eth_requestAccounts" });
-        // const account = accounts[0];
-
-        // const signedData = await ethereum?.request({
-        //     method: "personal_sign",
-        //     params: [JSON.stringify(messageToSign.data), account, messageToSign.data.id]
-        // })
-
-        // return { signedData, account };
+    if (!status && account === null) {
+        setStatus(true);
     }
-
-    // useEffect(() => {
-    //     getMintedStatus();
-    // }, [isMinted]);
-
-    // const getMintedStatus = async (contract) => {
-    //     const result = await contract?.isContentOwned(metadataURI);
-    //     console.log(result)
-    //     setIsMinted(result);
-    // };
+    console.log('contract', contract);
+    // const [nftOwnerDetails, setNftOwnerDetails] = useState({})
+    // const { nftOwner } = nftOwnerDetails
+    // console.log('nftOwner', nftOwner)
+    const { state } = useLocation();
+    let tokenId = state?.tokenId || null;
+    let nftId = state?.id;
+    let name = state?.name;
+    let description = state?.description;
+    let image = state?.image;
+    // let price = state?.price;
+    let creator = state?.creator;
+    let len = state?.len;
+    let nftOwnerDetails = state?.nftOwnerDetails;
+    console.log('nftOwnerDetails', nftOwnerDetails)
 
     useEffect(() => {
-        setImage(image);
-        setNftURI(nftURI);
-    }, [image, nftURI]);
-
-
-    // Submiting Metadata
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        // console.log(e.target.files[0])
-        console.log(image)
-        const jsonRes = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
-            pinataMetadata: {
-                name: uuidv4()
-            },
-            pinataContent: {
-                name,
-                description,
-                price,
-                image,
-                creatorMongoUId: userInfo?._id
-            }
-        }, {
-            headers: {
-                pinata_api_key: pinataApiKey,
-                pinata_secret_api_key: pinataSecretKey
-            }
-        });
-
-        if (jsonRes?.data?.IpfsHash) {
-            setLoading(false);
-            setNftURI(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
-            console.log(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
-            setMessage('Successfully uploaded NFT Metadata to IPFS!')
+        if (!tokenId) {
+            window.location.href = '/profile';
         }
-        // console.log(nftURI)
-        createNft(pinataDomain + '/ipfs/' + jsonRes?.data?.IpfsHash);
-        // getMintedStatus(contract);
-        // getCount(contract);
+    }, [tokenId])
+
+    const handleAccountsChanged = async () => {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = accounts[0];
+        setAccount(accounts[0]);
+        console.log('handleAccountsChangedFunc', account);
+        if (account.length === 0) {
+            setMessage("Please, connect to web3 wallet.");
+            console.error("Please, connect to Web3 wallet");
+        }
     }
 
 
-    // async function getURI(contract) {
-    //     const uri = await contract.tokenURI(tokenId);
-    //     alert(uri);
+    useEffect(() => {
+        handleAccountsChanged();
+        // window.ethereum?.on("accountsChanged", handleAccountsChanged);
+        // return () => {
+        //   window.ethereum?.removeListener("accountsChanged", handleAccountsChanged);
+        // }
+    })
+    console.log('loggedMetaMaskAccount', account)
+    async function getNftMetaData(ipfsDataLink) {
+        const config = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        }
+        let res = null;
+        if (ipfsDataLink) {
+            res = await axios.get(ipfsDataLink, config);
+        }
+        console.log(res?.data);
+        setNftMetadata(res?.data || null)
+    }
+
+    // async function getNftOwnerDetails(nftOwner) {
+    //   await axios.get(`/api/profile/nftOwner/${nftOwner}`).then(res => {
+    //     setNftOwnerDetails(res.data)
+    //     console.log('nftOwnerDetails', res.data)
+    //     // setOwnerStatus(true)
+    //   }).catch(err => {
+    //     console.error(err)
+    //   })
     // }
 
-    const handleImage = async (e) => {
+    window.ethereum.on('accountsChanged', function (accounts) {
+        // Time to reload your interface with accounts[0]!
+        setAccount(accounts[0]);
+        console.log('accounts', accounts);
+    })
+
+    const listNft = async (e) => {
+        e.preventDefault();
+        if (!price || price === '0') {
+            setMessage('Please enter a valid price');
+            return;
+        }
+        console.log('hello!')
+        // price = ethers.utils.parseEther(price);
         try {
-
-            if (e.target.name === 'avatar') {
-                setLoading(true);
-                const reader = new FileReader();
-                reader.onload = () => {
-                    if (reader.readyState === 2) {
-                        setAvatar(reader.result);
-                        setAvatarPreview(reader.result);
-                        // blob = reader.result;
-                        console.log('reader.result', reader.result);
-                    }
-                }
-                if (e.target.files[0]) reader.readAsDataURL(e.target.files[0])
-
-                const formData = new FormData();
-                let filename = e.target.files[0].name.replace(/\.[^/.]+$/, "") + "-" + uuidv4();
-                formData.append(
-                    "file",
-                    e.target.files[0],
-                    filename
-                );
-
-                const fileRes = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", formData, {
-                    maxBodyLength: Infinity,
-                    headers: {
-                        "Content-Type": `multipart/form-data; boundary=${formData._boundary}`,
-                        pinata_api_key: pinataApiKey,
-                        pinata_secret_api_key: pinataSecretKey,
-                    }
-                });
-
-
-                setImage(pinataDomain + '/ipfs/' + fileRes?.data?.IpfsHash)
-                console.log(`${pinataDomain}/ipfs/${fileRes?.data?.IpfsHash}`)
-                setLoading(false);
-                setMessage('Image uploaded to IPFS successfully!');
-
-            }
-        } catch (e) {
-            console.error(e.message);
+            console.log('b4NftListing');
+            const listNft = await contract?.placeNftOnSale(tokenId, ethers.utils.parseEther(price), account);
+            setMessage('NFT Item Listed successfully');
+            console.log('nftListed', listNft);
+            window.location.href = '/profile'
+        } catch (error) {
+            setMessage(error);
+            console.error(error);
         }
     }
 
-    const createNft = async (nftURI) => {
-        try {
-            setLoading(true);
-            setStatus('Minting NFT...');
-
-            console.log(contract)
-
-            const connection = contract.connect(signer);
-            const addr = connection.address;
-            console.log('addr', addr)
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const account = accounts[0];
-            setAccount(accounts[0]);
-            window.ethereum.on('accountsChanged', function (accounts) {
-                // Time to reload your interface with accounts[0]!
-                setAccount(accounts[0]);
-                console.log('accounts', accounts);
-            })
-            console.log(nftURI);
-            const nftRes = await axios.get(nftURI);
-            console.log('nftRes', nftRes)
-            const content = nftRes.data;
-
-            console.log('loggedAccount', account)
-            const tx = await contract?.mintToken(
-                nftURI,
-                account,
-                ethers.utils.parseEther(price.toString()),
-                {
-                    value: ethers.utils.parseEther(0.025.toString())
-                }
-            );
-
-            await tx.wait();
-            console.log('tx', tx)
-            if (tx) {
-                dispatch(saveNftDetails(user?._id, nftURI, image))
-                setMessage('NFT Minted successfully!');
-            }
-            setLoading(false);
-        } catch (e) {
-            setMessage(e.message);
-            console.error(e.message);
-        }
-    }
 
     return (
-        <div className="body upr">
+        <div className="body">
+            {/* Section2 */}
 
             {/* Signup and register popups */}
             {showPopup &&
@@ -311,128 +166,175 @@ const ListNFT = (props) => {
             }
             {/* Signup and register popups */}
 
-            <div className="navBarDiscoverSignup">
+
+            <div className="navBarDiscover">
                 <CustomNavbar onSigninClick={() => setShowPopup(!showPopup)} onSignupClick={() => setShowSignupPopup(!showSignupPopup)} />
-                <div className="signupTitle">
-                    Create NFT Asset
-                </div>
-                <div className="signupTagline">
-                    You can set List your NFT Asset here.
-                </div>
             </div>
-            <div className="fullHr"></div>
-            {/* Navbar ends here */}
 
-            {/* Form Starts here here */}
+            <div className="discoverSingleSection">
+                <div className="container">
+                    <div className="discoverSingleContainer">
+                        <div className="row">
+                            <div className="col-sm-5">
+                                <div className="discoverSingleContainerCol1Thumbnail">
+                                    <img
+                                        src={image || discoverSingleThumbnail}
+                                        className="discoverSingleThumbnail"
+                                    />
+                                </div>
+                            </div>
 
-            {/* {success && <Message variant='success'>Profile Updated</Message>} */}
-            <form onSubmit={handleSubmit} className="signupFormSection row">
-                <div className="col-sm-6 signupFormSectionCol ">
-                    {/* Left form column Starts here here */}
-                    <div className="signupVR"></div>
-                    <div className="row signupFormCol1Row1">
+                            <div className="col-sm-6 discoverSingleCol2Wrapper">
+                                <div className="discoverSingleCol2Title">{name || "3D Glassy Pyramid"}</div>
+                                <div className="discoverSingleCol2Row1 row">
+                                    <div className="col-sm-4">
+                                        <div className="discoverSingleCol2Row1Col1Text">
+                                            <span>Views: 0</span>
+                                            <span>In stock: {len || 1}</span>
+                                        </div>
+                                    </div>
 
-                        <div className="signupFormCol1Row1Text1">Create NFT Metadata</div>
+                                    {/* <div className="col-sm-7 discoverSingleCol2Row1Col2Wrapper">
+                                        <div className="discoverSingleCol2Row1Col2BtnContainer">
+                                            <div className="discoverSingleCol2Row1Col2BtnWrapper">
+                                                <img src={heart} className="heartIcon" />
+                                                <span className="discoverSingleCol2Row1Col2BtnWrapperText">
+                                                    234
+                                                </span>
+                                            </div>
+                                        </div>
 
-                        {/* Form starts here */}
-                        {/* Name Field */}
-                        <div className="signupInputWrapper">
-                            <div className="signupInputLabel">This information will be displayed publicly so be careful what you share.</div>
-                        </div>
-                        <div className="container my-4 px-2">
-                            {message && <Message variant='warning'>{message}</Message>}
-                            {error && <Message variant='danger'>{error}</Message>}
-                            {loading && <Spinner />}
-                            {/* {<Spinner />} */}
-                        </div>
-                        {/* Form starts here */}
-                    </div>
-                </div>
-                {/* Left form column Ends here here */}
-                <div className="col-sm-6 signupFormSectionCol" style={{ paddingLeft: 30 }}>
-                    {/* Left form column Starts here here */}
-                    {/* <div className="signupVR"></div> */}
-                    {/* <div className="signupFormCol1Row1Text1">Social Account</div> */}
+                                        <div className="discoverSingleCol2Row1Col2BtnContainer2">
+                                            <div className="discoverSingleCol2Row1Col2BtnWrapper">
+                                                <img src={share} className="shareIcon" />
+                                            </div>
+                                        </div>
 
-                    {/* Name Field */}
-                    <div className="signupInputWrapper">
-                        <div className="signupInputLabel">Asset Name</div>
-                        <div className="signupInputFieldWrapper">
-                            <div className="signupInputFieldWrapperLayer"></div>
-                            <input name="name" value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Crypto Kitty" className="signupInputField" required />
-                        </div>
-                    </div>
+                                        <div className="discoverSingleCol2Row1Col2BtnContainer2">
+                                            <div className="discoverSingleCol2Row1Col2BtnWrapper">
+                                                <img src={dots} className="shareIcon" />
+                                            </div>
+                                        </div>
+                                    </div> */}
+                                </div>
+
+                                {/* <div className="row dsCol2Row2">
+                                    <div className="col-sm-4 dsCol2Row2Text1">Current Price</div>
+                                </div>
+                                <div className="dsCol2Row3Text1">
+                                    {price || "0"} ETH
+                                </div> */}
+
+                                {/* <div className="row dsCol2Row3">
+                                    <div className="col-sm-3" style={{ display: 'flex' }}>
+                                        <div className="trendingSecBtnWrapper dsCol2Row3Btn"
+                                        >
+                                            <button onClick={buyNft} className="trendingSecBtn">
+                                                <FontAwesomeIcon icon={faTag} />
+                                                <span style={{ marginLeft: 10 }}> Buy Now</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div> */}
 
 
+                                {/* { Wallet } */}
+                                <form>
+                                    <div className="signupInputWrapper">
+                                        <div className="signupInputLabel">Asset Price in ETH</div>
+                                        <div className="signupInputFieldWrapper">
+                                            <div className="signupInputFieldWrapperLayer"></div>
+                                            <input type="number" value={price} step={0.01} min={0} max={10} onChange={(e) => setPrice(e.target.value)} placeholder="0.8" className="signupInputField" required />
+                                        </div>
+                                    </div>
+                                    <div className="fullHr" style={{ marginTop: 30 }}></div>
+                                    <div className="row dsCol2Row4">
+                                        <div className="col-sm-1">
+                                            <div className="dsCol2Row4ProfileWrapper">
+                                                <img src={nftOwnerDetails?.avatar?.url || profile} className="dsCol2Row4Profile" />
+                                                <div className="dsCol2Row4ProfileDot"></div>
+                                            </div>
+                                        </div>
+                                        <div className="col-sm-2 dsCol2Row4ProfileTitleWrapper">
+                                            <div className="dsCol2Row4ProfileTitle">Creator</div>
+                                            <div className="dsCol2Row4ProfileTitle2">{nftOwnerDetails?.name || "Steve1889"}</div>
+                                        </div>
+                                        <div className="col-sm-1 dsCol2Row4ProfileTitleWrapper">
+                                        </div>
+                                        <div className="col-sm-2 dsCol2Row4ProfileTitleWrapper">
+                                            <div className="dsCol2Row4ProfileTitle">Price</div>
+                                            <div className="dsCol2Row4ProfileTitle2">{price || "0"} ETH</div>
+                                        </div>
+                                    </div>
+                                    <div className="fullHr" style={{ marginTop: 30 }}></div>
+                                    {/* Save Profile Button starts here  */}
+                                    <button type="submit" onClick={listNft} className="saveProfileBtn">
+                                        List NFT
+                                    </button>
+                                </form>
+                                <div className="dsCol2Row6 row">
+                                    {/* <div className="col-sm-1">
+                                        <div className="dsCol2Row6Text1">Tags :</div>
+                                    </div>
+                                    <div className="col-sm-8 dsCol2Row6BtnContainer">
+                                        <div className="dsCol2Row6Btn">
+                                            <div className="dsCol2Row6BtnLayer"></div>
+                                            #Netfly
+                                        </div>
+                                        <div className="dsCol2Row6Btn">
+                                            <div className="dsCol2Row6BtnLayer"></div>
+                                            #Rare
+                                        </div>
+                                        <div className="dsCol2Row6Btn">
+                                            <div className="dsCol2Row6BtnLayer"></div>
+                                            #Art
+                                        </div>
+                                    </div> */}
+                                    <div className="col-sm-12 mt-4">
+                                        {message && <Message variant='danger'>{message}</Message>}
+                                    </div>
 
-                    {/* Description Field */}
-                    <div className="signupInputWrapper">
-                        <div className="signupInputLabel">Asset Description</div>
-                        <div className="signupInputFieldWrapper" style={{ paddingBottom: '95px' }}>
-                            <div className="signupInputFieldWrapperLayer"></div>
-                            <textarea type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Add your Description here" className="signupInputField" />
-                        </div>
-                    </div>
-
-                    {/* <div className="signupFormCol1Row1Text1">My Account</div> */}
-
-                    {/* Form starts here */}
-
-                    <div className="col-sm-6 nftImgCardWrapper">
-                        {/* <img src={profileAvatar} style={{ width: '100%', height: '100%' }} /> */}
-                        <img src={avatarPreview} style={{ width: '100%', height: '100%' }} />
-                    </div>
-                    <div className="col-sm-6 signupFormSectionCol" style={{ paddingLeft: 30 }}>
-                        <div className="signupFormCol1Row1Text1">Asset picture</div>
-                        {/* <div className="signupFormCol1Row1Text2">We recommend an image of at <br />least 400x400. 🙌</div> */}
-                        <div className="uploadSignupBtnWrapper">
-                            <div className="uploadSignupBtn">
-                                <label style={{ cursor: 'pointer' }} htmlFor="uploadPhoto" className="uploadSignupBtnLayer">
-                                    Upload
-                                </label>
-                                <input name='avatar' id="uploadPhoto" onChange={handleImage} type="file" className="uploadSignupBtnLayer" accept='images/*' required />
-
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className="fullHr" style={{ marginTop: 30 }}></div>
 
+                    {/* Popular Cards Starts her */}
+                    <div className="dsPopularCont">
+                        <div className="row trending" style={{ marginBottom: 40 }}>
+                            <div className="col-sm-8" >
+                                <div className="trendingTitle showDeskFlex">Top Artist</div>
+                                <div className="trendingTitle showMobile">Related Artworks</div>
+                            </div>
+                            <div className="col-sm-4 secHeadDateCol showDeskFlex">
+                                <div className="trendingDateWrapper ">
+                                    <div className="trendingDateText">Today</div>
+                                    <a href="#" className="trendingDateArrow">
+                                        <FontAwesomeIcon icon={faChevronDown} color="white" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row popularCollectioContainer">
+                            <PopularCard thumbnail={popularCardThumbnail1} />
+                            <PopularCard thumbnail={popularCardThumbnail2} />
+                            <PopularCard thumbnail={popularCardThumbnail3} />
+                        </div>
 
-                    {/* { Wallet } */}
-                    <div className="signupInputWrapper">
-                        <div className="signupInputLabel">Asset Price in ETH</div>
-                        <div className="signupInputFieldWrapper">
-                            <div className="signupInputFieldWrapperLayer"></div>
-                            <input type="number" value={price} step={0.01} min={0} onChange={(e) => setPrice(e.target.value)} placeholder="0.8" className="signupInputField" required />
+                        <div className="trendingSecBtnWrapper">
+                            <div className="trendingSecBtn">
+                                MarketPlace
+                            </div>
                         </div>
                     </div>
-                    <div className="fullHr" style={{ marginTop: 30 }}></div>
-                    {/* Save Profile Button starts here  */}
-                    <button type="submit" className="saveProfileBtn" disabled={!loading && image ? false : true}>
-                        {loading ? status : "List"}
-                    </button>
 
-
-
-
-                    {/* Form starts here */}
                 </div>
-            </form>
-            {/* Form Ends  here */}
-
-
-
+            </div>
 
             {/* Footer */}
-            <div style={{
-                paddingTop: 80, minHeight: 400,
-                backgroundColor: '#020407',
-                position: 'relative'
-            }}>
-                <Footer />
-            </div>
+            <Footer />
         </div>
     );
 };
 
-export default ListNFT;
+export default DiscoverSingle;

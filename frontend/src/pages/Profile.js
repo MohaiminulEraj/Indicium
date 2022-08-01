@@ -25,6 +25,7 @@ import { ethers } from "ethers";
 import NftMarket from '../contracts/NftMarket.json';
 import { getNfts } from "../redux/actions/nftActions"
 import ProfileDiscoverCard from "./components/ProfileDiscoverCard"
+import ListNFT from "./nft/ListNFT"
 import Message from './components/Message'
 import Loader from './components/Loader'
 import axios from 'axios'
@@ -72,7 +73,7 @@ const Profile = (props) => {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
         setAccount(accounts[0]);
-        const coreNfts = await contract.getOwnedNfts(account);
+        const coreNfts = await contract?.getOwnedNfts(account);
         let meta = null;
         for (let i = 0; i < coreNfts.length; i++) {
             const item = coreNfts[i];
@@ -403,13 +404,13 @@ const Profile = (props) => {
                                                 owner={myNft?.creator}
                                                 creatorMongoUId={myNft?.meta?.creatorMongoUId}
                                                 image={myNft?.meta?.image}
-                                                price={myNft?.meta?.price}
+                                                price={myNft?.price}
                                                 name={myNft?.meta?.name}
                                                 description={myNft?.meta?.description}
+                                                isListed={myNft?.isListed}
                                                 thumbnail={discoverCardThumbnail1} />
                                         ))
                                 }
-
                                 {/* <ProfileDiscoverCard thumbnail={discoverCardThumbnail2} />
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail4} />
                                 <ProfileDiscoverCard thumbnail={discoverCardThumbnail1} /> */}

@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // import { getUsersNft } from "../../redux/actions/nftActions"
 import axios from 'axios';
 
-const ProfileDiscoverCard = ({ thumbnail, len, tokenId, owner, creatorMongoUId, name, image, price, description }) => {
+const ProfileDiscoverCard = ({ thumbnail, len, tokenId, owner, creatorMongoUId, name, image, price, description, isListed }) => {
   const dispatch = useDispatch();
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -38,7 +38,7 @@ const ProfileDiscoverCard = ({ thumbnail, len, tokenId, owner, creatorMongoUId, 
   // console.log(nft[0])
   return (
     <>
-      <Link to="/discoverSingle" state={{ image, len: `${len} (Yours)`, name: name, price: price, userIdMongo: creatorMongoUId, owner, description, tokenId, nftOwnerDetails: { name: user?.name, avatar: { url: user?.avatar?.url } } }} className="col-sm-4 dicoverCard">
+      <Link to={isListed ? "/discoverSingle" : "/listNft"} state={{ image, len: `${len} (Yours)`, name: name, price: price, userIdMongo: creatorMongoUId, owner, description, tokenId, nftOwnerDetails: { name: user?.name, avatar: { url: user?.avatar?.url } } }} className="col-sm-4 dicoverCard">
         <div className="discoverCardThumbnailWrapper">
           <img src={image || thumbnail} className="popularCardThumbnailImg" />
           {/* <img src={{ uri: blob }} style={{ height: 200, width: null, flex: 1 }} /> */}
