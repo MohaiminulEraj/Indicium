@@ -160,7 +160,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
         // require(msg.value == price, "Please submit the asking price");
 
         _idToNftItem[tokenId].isListed = false;
-        // _listedItems.decrement();
+        _listedItems.decrement();
         payable(_idToNftItem[tokenId].creator).transfer(msg.value);
 
         _transfer(owner, _to, tokenId);
