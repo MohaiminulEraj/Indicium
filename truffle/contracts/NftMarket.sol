@@ -151,28 +151,28 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return newTokenId;
     }
 
-    function buyNft(uint256 tokenId, address account) public payable {
-        uint256 price = _idToNftItem[tokenId].price;
+    function buyNft(uint256 tokenId, address payable _to) public payable {
         address owner = ERC721.ownerOf(tokenId);
+        // uint256 price = _idToNftItem[tokenId].price;
 
-        require(account != owner, "You already own this NFT");
+        require(_to != owner, "You already own this NFT");
         // require(msg.sender != owner, "You already own this NFT");
         // require(msg.value == price, "Please submit the asking price");
 
         _idToNftItem[tokenId].isListed = false;
-        _listedItems.decrement();
+        // _listedItems.decrement();
+        payable(_idToNftItem[tokenId].creator).transfer(msg.value);
 
-        _transfer(owner, account, tokenId);
+        _transfer(owner, _to, tokenId);
+        _idToNftItem[tokenId].creator = payable(_to);
         // _transfer(owner, msg.sender, tokenId);
-        // payable(owner).transfer(price);
-        payable(owner).transfer(msg.value);
+        // payable(owner).transfer(_idToNftItem[tokenId].price);
+
+        // payable(owner).transfer(msg.value);
+        payable(owner).transfer(listingPrice);
     }
 
-    function placeNftOnSale(
-        uint256 tokenId,
-        uint256 newPrice,
-        address account
-    ) public payable {
+    function placeNftOnSale(uint256 tokenId, address account) public payable {
         require(
             ERC721.ownerOf(tokenId) == account,
             "You are not owner of this nft"
@@ -191,7 +191,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
         // );
 
         _idToNftItem[tokenId].isListed = true;
-        _idToNftItem[tokenId].price = newPrice;
+        _idToNftItem[tokenId].price = msg.value;
         _listedItems.increment();
     }
 

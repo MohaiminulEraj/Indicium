@@ -18,6 +18,10 @@
  *
  */
 
+ require('dotenv').config();
+ const HDWalletProvider = require('@truffle/hdwallet-provider');
+ const { INFURA_API_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env;
+
 // const HDWalletProvider = require('@truffle/hdwallet-provider');
 //
 // const fs = require('fs');
@@ -46,6 +50,11 @@ module.exports = {
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
     },
+    ropsten: {
+      provider: () => new HDWalletProvider(MNEMONIC, INFURA_API_KEY),
+      network_id: 3,
+      gas: 5500000
+    }
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -71,6 +80,12 @@ module.exports = {
     // network_id: 2111,   // This network is yours, in the cloud.
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }
+  },
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: ETHERSCAN_API_KEY
   },
 
   // Set default mocha options here, use special reporters etc.
