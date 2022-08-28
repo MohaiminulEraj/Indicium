@@ -49,9 +49,9 @@ const authUser = asyncHandler(async (req, res) => {
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const client = new twilio(accountSid, authToken);
+    // const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    // const authToken = process.env.TWILIO_AUTH_TOKEN;
+    // const client = new twilio(accountSid, authToken);
     const { email, password, rememberMe } = req.body
 
     const userExists = await User.findOne({ email: email.toLowerCase() })
@@ -83,6 +83,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         email: email.toLowerCase(),
         password,
+        username: email.substr(0,email.indexOf('@')),
         avatar,
     })
     if (user) {
