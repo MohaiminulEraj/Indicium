@@ -27,7 +27,21 @@ const Discover = (props) => {
   const [status, setStatus] = useState(false);
   const [nftId, setNftId] = useState("");
   let nftsFromChain = [];
-  const buyNftHandler = async () => {
+
+  window.ethereum.send('eth_requestAccounts');
+
+  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+  console.log('contractAddress', contractAddress);
+  const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+
+  // get the end user
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+
+  // get the smart contract
+  console.log({contract})
+
+  const getNftData = async () => {
     try {
       // const provider = ethers.getDefaultProvider('ropsten');
       // const wallet = provider.getSigner();
@@ -35,72 +49,73 @@ const Discover = (props) => {
       // const tx = await contract.buyNft(nftId, { value: ethers.utils.parseEther('0.1') });
       // console.log(tx.hash);
 
-      window.ethereum.send('eth_requestAccounts');
-
-      const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-      console.log('contractAddress', contractAddress);
-      const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
-
-      // get the end user
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
-
-      // get the smart contract
-      console.log(contract)
+      
 
       // nftsFromChain = [];
       const coreNfts = await contract?.getAllNftsOnSale();
+      console.log({coreNfts});
+      console.log('len',coreNfts.length);
       let meta = null;
-      for (let i = 0; i < coreNfts.length; i++) {
-        const item = coreNfts[i];
-        const tokenURI = await contract?.tokenURI(item?.tokenId);
-        // console.log('tokenURI', tokenURI);
-        const metaRes = await fetch(tokenURI);
-        // console.log('metaRes', metaRes);
-        meta = await metaRes.json();
-        // console.log('meta', meta);
-
-        nftsFromChain.push({
-          price: parseFloat(ethers.utils.formatEther(item.price)),
-          tokenId: item.tokenId.toNumber(),
-          creator: item.creator,
-          isListed: item.isListed,
-          meta
-        })
+      try {
+        for (let i = 0; i < coreNfts.length; i++) {
+          if(coreNfts[i]?.isListed === true){
+            const item = coreNfts[i];
+            const tokenURI = await contract?.tokenURI(item?.tokenId);
+            // console.log('tokenURI', tokenURI);
+            const metaRes = await fetch(tokenURI);
+            // console.log('metaRes', metaRes);
+            meta = await metaRes.json();
+            // console.log('meta', meta);
+  
+            nftsFromChain.push({
+              price: parseFloat(ethers.utils.formatEther(item.price)),
+              tokenId: item.tokenId.toNumber(),
+              creator: item.creator,
+              isListed: item.isListed,
+              meta
+            })
+            console.log({nftsFromChain})
+            setNfts([...nfts, nftsFromChain]);
+          }
+        }
+      } catch (error) {
+          console.log(error);
       }
-      setNfts([...nfts, nftsFromChain]);
-      console.log('nftsFromChain', nftsFromChain)
+      
+      // console.log('nftsFromChain', nftsFromChain)
 
-      await axios.get(`/api/nfts/user/${meta?.creatorMongoUId}`).then(res => {
-        setNftId(res.data)
-        console.log('nftId', res.data)
-        // setOwnerStatus(true)
-      }).catch(err => {
-        console.error(err)
-      })
+      // await axios.get(`/api/nfts/user/${meta?.creatorMongoUId}`).then(res => {
+      //   setNftId(res.data)
+      //   console.log('nftId', res.data)
+      //   // setOwnerStatus(true)
+      // }).catch(err => {
+      //   console.error(err)
+      // })
       // return nftsFromChain;
     } catch (error) {
-      console.error(error);
+      console.error({error});
     }
   }
 
   useEffect(() => {
-    if (!status) {
-      buyNftHandler();
-      setStatus(true);
+    if (nfts[0] === undefined) {
+      getNftData();
+      // setStatus(true);
     }
-  }, [nfts, nftsFromChain])
+  }, [nfts[0]]
+  // [nfts, nftsFromChain]
+  )
 
   // console.log('nfts', nfts[0])
 
-  async function getNfts() {
-    await axios.get(`/api/nfts/owned`).then(res => {
-      setNfts(res.data)
-      console.log('nfts=>res.data=>', res.data)
-    }).catch(err => {
-      console.error(err)
-    })
-  }
+  // async function getNfts() {
+  //   await axios.get(`/api/nfts/owned`).then(res => {
+  //     setNfts(res.data)
+  //     console.log('nfts=>res.data=>', res.data)
+  //   }).catch(err => {
+  //     console.error(err)
+  //   })
+  // }
   // const dispatch = useDispatch();
   // useEffect(() => {
   //   if (!status) {

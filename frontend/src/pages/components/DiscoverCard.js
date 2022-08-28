@@ -7,6 +7,8 @@ import DiscoverSingle from '../nft/DiscoverSingle';
 import { Link, Route } from "react-router-dom";
 import { getUserDetails, getNftOwner } from "../../redux/actions/userActions"
 import axios from "axios";
+// import jazzicon from "@metamask/jazzicon"
+import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import canvas from "canvas";
 import dotenv from 'dotenv';
 dotenv.config();
@@ -34,10 +36,17 @@ const DiscoverCard = ({ image, len, thumbnail, id, creator, name, description, p
       })
     }
   }
-
-  useEffect(() => {
-    getNftOwnerDetails();
-  }, [])
+  console.log({creator})
+  // let icon = '';
+  // if(creator){
+  //     const addr = creator.slice(2, 10);
+  //     const seed = parseInt(addr, 16);
+  //     icon = jazzicon(20, seed); //generates a size 20 icon
+  // }
+  // console.log(icon)
+  // useEffect(() => {
+    // getNftOwnerDetails();
+  // }, [])
 
   return (
     <Link to={"/discoverSingle"} state={{ nftId, image, len, creator, name, description, price, tokenId, nftOwnerDetails }} className="col-sm-3 dicoverCard">
@@ -62,13 +71,16 @@ const DiscoverCard = ({ image, len, thumbnail, id, creator, name, description, p
         <div className="col-sm-8">
           <div className="discoverCardRow2ImgsWrapper">
             <div className="discoverCardRow2ImgContainer" style={{ right: 0 }}>
-              <img src={nftOwnerDetails?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
+            <Jazzicon diameter={22} seed={jsNumberForAddress(creator)} />
+              {/* <img src={nftOwnerDetails?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" /> */}
             </div>
             <div className="discoverCardRow2ImgContainer" style={{ right: 10 }}>
-              <img src={nftOwnerDetails?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
+            <Jazzicon diameter={22} seed={jsNumberForAddress(creator)} />
+              {/* <img src={nftOwnerDetails?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" /> */}
             </div>
             <div className="discoverCardRow2ImgContainer" style={{ right: 20 }}>
-              <img src={nftOwnerDetails?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
+            <Jazzicon diameter={22} seed={jsNumberForAddress(creator)} />
+              {/* <img src={nftOwnerDetails?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" /> */}
             </div>
           </div>
         </div>

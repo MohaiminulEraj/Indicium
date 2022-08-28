@@ -70,7 +70,8 @@ const Profile = (props) => {
         console.log('accounts', accounts);
     })
     async function getNfts() {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
         setAccount(accounts[0]);
         const coreNfts = await contract?.getOwnedNfts(account);
@@ -91,8 +92,8 @@ const Profile = (props) => {
                 isListed: item.isListed,
                 meta
             })
+            setNfts([...nfts, nftsFromChain]);
         }
-        setNfts([...nfts, nftsFromChain]);
         // await axios.get(`/api/nfts/owned?userId=${userInfo?._id}`).then(res => {
         //     setNfts(res.data)
         //     console.log('nfts', res.data)
@@ -100,6 +101,10 @@ const Profile = (props) => {
         // }).catch(err => {
         //     console.error(err)
         // })
+        } catch (error) {
+            console.error({error});
+        }
+        
     }
 
     let createdAt = new Date(user?.createdAt || '2022-01-04T11:14:09.314Z');
@@ -334,7 +339,7 @@ const Profile = (props) => {
                                                 on Sale
                                             </div>
                                         </div>
-                                        <div className="col-sm-4 profileRightMenuItemCol" onClick={() => onMenuItemClick("Collectibles")}>
+                                        {/* <div className="col-sm-4 profileRightMenuItemCol" onClick={() => onMenuItemClick("Collectibles")}>
                                             <div className={
                                                 activeItem == "Collectibles"
                                                     ?
@@ -343,7 +348,7 @@ const Profile = (props) => {
                                                     "profileRightMenuItemNonActive"}>
                                                 Collectibles
                                             </div>
-                                        </div>
+                                        </div> */}
                                         <div className="col-sm-4 profileRightMenuItemCol" onClick={() => onMenuItemClick("Unlisted")}>
                                             <div className={
                                                 activeItem == "Unlisted"
@@ -401,7 +406,7 @@ const Profile = (props) => {
                                                 key={index}
                                                 len={nfts[0]?.length}
                                                 tokenId={myNft?.tokenId}
-                                                owner={myNft?.creator}
+                                                creator={myNft?.creator}
                                                 creatorMongoUId={myNft?.meta?.creatorMongoUId}
                                                 image={myNft?.meta?.image}
                                                 price={myNft?.price}

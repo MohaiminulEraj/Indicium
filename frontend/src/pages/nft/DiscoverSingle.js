@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { ethers } from "ethers";
+import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/Home.css";
 import "../../styles/Responsive.css";
@@ -46,6 +47,7 @@ const DiscoverSingle = (props) => {
   const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
   const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
   const [message, setMessage] = useState("");
+  const [variant, setVariant] = useState("");
   const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN + "/ipfs/";
   const [status, setStatus] = useState(false);
 
@@ -102,6 +104,7 @@ const DiscoverSingle = (props) => {
     console.log('handleAccountsChangedFunc', account);
     if (account.length === 0) {
       setMessage("Please, connect to web3 wallet.");
+      setVariant('danger');
       console.error("Please, connect to Web3 wallet");
     }
     // else if (accounts[0] !== data) {
@@ -236,23 +239,35 @@ const DiscoverSingle = (props) => {
         console.log('account', account);
         try {
           console.log('b4BuyNft');
-          const buyNft = await contract?.buyNft(tokenId, account);
+          const buyNewNft = await contract?.buyNft(tokenId, account,  {
+            value: ethers.utils.parseEther((nfts[0].price).toString())
+        });
+        await buyNewNft.wait(1);
           setMessage('NFT bought successfully');
-          console.log('buyNft', JSON.parse(buyNft));
+          setVariant('success');
+          // console.log('buyNft', JSON.parse(buyNft));
           window.location.href = '/profile'
 
         } catch (error) {
           if (error?.error?.stack) {
-            setMessage(JSON.parse(JSON.stringify(error?.reason)) + "!");
+            // setMessage(JSON.parse(JSON.stringify(error?.reason)) + "!");
             // setMessage(JSON.parse(JSON.stringify(error?.error?.stack))?.substring(57, 81) + "!");
+            setMessage(error.error.message);
+            setVariant('danger');
             console.error(JSON.parse(JSON.stringify(error)));
+          } else {
+            setMessage(JSON.stringify(error));
+            setVariant('danger');
+            console.error(error);
           }
         }
       } else {
         setMessage('You Already Own this NFT!');
+        setVariant('danger');
       }
     } catch (error) {
       setMessage(error);
+      setVariant('danger');
       console.error(error);
     }
     // console.log(event);
@@ -360,13 +375,14 @@ const DiscoverSingle = (props) => {
                 <div className="row dsCol2Row4">
                   <div className="col-sm-1">
                     <div className="dsCol2Row4ProfileWrapper">
-                      <img src={nftOwnerDetails?.avatar?.url || profile} className="dsCol2Row4Profile" />
+                      <Jazzicon diameter={36} seed={jsNumberForAddress(creator)} />
+                      {/* <img src={nftOwnerDetails?.avatar?.url || profile} className="dsCol2Row4Profile" /> */}
                       <div className="dsCol2Row4ProfileDot"></div>
                     </div>
                   </div>
                   <div className="col-sm-2 dsCol2Row4ProfileTitleWrapper">
-                    <div className="dsCol2Row4ProfileTitle">Creator</div>
-                    <div className="dsCol2Row4ProfileTitle2">{nftOwnerDetails?.name || "Steve1889"}</div>
+                    <div className="dsCol2Row4ProfileTitle">Owner</div>
+                    <div className="dsCol2Row4ProfileTitle2">{"0x********" + creator?.slice(-4) || "Steve1889"}</div>
                   </div>
                 </div>
 
@@ -392,7 +408,7 @@ const DiscoverSingle = (props) => {
                     </div>
                   </div>
                   <div className="col-sm-12 mt-4">
-                    {message && <Message variant='danger'>{tokenId !== "myToken" && tokenId !== null && message}</Message>}
+                    {message && <Message variant={variant}>{tokenId !== "myToken" && tokenId !== null && message}</Message>}
                   </div>
 
                 </div>

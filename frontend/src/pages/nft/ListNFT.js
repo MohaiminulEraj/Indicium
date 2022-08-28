@@ -9,6 +9,7 @@ import Footer from "../components/Footer";
 import CustomNavbar from "../components/CustomNavbar";
 import discoverSingleThumbnail from "../../assets/images/NFTSingle.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 import heart from "../../assets/images/heart.png";
 import share from "../../assets/images/share.png";
 import dots from "../../assets/images/dots.png";
@@ -46,6 +47,7 @@ const DiscoverSingle = (props) => {
     const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
     const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
     const [message, setMessage] = useState("");
+    const [variant, setVariant] = useState("");
     const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN + "/ipfs/";
     const [status, setStatus] = useState(false);
     const [price, setPrice] = useState(null);
@@ -86,6 +88,7 @@ const DiscoverSingle = (props) => {
         console.log('handleAccountsChangedFunc', account);
         if (account.length === 0) {
             setMessage("Please, connect to web3 wallet.");
+            setVariant('danger');
             console.error("Please, connect to Web3 wallet");
         }
     }
@@ -134,18 +137,24 @@ const DiscoverSingle = (props) => {
         e.preventDefault();
         if (!price || price === '0') {
             setMessage('Please enter a valid price');
+            setVariant('danger');
             return;
         }
         console.log('hello!')
         // price = ethers.utils.parseEther(price);
         try {
             console.log('b4NftListing');
-            const listNft = await contract?.placeNftOnSale(tokenId, ethers.utils.parseEther(price), account);
+            const listNft = await contract?.placeNftOnSale(tokenId, account,  {
+                value: ethers.utils.parseEther(price.toString())
+            });
+            await listNft.wait(1);
             setMessage('NFT Item Listed successfully');
+            setVariant('success');
             console.log('nftListed', listNft);
             window.location.href = '/profile'
         } catch (error) {
             setMessage(error);
+            setVariant('danger');
             console.error(error);
         }
     }
@@ -251,13 +260,14 @@ const DiscoverSingle = (props) => {
                                     <div className="row dsCol2Row4">
                                         <div className="col-sm-1">
                                             <div className="dsCol2Row4ProfileWrapper">
-                                                <img src={nftOwnerDetails?.avatar?.url || profile} className="dsCol2Row4Profile" />
+                                            <Jazzicon diameter={36} seed={jsNumberForAddress(creator)} />
+                                                {/* <img src={nftOwnerDetails?.avatar?.url || profile} className="dsCol2Row4Profile" /> */}
                                                 <div className="dsCol2Row4ProfileDot"></div>
                                             </div>
                                         </div>
                                         <div className="col-sm-2 dsCol2Row4ProfileTitleWrapper">
-                                            <div className="dsCol2Row4ProfileTitle">Creator</div>
-                                            <div className="dsCol2Row4ProfileTitle2">{nftOwnerDetails?.name || "Steve1889"}</div>
+                                            <div className="dsCol2Row4ProfileTitle">Owner</div>
+                                            <div className="dsCol2Row4ProfileTitle2">{"0x********" + creator?.slice(-4) || "Steve1889"}</div>
                                         </div>
                                         <div className="col-sm-1 dsCol2Row4ProfileTitleWrapper">
                                         </div>
@@ -291,7 +301,7 @@ const DiscoverSingle = (props) => {
                                         </div>
                                     </div> */}
                                     <div className="col-sm-12 mt-4">
-                                        {message && <Message variant='danger'>{message}</Message>}
+                                        {message && <Message variant={variant}>{message}</Message>}
                                     </div>
 
                                 </div>

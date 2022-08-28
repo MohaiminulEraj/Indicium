@@ -5,11 +5,12 @@ import discoverCardRow2Img1 from "../../assets/images/trendingImg6.png";
 import discoverCardRow3Col1Img from "../../assets/images/discoverCardRow3Col1Img.png";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
+import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 // import Image from 'react-bootstrap/Image'
 // import { getUsersNft } from "../../redux/actions/nftActions"
 import axios from 'axios';
 
-const ProfileDiscoverCard = ({ thumbnail, len, tokenId, owner, creatorMongoUId, name, image, price, description, isListed }) => {
+const ProfileDiscoverCard = ({ thumbnail, len, tokenId, creator, creatorMongoUId, name, image, price, description, isListed }) => {
   const dispatch = useDispatch();
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -38,7 +39,7 @@ const ProfileDiscoverCard = ({ thumbnail, len, tokenId, owner, creatorMongoUId, 
   // console.log(nft[0])
   return (
     <>
-      <Link to={isListed ? "/discoverSingle" : "/listNft"} state={{ image, len: `${len} (Yours)`, name: name, price: price, userIdMongo: creatorMongoUId, owner, description, tokenId, nftOwnerDetails: { name: user?.name, avatar: { url: user?.avatar?.url } } }} className="col-sm-4 dicoverCard">
+      <Link to={isListed ? "/discoverSingle" : "/listNft"} state={{ image, len: `${len} (Yours)`, name: name, price: price, userIdMongo: creatorMongoUId, creator, description, tokenId, nftOwnerDetails: { name: user?.name, avatar: { url: user?.avatar?.url } } }} className="col-sm-4 dicoverCard">
         <div className="discoverCardThumbnailWrapper">
           <img src={image || thumbnail} className="popularCardThumbnailImg" />
           {/* <img src={{ uri: blob }} style={{ height: 200, width: null, flex: 1 }} /> */}
@@ -63,13 +64,16 @@ const ProfileDiscoverCard = ({ thumbnail, len, tokenId, owner, creatorMongoUId, 
           <div className="col-sm-8">
             <div className="discoverCardRow2ImgsWrapper">
               <div className="discoverCardRow2ImgContainer" style={{ right: 0 }}>
-                <img src={user?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
+            <Jazzicon diameter={22} seed={jsNumberForAddress(creator)} />
+                {/* <img src={user?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" /> */}
               </div>
               <div className="discoverCardRow2ImgContainer" style={{ right: 10 }}>
-                <img src={user?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
+            <Jazzicon diameter={22} seed={jsNumberForAddress(creator)} />
+                {/* <img src={user?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" /> */}
               </div>
               <div className="discoverCardRow2ImgContainer" style={{ right: 20 }}>
-                <img src={user?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" />
+            <Jazzicon diameter={22} seed={jsNumberForAddress(creator)} />
+                {/* <img src={user?.avatar?.url || discoverCardRow2Img1} className="discoverCardRow2Img" /> */}
               </div>
             </div>
           </div>

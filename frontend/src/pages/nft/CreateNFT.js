@@ -270,9 +270,9 @@ const CreateNFT = (props) => {
                 console.log('accounts', accounts);
             })
             console.log(nftURI);
-            const nftRes = await axios.get(nftURI);
-            console.log('nftRes', nftRes)
-            const content = nftRes.data;
+            // const nftRes = await axios.get(nftURI);
+            // console.log('nftRes', nftRes)
+            // const content = nftRes.data;
 
             console.log('loggedAccount', account)
             const tx = await contract?.mintToken(
