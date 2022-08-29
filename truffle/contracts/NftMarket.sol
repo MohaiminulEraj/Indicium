@@ -144,6 +144,7 @@ contract NftMarket is ERC721URIStorage, Ownable {
 
         _safeMint(account, newTokenId);
         // _safeMint(msg.sender, newTokenId);
+        _idToNftItem[newTokenId].creator = account;
         _setTokenURI(newTokenId, tokenURI);
         _createNftItem(newTokenId, price, account);
         _usedTokenURIs[tokenURI] = true;
@@ -157,22 +158,32 @@ contract NftMarket is ERC721URIStorage, Ownable {
 
         require(_to != owner, "You already own this NFT");
         // require(msg.sender != owner, "You already own this NFT");
-        // require(msg.value == price, "Please submit the asking price");
+        require(
+            msg.value >= _idToNftItem[tokenId].price + listingPrice,
+            "Please submit the asking price"
+        );
 
         _idToNftItem[tokenId].isListed = false;
-        _listedItems.decrement();
-        payable(_idToNftItem[tokenId].creator).transfer(msg.value);
+        uint256 buyingPrice = msg.value - listingPrice;
+        (bool success, ) = owner.call{value: buyingPrice}("");
+        require(success, "Failed to send buying price");
 
         _transfer(owner, _to, tokenId);
         _idToNftItem[tokenId].creator = payable(_to);
-        // _transfer(owner, msg.sender, tokenId);
-        // payable(owner).transfer(_idToNftItem[tokenId].price);
 
-        // payable(owner).transfer(msg.value);
-        payable(owner).transfer(listingPrice);
+        // payable(owner).transfer(listingPrice);
+        (bool successs, ) = address(this).call{value: listingPrice}("");
+        require(successs, "Failed to send listing price");
     }
 
-    function placeNftOnSale(uint256 tokenId, address account) public payable {
+    fallback() external payable {}
+
+    // receive() external payable {}
+    function placeNftOnSale(
+        uint256 tokenId,
+        address account,
+        uint256 price
+    ) public payable {
         require(
             ERC721.ownerOf(tokenId) == account,
             "You are not owner of this nft"
@@ -189,9 +200,12 @@ contract NftMarket is ERC721URIStorage, Ownable {
         //     msg.value == listingPrice,
         //     "Price must be equal to listing price"
         // );
+        // payable(owner).transfer(listingPrice);
+        (bool successs, ) = address(this).call{value: listingPrice}("");
+        require(successs, "Failed to send listing price");
 
         _idToNftItem[tokenId].isListed = true;
-        _idToNftItem[tokenId].price = msg.value;
+        _idToNftItem[tokenId].price = price;
         _listedItems.increment();
     }
 
