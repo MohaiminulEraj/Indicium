@@ -81,10 +81,15 @@ const CreateNFT = (props) => {
     // const contentId = 'QmXVmZoTRgxin2v2aTsVoCjCXW6fg9FzGK1oQ64ZMrqKKB';
     // const metadataURI = `${contentId}/${tokenId}.json`;
     // const imageURI = `https://gateway.pinata.cloud/ipfs/${contentId}/${tokenId}.png`;
-    window.ethereum.send('eth_requestAccounts');
+    // window.ethereum.send('eth_requestAccounts');
     const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-
-    const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+    console.log('ethereum', window.ethereum)
+    console.log(process.env.REACT_APP_CONTRACT_ADDRESS +'\n'+ process.env.REACT_APP_PROVIDER )
+    // const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+    const provider= new ethers.providers.Web3Provider(
+        window.ethereum
+    )
+    provider.send('eth_requestAccounts', []);
 
     // get the end user
     const signer = provider.getSigner();

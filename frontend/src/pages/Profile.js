@@ -53,12 +53,15 @@ const Profile = (props) => {
     const { success } = coverPhotoUpdate
     let nftsFromChain = [];
 
-    window.ethereum.send('eth_requestAccounts');
+    // window.ethereum.send('eth_requestAccounts');
 
     const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
     console.log('contractAddress', contractAddress);
-    const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
-
+    // const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+    const provider= new ethers.providers.Web3Provider(
+        window.ethereum
+    )
+    provider.send('eth_requestAccounts', []);
     // get the end user
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
@@ -262,9 +265,9 @@ const Profile = (props) => {
                                 <div className="profileLeftCardImgWrapper">
                                     <img src={user?.avatar?.url || profileAvatar} style={{ width: '100%', height: '100%' }} />
                                 </div>
-                                <div className="profileLeftCardUsernameText">{user?.name}</div>
+                                <div className="profileLeftCardUsernameText">{userInfo?.email.substr(0, userInfo?.email.indexOf('@')).toUpperCase() || 'User'}</div>
                                 <div style={{ display: 'flex', alignItems: 'baseline' }}>
-                                    <div className="profileLeftCardUsernameText2">0xc4c16a645...b21a</div>
+                                    <div className="profileLeftCardUsernameText2">{"0x*********"+account?.slice(-4)}</div>
                                     <img src={filledIcon} style={{ width: 16, height: 16, marginLeft: 10 }} />
                                 </div>
                                 <div className="profileLeftCardUsernameText3">

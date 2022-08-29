@@ -45,12 +45,16 @@ const DiscoverSingle = (props) => {
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin;
   const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-  const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+  // const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
   const [message, setMessage] = useState("");
   const [variant, setVariant] = useState("");
   const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN + "/ipfs/";
   const [status, setStatus] = useState(false);
 
+  const provider= new ethers.providers.Web3Provider(
+    window.ethereum
+)
+  provider.send('eth_requestAccounts', []);
   const signer = provider.getSigner();
   const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
 
@@ -58,10 +62,6 @@ const DiscoverSingle = (props) => {
   if (!status && account === null) {
     setStatus(true);
   }
-  console.log('contract', contract);
-  // const [nftOwnerDetails, setNftOwnerDetails] = useState({})
-  // const { nftOwner } = nftOwnerDetails
-  // console.log('nftOwner', nftOwner)
   const { state } = useLocation();
   let tokenId = state?.tokenId || null;
   let nftId = state?.id;
@@ -74,22 +74,6 @@ const DiscoverSingle = (props) => {
   let nftOwnerDetails = state?.nftOwnerDetails;
   console.log('nftOwnerDetails', nftOwnerDetails)
 
-  // const { data, mutate, isValidating, ...swr } = useSWR(
-  //   provider ? "web3/useAccount" : null,
-  //   async () => {
-  //     const accounts = await provider?.listAccounts();
-  //     const account = accounts[0];
-  //     // setAccount(accounts[0]);
-  //     if (!account) {
-  //       throw "Cannot retreive account! Please, connect to web3 wallet."
-  //     }
-
-  //     return account;
-  //   }, {
-  //   revalidateOnFocus: false,
-  //   shouldRetryOnError: false
-  // }
-  // )
 
   useEffect(() => {
     if (!tokenId) {
@@ -107,9 +91,6 @@ const DiscoverSingle = (props) => {
       setVariant('danger');
       console.error("Please, connect to Web3 wallet");
     }
-    // else if (accounts[0] !== data) {
-    //   mutate(accounts[0]);
-    // }
   }
 
 
@@ -155,61 +136,22 @@ const DiscoverSingle = (props) => {
 
   const buyNftHandler = async () => {
     try {
-      // const provider = ethers.getDefaultProvider('ropsten');
-      // const wallet = provider.getSigner();
-      // const contract = new ethers.Contract(NftMarket.networks['3'].address, NftMarket.abi, wallet);
-      // const tx = await contract.buyNft(nftId, { value: ethers.utils.parseEther('0.1') });
-      // console.log(tx.hash);
-
-      // window.ethereum.send('eth_requestAccounts');
-
-
-      // const contractAddress = '0xAC868650a24224cd133473F1933e1f5fb7924142';
-      // const contractAddress = '0x079fA92A1D65716a626690556b3FbbA160c4fbc0';
-      // const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-      // console.log('contractAddress', contractAddress);
-      // const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
-
-      // // get the end user
-      // const signer = provider.getSigner();
-      // const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
-
-      // // get the smart contract
-      // console.log(contract)
-      console.log('funct called', tokenId);
       const nfts = [];
       if (tokenId && tokenId !== 'myToken') {
         const coreNfts = await contract?.getNftItem(tokenId);
-        console.log('coreNfts', coreNfts);
-
-        // for (let i = 0; i < coreNfts.length; i++) {
-        //   const item = coreNfts[i];
-        //   console.log('item', item)
-        //   const tokenURI = await contract?.tokenURI(item?.tokenId);
-        //   console.log('tokenURI', tokenURI);
-        //   const metaRes = await fetch(tokenURI);
-        //   // console.log('metaRes', metaRes);
-        //   const meta = await metaRes.json();
-        //   // console.log('meta', meta);
-
-        //   nfts.push({
-        //     price: parseFloat(ethers.utils.formatEther(item.price)),
-        //     tokenId: item.tokenId.toNumber(),
-        //     creator: item.creator,
-        //     isListed: item.isListed,
-        //     meta
-        //   })
-        // }
-
         const tokenURI = await contract?.tokenURI(coreNfts?.tokenId);
         console.log('tokenURI', tokenURI);
         const metaRes = await fetch(tokenURI);
         // console.log('metaRes', metaRes);
         const meta = await metaRes.json();
-        // console.log('meta', meta);
-
+        console.log('meta', meta);
+        // console.log('Uprice:' + parseFloat(ethers.utils.parseEther(coreNfts.price) + ethers.utils.parseEther(0.025)))
+        console.log(parseFloat(ethers.utils.formatEther(coreNfts.price.toString())) + parseFloat(ethers.utils.formatEther(ethers.utils.parseUnits((0.025).toString()))) );
+        console.log('Uprice: ' +  ethers.utils.formatEther(ethers.utils.parseUnits((0.025).toString())));
+        let askingPrice = parseFloat(ethers.utils.formatEther(coreNfts.price.toString())) + parseFloat(ethers.utils.formatEther(ethers.utils.parseUnits((0.025).toString())));
+        console.log({askingPrice})
         nfts.push({
-          price: parseFloat(ethers.utils.formatEther(coreNfts.price)),
+          price: askingPrice,
           tokenId: coreNfts.tokenId.toNumber(),
           creator: coreNfts.creator,
           isListed: coreNfts.isListed,
@@ -239,26 +181,29 @@ const DiscoverSingle = (props) => {
         console.log('account', account);
         try {
           console.log('b4BuyNft');
+          console.log('msg.val', ethers.utils.parseEther((nfts[0].price).toString()))
           const buyNewNft = await contract?.buyNft(tokenId, account,  {
             value: ethers.utils.parseEther((nfts[0].price).toString())
-        });
-        await buyNewNft.wait(1);
+          });
+        await buyNewNft.wait();
+          console.log('tx', buyNewNft);
+          // setMessage(nfts[0].price.toString());
           setMessage('NFT bought successfully');
           setVariant('success');
           // console.log('buyNft', JSON.parse(buyNft));
-          window.location.href = '/profile'
+          // window.location.href = '/profile'
 
         } catch (error) {
-          if (error?.error?.stack) {
+          if (error?.reason) {
             // setMessage(JSON.parse(JSON.stringify(error?.reason)) + "!");
             // setMessage(JSON.parse(JSON.stringify(error?.error?.stack))?.substring(57, 81) + "!");
-            setMessage(error.error.message);
+            console.error({error});
+            setMessage(error?.reason);
             setVariant('danger');
-            console.error(JSON.parse(JSON.stringify(error)));
           } else {
             setMessage(JSON.stringify(error));
             setVariant('danger');
-            console.error(error);
+            console.error({error});
           }
         }
       } else {

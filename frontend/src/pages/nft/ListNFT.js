@@ -45,13 +45,17 @@ const DiscoverSingle = (props) => {
     const userLogin = useSelector((state) => state.userLogin)
     const { userInfo } = userLogin;
     const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-    const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+    // const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
     const [message, setMessage] = useState("");
     const [variant, setVariant] = useState("");
     const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN + "/ipfs/";
     const [status, setStatus] = useState(false);
     const [price, setPrice] = useState(null);
 
+    const provider= new ethers.providers.Web3Provider(
+        window.ethereum
+    )
+      provider.send('eth_requestAccounts', []);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
 
@@ -82,14 +86,18 @@ const DiscoverSingle = (props) => {
     }, [tokenId])
 
     const handleAccountsChanged = async () => {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const account = accounts[0];
-        setAccount(accounts[0]);
-        console.log('handleAccountsChangedFunc', account);
-        if (account.length === 0) {
-            setMessage("Please, connect to web3 wallet.");
-            setVariant('danger');
-            console.error("Please, connect to Web3 wallet");
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+            setAccount(accounts[0]);
+            console.log('handleAccountsChangedFunc', account);
+            if (account.length === 0) {
+                setMessage("Please, connect to web3 wallet.");
+                setVariant('danger');
+                console.error("Please, connect to Web3 wallet");
+            }   
+        } catch (error) {
+            console.log(error);
         }
     }
 
@@ -102,20 +110,20 @@ const DiscoverSingle = (props) => {
         // }
     })
     console.log('loggedMetaMaskAccount', account)
-    async function getNftMetaData(ipfsDataLink) {
-        const config = {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        }
-        let res = null;
-        if (ipfsDataLink) {
-            res = await axios.get(ipfsDataLink, config);
-        }
-        console.log(res?.data);
-        setNftMetadata(res?.data || null)
-    }
+    // async function getNftMetaData(ipfsDataLink) {
+    //     const config = {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json',
+    //         },
+    //     }
+    //     let res = null;
+    //     if (ipfsDataLink) {
+    //         res = await axios.get(ipfsDataLink, config);
+    //     }
+    //     console.log(res?.data);
+    //     setNftMetadata(res?.data || null)
+    // }
 
     // async function getNftOwnerDetails(nftOwner) {
     //   await axios.get(`/api/profile/nftOwner/${nftOwner}`).then(res => {
@@ -143,19 +151,21 @@ const DiscoverSingle = (props) => {
         console.log('hello!')
         // price = ethers.utils.parseEther(price);
         try {
+            // setPrice(parseFloat(ethers.utils.parseEther(price?.toString())));
+            console.log(parseFloat(ethers.utils.parseEther(price?.toString())))
             console.log('b4NftListing');
-            const listNft = await contract?.placeNftOnSale(tokenId, account,  {
-                value: ethers.utils.parseEther(price.toString())
+            const listNft = await contract?.placeNftOnSale(tokenId, account, ethers.utils.parseEther(price?.toString()), {
+                value: ethers.utils.parseEther(0.025.toString())
             });
-            await listNft.wait(1);
+            await listNft.wait();
             setMessage('NFT Item Listed successfully');
             setVariant('success');
             console.log('nftListed', listNft);
             window.location.href = '/profile'
         } catch (error) {
-            setMessage(error);
-            setVariant('danger');
             console.error(error);
+            // setMessage(error);
+            // setVariant('danger');
         }
     }
 
