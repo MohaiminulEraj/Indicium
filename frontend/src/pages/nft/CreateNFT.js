@@ -292,11 +292,13 @@ const CreateNFT = (props) => {
             await tx.wait();
             console.log('tx', tx)
             if (tx) {
-                dispatch(saveNftDetails(user?._id, nftURI, image))
+                setLoading(false);
                 setMessage('NFT Minted successfully!');
+                dispatch(saveNftDetails(user?._id, nftURI, image))
+                window.location.href = '/profile'
             }
-            setLoading(false);
         } catch (e) {
+            setLoading(false);
             setMessage(e.message);
             console.error(e.message);
         }

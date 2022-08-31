@@ -186,12 +186,14 @@ const DiscoverSingle = (props) => {
             value: ethers.utils.parseEther((nfts[0].price).toString())
           });
         await buyNewNft.wait();
-          console.log('tx', buyNewNft);
+          // console.log('tx', buyNewNft);
           // setMessage(nfts[0].price.toString());
+          if(buyNewNft){
           setMessage('NFT bought successfully');
           setVariant('success');
+          window.location.href = '/profile'
           // console.log('buyNft', JSON.parse(buyNft));
-          // window.location.href = '/profile'
+        }
 
         } catch (error) {
           if (error?.reason) {

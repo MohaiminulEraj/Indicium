@@ -152,16 +152,18 @@ const DiscoverSingle = (props) => {
         // price = ethers.utils.parseEther(price);
         try {
             // setPrice(parseFloat(ethers.utils.parseEther(price?.toString())));
-            console.log(parseFloat(ethers.utils.parseEther(price?.toString())))
-            console.log('b4NftListing');
+            // console.log(parseFloat(ethers.utils.parseEther(price?.toString())))
+            // console.log('b4NftListing');
             const listNft = await contract?.placeNftOnSale(tokenId, account, ethers.utils.parseEther(price?.toString()), {
                 value: ethers.utils.parseEther(0.025.toString())
             });
             await listNft.wait();
-            setMessage('NFT Item Listed successfully');
-            setVariant('success');
-            console.log('nftListed', listNft);
-            window.location.href = '/profile'
+            // console.log('nftListed', listNft);
+            if(listNft){
+                setMessage('NFT Item Listed successfully');
+                setVariant('success');
+                window.location.href = '/profile'
+            }
         } catch (error) {
             console.error(error);
             // setMessage(error);
