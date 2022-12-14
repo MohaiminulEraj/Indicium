@@ -2,8 +2,8 @@ import asyncHandler from 'express-async-handler';
 import generateToken from '../utils/generateToken.js';
 import User from '../models/User.js';
 import gravatar from 'gravatar';
-import nodemailer from 'nodemailer';
-import sendgridTransport from 'nodemailer-sendgrid-transport';
+// import nodemailer from 'nodemailer';
+// import sendgridTransport from 'nodemailer-sendgrid-transport';
 import sgMail from '@sendgrid/mail'
 import normalize from 'normalize-url';
 import crypto from 'crypto';
@@ -11,12 +11,12 @@ import dotenv from 'dotenv';
 import twilio from 'twilio';
 dotenv.config()
 
-const transporter = nodemailer.createTransport(sendgridTransport({
-    auth: {
-        api_key: process.env.SENDGRID_API_KEY
-    }
-}))
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+// const transporter = nodemailer.createTransport(sendgridTransport({
+//     auth: {
+//         api_key: process.env.SENDGRID_API_KEY
+//     }
+// }))
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login

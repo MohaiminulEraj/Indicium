@@ -146,9 +146,10 @@ const DiscoverSingle = (props) => {
         const meta = await metaRes.json();
         console.log('meta', meta);
         // console.log('Uprice:' + parseFloat(ethers.utils.parseEther(coreNfts.price) + ethers.utils.parseEther(0.025)))
+        console.log('price', (parseFloat(ethers.utils.formatEther(coreNfts.price.toString())) + 0.025).toFixed(3))
         console.log(parseFloat(ethers.utils.formatEther(coreNfts.price.toString())) + parseFloat(ethers.utils.formatEther(ethers.utils.parseUnits((0.025).toString()))) );
         console.log('Uprice: ' +  ethers.utils.formatEther(ethers.utils.parseUnits((0.025).toString())));
-        let askingPrice = parseFloat(ethers.utils.formatEther(coreNfts.price.toString())) + parseFloat(ethers.utils.formatEther(ethers.utils.parseUnits((0.025).toString())));
+        let askingPrice = (parseFloat(ethers.utils.formatEther(coreNfts.price.toString())) + parseFloat(ethers.utils.formatEther(ethers.utils.parseUnits((0.025).toString())))).toFixed(3);
         console.log({askingPrice})
         nfts.push({
           price: askingPrice,
@@ -163,7 +164,7 @@ const DiscoverSingle = (props) => {
       }
       return null;
     } catch (error) {
-      setMessage(error);
+      setMessage(error?.message);
       console.error(error);
     }
   }
@@ -203,7 +204,7 @@ const DiscoverSingle = (props) => {
             setMessage(error?.reason);
             setVariant('danger');
           } else {
-            setMessage(JSON.stringify(error));
+            setMessage(error?.message);
             setVariant('danger');
             console.error({error});
           }
@@ -213,7 +214,7 @@ const DiscoverSingle = (props) => {
         setVariant('danger');
       }
     } catch (error) {
-      setMessage(error);
+      setMessage(error?.message);
       setVariant('danger');
       console.error(error);
     }

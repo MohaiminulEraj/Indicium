@@ -9,7 +9,6 @@ import { getUserDetails, getNftOwner } from "../../redux/actions/userActions"
 import axios from "axios";
 // import jazzicon from "@metamask/jazzicon"
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
-import canvas from "canvas";
 import dotenv from 'dotenv';
 dotenv.config();
 

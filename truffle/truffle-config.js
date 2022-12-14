@@ -50,11 +50,11 @@ module.exports = {
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
     },
-    ropsten: {
-      provider: () => new HDWalletProvider(MNEMONIC, INFURA_API_KEY),
-      network_id: 3,
-      gas: 5500000
-    }
+    // ropsten: {
+    //   provider: () => new HDWalletProvider(MNEMONIC, INFURA_API_KEY),
+    //   network_id: 3,
+    //   gas: 5500000
+    // }
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port

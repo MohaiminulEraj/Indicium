@@ -57,14 +57,14 @@ const Profile = (props) => {
 
     const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
     console.log('contractAddress', contractAddress);
-    // const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
-    const provider= new ethers.providers.Web3Provider(
-        window.ethereum
-    )
-    provider.send('eth_requestAccounts', []);
+    const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
+    // const provider= new ethers.providers.Web3Provider(
+    //     window.ethereum
+    // )
+    // provider.send('eth_requestAccounts', []);
     // get the end user
     const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
+    const contract = new ethers.Contract(contractAddress, NftMarket.abi, provider);
 
     const dispatch = useDispatch();
     window.ethereum.on('accountsChanged', function (accounts) {

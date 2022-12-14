@@ -41,9 +41,6 @@ const Discover = (props) => {
   const signer = provider.getSigner();
   const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
 
-  // get the smart contract
-  console.log({contract})
-
   const getNftData = async () => {
     try {
       // const provider = ethers.getDefaultProvider('ropsten');

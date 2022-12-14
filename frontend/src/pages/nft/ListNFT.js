@@ -51,11 +51,12 @@ const DiscoverSingle = (props) => {
     const pinataDomain = process.env.REACT_APP_PINATA_DOMAIN + "/ipfs/";
     const [status, setStatus] = useState(false);
     const [price, setPrice] = useState(null);
+    const provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_PROVIDER);
 
-    const provider= new ethers.providers.Web3Provider(
-        window.ethereum
-    )
-      provider.send('eth_requestAccounts', []);
+    // const provider= new ethers.providers.Web3Provider(
+    //     window.ethereum
+    // )
+    //   provider.send('eth_requestAccounts', []);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, NftMarket.abi, signer);
 
