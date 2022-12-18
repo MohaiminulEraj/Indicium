@@ -30,12 +30,8 @@ contract NftMarket is ERC721URIStorage, Ownable {
     mapping(string => bool) private _usedTokenURIs;
     mapping(uint256 => NftItem) private _idToNftItem;
 
-    mapping(address => mapping(uint256 => uint256)) private _ownedTokens;
-    mapping(uint256 => uint256) private _idToOwnedIndex;
-
     uint256[] private _allNftsToken;
     
-    mapping(uint256 => uint256) private _idToNftIndex;
 
     event NftItemCreated(
         uint256 tokenId,
@@ -45,14 +41,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
     );
 
     constructor() ERC721("AnchorNft", "ANCHOR") {}
-
-    // function _baseURI() internal pure override returns (string memory) {
-    //     return "ipfs://";
-    // }
-
-    // function returnLength() public returns(uint){
-    //     return _idToNftItem.length;
-    // }
 
 
     function safeMint(address to, string memory uri) public onlyOwner {
@@ -88,14 +76,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return _allNftsToken[index];
     }
 
-    function tokenOfOwnerByIndex(address owner, uint256 index)
-        public
-        view
-        returns (uint256)
-    {
-        require(index < ERC721.balanceOf(owner), "Index out of bounds");
-        return _ownedTokens[owner][index];
-    }
 
     function getAllNftsOnSale() public view returns (NftItem[] memory) {
         uint256 allItemsCounts = totalSupply();
@@ -136,24 +116,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
         return items;
     }
 
-    // function getOwnedNfts(address account)
-    //     public
-    //     view
-    //     returns (NftItem[] memory)
-    // {
-    //     uint256 ownedItemsCount = ERC721.balanceOf(account);
-    //     // uint256 ownedItemsCount = ERC721.balanceOf(msg.sender);
-    //     NftItem[] memory items = new NftItem[](ownedItemsCount);
-
-    //     for (uint256 i = 0; i < ownedItemsCount; i++) {
-    //         uint256 tokenId = tokenOfOwnerByIndex(account, i);
-    //         // uint256 tokenId = tokenOfOwnerByIndex(msg.sender, i);
-    //         NftItem storage item = _idToNftItem[tokenId];
-    //         items[i] = item;
-    //     }
-
-    //     return items;
-    // }
 
     function mintToken(
         string memory tokenURI,
@@ -173,8 +135,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
         _listedItems.increment();
         _owendNftsToken[account]++;
         uint256 newTokenId = _tokenIds.current();
-        
-        // _addTokenToOwnerEnumeration(account, newTokenId);
 
         _safeMint(account, newTokenId);
         // _safeMint(msg.sender, newTokenId);
@@ -190,10 +150,9 @@ contract NftMarket is ERC721URIStorage, Ownable {
         require(_to != address(0));
 
         address owner = ERC721.ownerOf(tokenId);
-        // uint256 price = _idToNftItem[tokenId].price;
 
         require(_to != owner, "You already own this NFT");
-        // require(msg.sender != owner, "You already own this NFT");
+
         require(
             msg.value >= _idToNftItem[tokenId].price + listingPrice,
             "Please submit the asking price with fee price of 0.025 eth"
@@ -210,7 +169,6 @@ contract NftMarket is ERC721URIStorage, Ownable {
         _transfer(owner, _to, tokenId);
         _idToNftItem[tokenId].creator = payable(_to);
 
-        // payable(owner).transfer(listingPrice);
         (bool successs, ) = address(this).call{value: listingPrice}("");
         require(successs, "Failed to send listing price");
     }
@@ -228,19 +186,10 @@ contract NftMarket is ERC721URIStorage, Ownable {
             ERC721.ownerOf(tokenId) == account,
             "You are not owner of this nft"
         );
-        // require(
-        //     ERC721.ownerOf(tokenId) == msg.sender,
-        //     "You are not owner of this nft"
-        // );
         require(
             _idToNftItem[tokenId].isListed == false,
             "Item is already on sale"
         );
-        // require(
-        //     msg.value == listingPrice,
-        //     "Price must be equal to listing price"
-        // );
-        // payable(owner).transfer(listingPrice);
         (bool successs, ) = address(this).call{value: listingPrice}("");
         require(successs, "Failed to send listing price");
         _idToNftItem[tokenId].isListed = true;
@@ -270,91 +219,4 @@ contract NftMarket is ERC721URIStorage, Ownable {
     function count() public view returns (uint256) {
         return _tokenIdCounter.current();
     }
-
-    //// Burn Functionalities 
-    // function _beforeTokenTransfer(
-    //     address from,
-    //     address to,
-    //     uint256 tokenId
-    // ) internal virtual {
-    //     super._beforeTokenTransfer(from, to, tokenId);
-
-    //     if (from != address(0)) {
-    //         _addTokenToAllTokensEnumeration(tokenId);
-    //     } else if (from != to) {
-    //         _removeTokenFromOwnerEnumeration(from, tokenId);
-    //     }
-
-    //     if (from != to) {
-    //         _removeTokenFromOwnerEnumeration(from, tokenId);
-    //     }
-
-    //     if (to != address(0)) {
-    //         _removeTokenFromAllTokensEnumeration(tokenId);
-    //     } else if (to != from) {
-    //         _addTokenToOwnerEnumeration(to, tokenId);
-    //     }
-
-    //     if (to != from) {
-    //         _addTokenToOwnerEnumeration(to, tokenId);
-    //     }
-    // }
-
-    // function _addTokenToAllTokensEnumeration(uint256 tokenId) private {
-    //     _idToNftIndex[tokenId] = _allNfts.length;
-    //     _allNfts.push(tokenId);
-    // }
-
-    // function _addTokenToOwnerEnumeration(address to, uint256 tokenId) private {
-    //     uint256 length = ERC721.balanceOf(to);
-    //     _ownedTokens[to][length] = tokenId;
-    //     _idToOwnedIndex[tokenId] = length;
-    // }
-
-    // function _removeTokenFromOwnerEnumeration(address from, uint256 tokenId)
-    //     private
-    // {
-    //     uint256 lastTokenIndex = ERC721.balanceOf(from) - 1;
-    //     uint256 tokenIndex = _idToOwnedIndex[tokenId];
-
-    //     if (tokenIndex != lastTokenIndex) {
-    //         uint256 lastTokenId = _ownedTokens[from][lastTokenIndex];
-
-    //         _ownedTokens[from][tokenIndex] = lastTokenId;
-    //         _idToOwnedIndex[lastTokenId] = tokenIndex;
-    //     }
-
-    //     delete _idToOwnedIndex[tokenId];
-    //     delete _ownedTokens[from][lastTokenIndex];
-    // }
-
-    // function _removeTokenFromAllTokensEnumeration(uint256 tokenId) private {
-    //     uint256 lastTokenIndex = _allNfts.length - 1;
-    //     uint256 tokenIndex = _idToNftIndex[tokenId];
-    //     uint256 lastTokenId = _allNfts[lastTokenIndex];
-
-    //     _allNfts[tokenIndex] = lastTokenId;
-    //     _idToNftIndex[lastTokenId] = tokenIndex;
-
-    //     delete _idToNftIndex[tokenId];
-    //     _allNfts.pop();
-    // }
-
-    // The following functions are overrides required by Solidity.
-
-    // function _burn(uint256 tokenId)
-    //     internal
-    //     override(ERC721, ERC721URIStorage)
-    // {
-    //     super._burn(tokenId);
-    // }
-
-    // function tokenURI(uint256 tokenId)
-    //     public
-    //     view
-    //     override(ERC721, ERC721URIStorage)
-    //     returns (string memory)
-    // {
-    //     return super.tokenURI(tokenId);
-    // }
 }
